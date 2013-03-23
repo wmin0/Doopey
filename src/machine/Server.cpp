@@ -1,10 +1,14 @@
 #include "machine/Server.h"
 
+#include "config/Config.h"
+#include "config/ConfigLoader.h"
+
 #include <iostream>
 
 using namespace Doopey;
 
-Server::Server() {
+Server::Server(const char* configPath) {
+
 }
 
 Server::~Server() {

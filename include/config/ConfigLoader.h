@@ -1,5 +1,5 @@
-#ifndef _DOOPEY_H_
-#define _DOOPEY_H_
+#ifndef _DOOPEY_CONFIG_LOADER_H_
+#define _DOOPEY_CONFIG_LOADER_H_
 
 namespace Doopey {
 

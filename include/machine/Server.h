@@ -10,10 +10,12 @@ namespace Doopey {
   class FileManager;
   class Logger;
 
+  Logger* log;
+
   class Server {
 
     public:
-      Server();
+      Server(const char* configPath);
       ~Server();
       bool start();
 
