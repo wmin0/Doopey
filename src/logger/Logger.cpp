@@ -5,14 +5,11 @@
 #include <cstdarg>
 #include <string>
 
-#include <iostream>
-
 using namespace Doopey;
-using std::string;
 
 Logger::Logger(LogLevel level, const char* dir):
   _level(level), _dir(dir) {
-  
+
   if ("" == _dir) {
     _logFile = stderr;
     return;
@@ -27,8 +24,6 @@ Logger::Logger(LogLevel level, const char* dir):
 
   string tmp = _dir;
   tmp += name;
-
-  std::cerr << "here!" << std::endl;
 
   _logFile = fopen(tmp.data(), "w");
 }
