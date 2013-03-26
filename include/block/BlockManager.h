@@ -1,6 +1,8 @@
 #ifndef _DOOPEY_BLOCK_MANAGER_H_
 #define _DOOPEY_BLOCK_MANAGER_H_
 
+#include <cstdint>
+
 namespace Doopey {
 
   class Router;
@@ -15,7 +17,7 @@ namespace Doopey {
       ~BlockManager();
 
       // request handle interface
-      // ex. getBlock
+      Block* getBlock(uint64_t id) { return NULL; }
 
     private:
       Router* _router;

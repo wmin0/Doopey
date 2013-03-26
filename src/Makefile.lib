@@ -1,0 +1,8 @@
+LIBNAME=lib$(PKGNAME).a
+TARGET=$(LIBDIR)/$(LIBNAME)
+
+target: $(TARGET)
+
+$(TARGET): $(OBJS)
+	@echo "Building $(LIBNAME)"
+	@$(AR) $@ $(OBJS)

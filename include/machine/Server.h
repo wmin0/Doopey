@@ -3,14 +3,11 @@
 
 namespace Doopey {
 
-  class Config;
+  class SectionCollection;
   class BlockManager;
   class Dispather;
   class Router;
   class FileManager;
-  class Logger;
-
-  Logger* log;
 
   class Server {
 
@@ -20,8 +17,7 @@ namespace Doopey {
       bool start();
 
     private:
-      Logger* _logger;
-      Config* _config;
+      SectionCollection* _sectionCollection;
       BlockManager* _blockManager;
       Dispather* _dispather;
       Router* _router;

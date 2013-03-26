@@ -3,6 +3,19 @@
 
 namespace Doopey {
 
+  class Config;
+  class SectionCollection;
+
+  class ConfigLoader {
+
+    public:
+      ConfigLoader() {}
+      ~ConfigLoader() {}
+
+      SectionCollection* loadConfig(const char* path);
+
+    private:
+  }; // class ConfigLoader
 
 };  // namespace Doopey
 

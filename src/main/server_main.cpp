@@ -3,7 +3,7 @@
 using namespace Doopey;
 
 int main() {
-  Server server;
+  Server server("");
   server.start();
   return 0;
 }

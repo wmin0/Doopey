@@ -1,0 +1,29 @@
+CXX=g++ -std=c++11
+CCC=gcc
+AR=ar cr
+EXTINCLUDE=../../include
+LIBDIR=../../lib
+
+SRCS=$(wildcard *.cpp) $(wildcard *.c)
+OBJS=$(addsuffix .o, $(basename $(SRCS)))
+
+CFLAGS=-g -Wall $(PAKGFLAG)
+
+.PHONY: depend
+
+%.o: %.cpp
+	@echo "> compiling: $<"
+	@$(CXX) $(CFLAGS) -I$(EXTINCLUDE) -c -o $@ $<
+%.o: %.c
+	@echo "> compiling: $<"
+	@$(CCC) $(CFLAGS) -I$(EXTINCLUDE) -c -o $@ $<
+
+top: target
+
+clean:
+	@rm -f $(OBJS)
+
+#depend: .depend.mak
+#.depend.mak: $(SRCS)
+#	@$(CXX) -MM $(EXTINCLUDE) $(SRCS) > $@
+#include .depend.mak
