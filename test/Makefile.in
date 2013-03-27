@@ -21,4 +21,4 @@ CFLAGS=-g -Wall $(PAKGFLAG)
 top: target
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(TARGET)

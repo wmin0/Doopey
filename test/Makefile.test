@@ -1,0 +1,15 @@
+PKGFLAG=
+
+TARGET=$(basename $(wildcard *Main.cpp))
+
+target: $(TARGET)
+
+%Main: %.o %Main.o
+	@echo "> building $@"
+	@$(CXX) $(CFLAFS) -I. -I$(EXTINCLUDE) $< $@.o -L$(LIBDIR) $(INCLIB) -lcppunit -o $@
+
+run:
+	@for test in $(TARGET); do \
+		echo "> runing $$test"; \
+		./$$test; \
+	done
