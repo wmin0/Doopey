@@ -12,6 +12,7 @@ namespace Doopey {
       ConfigLoader() {}
       ~ConfigLoader() {}
 
+      // TODO: consider to be static
       SectionCollection* loadConfig(const char* path);
 
     private:

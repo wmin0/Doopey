@@ -1,17 +1,22 @@
 #ifndef _DOOPEY_SECTION_COLLECTION_H_
 #define _DOOPEY_SECTION_COLLECTION_H_
 
+#include <memory>
+
+using std::shared_ptr;
+
 namespace Doopey {
 
   class Config;
   class ConfigLoader;
 
   class SectionCollection {
+    typedef shared_ptr<Config> ConfigSPtr;
 
     public:
       ~SectionCollection() {}
 
-      Config* getConfig(const char* section) { return 0; }
+      ConfigSPtr getConfig(const char* section) { return NULL; }
 
     private:
       SectionCollection() {}

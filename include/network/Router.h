@@ -1,33 +1,48 @@
 #ifndef _DOOPEY_ROUTER_H_
 #define _DOOPEY_ROUTER_H_
 
-#include <pthread.h>
+#include "common/Doopey.h"
+
 #include <cstdint>
 #include <map>
+#include <memory>
+#include <pthread.h>
 #include <string>
+
+using std::map;
+using std::shared_ptr;
+using std::string;
 
 namespace Doopey {
 
-  class Router {
-    using std::map;
-    using std::string;
+  class Config;
 
+  class Router {
+    typedef shared_ptr<Config> ConfigSPtr;
+ 
     public:
-      Router() {}
-      ~Router() {}
+      Router(const ConfigSPtr& config);
+      ~Router();
+
+      // we need pass this to pthread, so we can't do so in constructor
+      bool start();
+      bool stop();
 
       // putRequest(class)
 
-      // startThread();
 
     private:
-      static void* threadFunc(void* obj) {
-        ((Router*)obj)->mainLoop();
-      }
-      void mainLoop();
+      static void* threadFunc(void* obj);
+
+      void* mainLoop();
+
+      static void handleTERM(int sig);
+      static Router* _this;
 
     private:
       pthread_t _thread;
+      ThreadState _threadState;
+
       map<uint64_t, string> _routingTable;
       // queue requestQueue;
   }; // class Router

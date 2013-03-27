@@ -13,7 +13,7 @@ namespace Doopey {
   class Config {
 
     public:
-      string getConfig(const char* key) { return ""; }
+      string getValue(const char* key) { return ""; }
 
     private:
       ~Config() {}

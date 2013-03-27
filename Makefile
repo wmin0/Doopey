@@ -3,7 +3,7 @@ SRCPKGS=machine network file block config logger common
 TESTPKGS=logger
 LIBPKGS=$(EXTPKGS) $(SRCPKGS)
 
-LIBS=$(addprefix -l, $(LIBPKGS))
+LIBS=$(addprefix -l, $(LIBPKGS)) -pthread
 SRCLIBS=$(addsuffix .a, $(addprefix lib, $(SRCPKGS)))
 
 MAIN=main
@@ -19,7 +19,7 @@ libs:
 
 main:
 	@echo "checking $(MAIN)"
-	@make -C src/$(MAIN) --no-print-directory INCLIB="$(LIBS)"
+	@make -C src/$(MAIN) --no-print-directory INCLIB="$(LIBS)" SRCLIBS="$(SRCLIBS)";
 
 utest:
 	@for pkg in $(TESTPKGS); do \
