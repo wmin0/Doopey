@@ -2,6 +2,7 @@
 #define _DOOPEY_SERVER_H_
 
 #include <memory>
+#include <pthread.h>
 
 using std::shared_ptr;
 
@@ -26,11 +27,20 @@ namespace Doopey {
       bool start();
 
     private:
+      void attachSignal();
+      void detachSignal();
+      void serve();
+
       SectionCollectionSPtr _sectionCollection;
       BlockManagerSPtr _blockManager;
       DispatherSPtr _dispather;
       RouterSPtr _router;
       FileManagerSPtr _fileManager;
+      pthread_t _thread;
+
+      static Server* _this;
+      static void handleTERM(int sig);
+      static void handleSREQ(int sig);
 
   }; // class Server
 

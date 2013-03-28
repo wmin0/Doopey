@@ -36,7 +36,8 @@ namespace Doopey {
 
       void* mainLoop();
 
-      static void handleTERM(int sig);
+      static void handleRSTOP(int sig);
+      static void handleRREQ(int sig);
       static Router* _this;
 
     private:

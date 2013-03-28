@@ -1,11 +1,12 @@
 #include "LoggerTest.h"
 
+#include "common/DoopeyTest.h"
+#include "logger/Logger.h"
+
+#include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
-#include <cppunit/TestAssert.h>
-
-#include "logger/Logger.h"
 
 using namespace Doopey;
 
@@ -18,9 +19,7 @@ void LoggerTest::testLog() {
 }
 
 CppUnit::Test* LoggerTest::suite() {
-  CppUnit::TestSuite* suiteOfTests = new CppUnit::TestSuite("LoggerTest");
-  suiteOfTests->addTest(new CppUnit::TestCaller<LoggerTest>(
-                        "testLog",
-                        &LoggerTest::testLog));
-  return suiteOfTests;
+  CppUnit::TestSuite* suite = new CppUnit::TestSuite("LoggerTest");
+  addUnitTest(suite, LoggerTest, testLog);
+  return suite;
 }
