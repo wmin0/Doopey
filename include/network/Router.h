@@ -19,7 +19,7 @@ namespace Doopey {
 
   class Router {
     typedef shared_ptr<Config> ConfigSPtr;
- 
+
     public:
       Router(const ConfigSPtr& config);
       ~Router();
@@ -33,14 +33,14 @@ namespace Doopey {
 
     private:
       static void* threadFunc(void* obj);
+      static void handleRSTOP(int sig);
+      static void handleRREQ(int sig);
 
       void* mainLoop();
 
-      static void handleRSTOP(int sig);
-      static void handleRREQ(int sig);
+    private:
       static Router* _this;
 
-    private:
       pthread_t _thread;
       ThreadState _threadState;
 

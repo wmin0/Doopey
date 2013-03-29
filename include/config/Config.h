@@ -7,8 +7,8 @@ using std::string;
 
 namespace Doopey {
 
-  class SectionCollection;
   class ConfigLoader;
+  class SectionCollection;
 
   class Config {
 

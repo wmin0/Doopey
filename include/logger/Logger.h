@@ -4,16 +4,16 @@
 #include <string>
 #include <cstdarg>
 
+using std::string;
+
 namespace Doopey {
 
-  using std::string;
-
   enum LogLevel {
-    None = 0,
-    Error = 1,
-    Warning = 2,
-    Info = 3,
-    Debug = 4
+    LL_None = 0,
+    LL_Error = 1,
+    LL_Warning = 2,
+    LL_Info = 3,
+    LL_Debug = 4
   }; // enum LogLevel
 
   class Logger {
@@ -29,6 +29,7 @@ namespace Doopey {
     private:
       void writeLog(LogLevel level, const char* format, va_list ap);
 
+    private:
       LogLevel _level;
       string _dir;
       FILE* _logFile;

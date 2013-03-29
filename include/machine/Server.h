@@ -9,7 +9,7 @@ using std::shared_ptr;
 namespace Doopey {
 
   class BlockManager;
-  class Dispather;
+  class Dispatcher;
   class FileManager;
   class Router;
   class SectionCollection;
@@ -17,7 +17,7 @@ namespace Doopey {
   class Server {
     typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
     typedef shared_ptr<BlockManager> BlockManagerSPtr;
-    typedef shared_ptr<Dispather> DispatherSPtr;
+    typedef shared_ptr<Dispatcher> DispatcherSPtr;
     typedef shared_ptr<Router> RouterSPtr;
     typedef shared_ptr<FileManager> FileManagerSPtr;
 
@@ -27,20 +27,22 @@ namespace Doopey {
       bool start();
 
     private:
+      static void handleTERM(int sig);
+      static void handleSREQ(int sig);
+
       void attachSignal();
       void detachSignal();
       void serve();
 
+    private:
+      static Server* _this;
+
       SectionCollectionSPtr _sectionCollection;
       BlockManagerSPtr _blockManager;
-      DispatherSPtr _dispather;
+      DispatcherSPtr _dispatcher;
       RouterSPtr _router;
       FileManagerSPtr _fileManager;
       pthread_t _thread;
-
-      static Server* _this;
-      static void handleTERM(int sig);
-      static void handleSREQ(int sig);
 
   }; // class Server
 

@@ -1,8 +1,8 @@
 #include "logger/Logger.h"
 
+#include <cstdarg>
 #include <cstdio>
 #include <ctime>
-#include <cstdarg>
 #include <string>
 
 using namespace Doopey;
@@ -14,7 +14,6 @@ Logger::Logger(LogLevel level, const char* dir):
     _logFile = stderr;
     return;
   }
-
 
   time_t cur;
   time(&cur);
@@ -35,28 +34,28 @@ Logger::~Logger() {
 void Logger::error(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  writeLog(Error, format, ap);
+  writeLog(LL_Error, format, ap);
   va_end(ap);
 }
 
 void Logger::warning(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  writeLog(Warning, format, ap);
+  writeLog(LL_Warning, format, ap);
   va_end(ap);
 }
 
 void Logger::info(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  writeLog(Info, format, ap);
+  writeLog(LL_Info, format, ap);
   va_end(ap);
 }
 
 void Logger::debug(const char* format, ...) {
   va_list ap;
   va_start(ap, format);
-  writeLog(Debug, format, ap);
+  writeLog(LL_Debug, format, ap);
   va_end(ap);
 }
 
@@ -66,16 +65,16 @@ void Logger::writeLog(LogLevel level, const char* format, va_list ap) {
   }
 
   switch (level) {
-    case Error:
+    case LL_Error:
       fprintf(_logFile, "[Error] ");
       break;
-    case Warning:
+    case LL_Warning:
       fprintf(_logFile, "[Warn] ");
       break;
-    case Info:
+    case LL_Info:
       fprintf(_logFile, "[Info] ");
       break;
-    case Debug:
+    case LL_Debug:
       fprintf(_logFile, "[Debug] ");
       break;
     default:

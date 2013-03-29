@@ -12,9 +12,9 @@ using namespace Doopey;
 
 void LoggerTest::testLog() {
   //CPPUNIT_ASSERT(1 == 1);
-  Logger logger(Debug);
+  Logger logger(LL_Debug);
   logger.debug("123");
-  Logger logger2(Error);
+  Logger logger2(LL_Error);
   logger2.debug("123");
 }
 

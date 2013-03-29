@@ -5,6 +5,7 @@
 #include "config/Config.h"
 #include "config/ConfigLoader.h"
 #include "config/SectionCollection.h"
+#include "network/Dispatcher.h"
 #include "network/Router.h"
 
 #include <csignal>
@@ -22,6 +23,7 @@ Server::Server(const char* configPath) {
   _sectionCollection.reset(loader.loadConfig(configPath));
   _blockManager.reset(new BlockManager(_sectionCollection->getConfig("")));
   _router.reset(new Router(_sectionCollection->getConfig("")));
+  _dispatcher.reset(new Dispatcher(_sectionCollection->getConfig(""), this));
 }
 
 Server::~Server() {
@@ -30,10 +32,11 @@ Server::~Server() {
 
 bool Server::start() {
   _router->start();
+  _dispatcher->start();
   return true;
 }
 
-void Sever::serve() {
+void Server::serve() {
 }
 
 void Server::attachSignal() {
@@ -49,7 +52,7 @@ void Server::detachSignal() {
 }
 
 void Server::handleTERM(int sig) {
-  log.debug("Server Recive TERM\n");
+  log.debug("Server Recieve TERM\n");
 }
 
 void Server::handleSREQ(int sig) {

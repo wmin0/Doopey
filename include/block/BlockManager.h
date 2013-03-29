@@ -37,7 +37,6 @@ namespace Doopey {
     private:
       RouterSPtr _router;
 
-    private: // owner
       BlockLoaderSPtr _loader;
       BlockResolverSPtr _resolver;
       BlockSaverSPtr _saver;

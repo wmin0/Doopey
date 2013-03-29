@@ -4,4 +4,4 @@
 
 using namespace Doopey;
 
-Logger Doopey::log(Debug);
+Logger Doopey::log(LL_Debug);

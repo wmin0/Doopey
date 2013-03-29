@@ -10,9 +10,10 @@ namespace Doopey {
   extern Logger log;
 
   enum ThreadState {
-    Start = 0,
-    Run = 1,
-    Terminate = 2
+    TS_None = 0,
+    TS_Start = 1,
+    TS_Run = 2,
+    TS_Terminate = 3
   };
 
   // signal
@@ -20,7 +21,7 @@ namespace Doopey {
   #define SIGDSTOP SIGRTMAX - 2
   #define SIGSREQ SIGRTMAX - 3
   #define SIGRREQ SIGRTMAX - 4
-  #define SIGDREQ SIGRTMAX - 5
 
 };  // namespace Doopey
 
+#endif

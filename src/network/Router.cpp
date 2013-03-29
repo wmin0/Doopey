@@ -10,7 +10,7 @@ using namespace Doopey;
 
 Router* Router::_this = NULL;
 
-Router::Router(const ConfigSPtr& config): _thread(0) {
+Router::Router(const ConfigSPtr& config): _thread(0), _threadState(TS_None) {
 }
 
 Router::~Router() {
@@ -21,12 +21,12 @@ bool Router::start() {
   if (0 != _thread || NULL != Router::_this) {
     return false;
   }
-  _threadState = Start;
+  _threadState = TS_Start;
   int ret = pthread_create(&_thread, NULL, Router::threadFunc, this);
   if (0 != ret) {
     log.error("Router Start Fail: %d\n", ret);
   } else {
-    while (_threadState != Run && _threadState != Terminate);
+    while (_threadState != TS_Run && _threadState != TS_Terminate);
   }
   return !ret;
 }
@@ -56,20 +56,20 @@ void* Router::threadFunc(void* obj) {
   log.debug("Thread Start!! %ld\n", router->_thread);
   signal(SIGRSTOP, Router::handleRSTOP);
   signal(SIGRREQ, Router::handleRREQ);
-  router->_this = router;
-  router->_threadState = Run;
+  Router::_this = router;
+  router->_threadState = TS_Run;
   return router->mainLoop();
 }
 
 void* Router::mainLoop() {
-  while (_threadState == Run);
+  while (_threadState == TS_Run);
   int* ret = new int(0);
   return ret;
 }
 
 void Router::handleRSTOP(int sig) {
   log.debug("Thread RSTOP\n");
-  Router::_this->_threadState = Terminate;
+  Router::_this->_threadState = TS_Terminate;
 }
 
 void Router::handleRREQ(int sig) {
