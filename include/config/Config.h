@@ -13,10 +13,10 @@ namespace Doopey {
   class Config {
 
     public:
+      ~Config() {}
       string getValue(const char* key) { return ""; }
 
     private:
-      ~Config() {}
       Config() {}
 
     friend ConfigLoader;

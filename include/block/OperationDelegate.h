@@ -2,6 +2,10 @@
 #define _DOOPEY_OPERATION_DELEGATE_H_
 
 #include <map>
+#include <memory>
+
+using std::map;
+using std::shared_ptr;
 
 namespace Doopey {
 
@@ -9,14 +13,15 @@ namespace Doopey {
   class DataInfo;
 
   class OperationDelegate {
-    using std::map;
+    typedef shared_ptr<Block> BlockSPtr;
+    typedef shared_ptr<DataInfo> DataInfoSPtr;
 
     public:
       OperationDelegate() {}
       virtual ~OperationDelegate() {}
 
-      DataInfo* getDataInfoFromBlock(
-        const char* name, const Block* block) const;
+      DataInfoWPtr getDataInfoFromBlock(
+        const char* name, const BlockSPtr& block) const;
 
     protected:
       class ColumnLocation {
