@@ -20,7 +20,7 @@ namespace Doopey {
       static OperationDelegate* Delegate;
       const static size_t BlockSize;
 
-    private:
+    protected:
       // NOTICE:
       // data are allocated by loader and then the Block class get the ownership
       // of the pointer.
