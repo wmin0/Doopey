@@ -15,7 +15,6 @@ namespace Doopey{
   class MetaDecoder;
   class MetaCreater;
   class FileUploader;
-  class MetaBlock;
 
   class FileManager{
     typedef shared_ptr<Config> ConfigSPtr;
