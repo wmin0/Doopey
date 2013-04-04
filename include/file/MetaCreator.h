@@ -2,6 +2,7 @@
 #define _DOOPEY_META_CREATOR_H_
 
 #include <cstdint>
+#include <memory>
 
 using std::shared_ptr;
 

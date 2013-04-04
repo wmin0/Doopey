@@ -13,13 +13,14 @@ using std::map;
 namespace Doopey{
 
   class MetaDecoder;
-  class MetaCreater;
+  class MetaCreator;
   class FileUploader;
+  class Config;
 
   class FileManager{
     typedef shared_ptr<Config> ConfigSPtr;
     typedef shared_ptr<MetaDecoder> MetaDecoderSPtr;
-    typedef shared_ptr<MetaCreater> MetaCreaterSPtr;
+    typedef shared_ptr<MetaCreator> MetaCreatorSPtr;
     typedef shared_ptr<FileUploader> FileUploaderSPtr;
 
     public:
@@ -38,7 +39,7 @@ namespace Doopey{
 
     private:
       MetaDecoderSPtr _decoder;
-      MetaCreaterSPtr _creater;
+      MetaCreatorSPtr _creator;
       FileUploaderSPtr _uploader;
 
       map<string, uint64_t> _fileTable;

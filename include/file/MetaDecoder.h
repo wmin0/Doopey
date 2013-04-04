@@ -1,7 +1,8 @@
 #ifndef _DOOPEY_META_DECODER_H_
 #define _DOOPEY_META_DECODER_H_
 
-#include <cstdinti>
+#include <cstdint>
+#include <memory>
 
 using std::shared_ptr;
 
@@ -15,10 +16,10 @@ namespace Doopey{
     public:
       MetaDecoder();
       ~MetaDecoder();
-      bool decode(const MetaBlockSptr& meta);
+      bool decode(const MetaBlockSPtr& meta);
     private:
 
-  }//class MetaDecoder
+  };//class MetaDecoder
 
 }//namespace Doopey
 

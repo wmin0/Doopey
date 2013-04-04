@@ -1,6 +1,13 @@
 #ifndef _DOOPEY_FILE_UPLOADER_H_
 #define _DOOPEY_FILE_UPLOADER_H_
 
+#include <cstdint>
+#include <string>
+#include <memory>
+
+using std::shared_ptr;
+using std::string;
+
 namespace Doopey{
 
   class MetaBlock;
@@ -19,8 +26,8 @@ namespace Doopey{
       bool receiveFile(MetaBlockSPtr meta, string path);
     private:
       FileUploader();
-  }
+  };//class FileUploader
 
-}
+}//namespace Doopey
 
 #endif
