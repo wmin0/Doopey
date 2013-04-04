@@ -15,7 +15,8 @@ namespace Doopey{
     public:
       ~FileUploader();
       bool receiveFile(MetaBlockSPtr meta, uint64_t port, string IP);
-
+      //parameter with path used for test in single machine
+      bool receiveFile(MetaBlockSPtr meta, string path);
     private:
       FileUploader();
   }
