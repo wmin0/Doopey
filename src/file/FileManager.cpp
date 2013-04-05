@@ -5,6 +5,8 @@
 
 using namespace Doopey;
 
+typedef shared_ptr<MetaBlock> MetaBlockSPtr;
+
 FileManager::FileManager(const ConfigSPtr& config){
   _decoder.reset(new MetaDecoder());
   _creator.reset(new MetaCreator());
@@ -16,14 +18,31 @@ FileManager::~FileManager()
 
 }
 
-bool FileManager::uploadFile(uint64_t port, string IP, string filename)
+bool FileManager::uploadFile(uint64_t port, string IP, string filename, string pathRemote)
 {
-  return true;
+  MetaBlockSPtr meta;
+  meta = _creator->create();
+
+  bool result = _uploader->receiveFile(meta, port, IP);
+
+
+  return result;
 }
 
-bool FileManager::uploadFile(string path)
+bool FileManager::uploadFile(string pathUpload, string pathRemote)
 {
-  return true;
+  //create meta
+  MetaBlockSPtr meta;
+  meta = _creator->create();
+
+  //transmit meta to FileUploader and receive and split file
+  bool result = _uploader->receiveFile(meta, pathUpload);
+  
+  //add file into map
+  //_fileTable[pathRemote, meta.Delegate
+  //broadcast here have a new file
+
+  return result;
 }
 
 

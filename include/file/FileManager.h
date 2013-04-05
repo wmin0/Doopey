@@ -32,9 +32,9 @@ namespace Doopey{
       //         second step: receive entire file, then
       //                      1.split file into different blocks
       //                      2.create meta block(need to design the meta block
-      bool uploadFile(uint64_t port, string IP, string filename);
+      bool uploadFile(uint64_t port, string IP, string filename, string pathRemote);
       //parameter with path used for test in single machine
-      bool uploadFile(string path);
+      bool uploadFile(string pathUpload, string pathRemote);
       bool getFile(string filename);
 
     private:
