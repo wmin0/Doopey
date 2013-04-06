@@ -20,7 +20,7 @@ Server::Server(const char* configPath) {
   _thread = pthread_self();
 
   ConfigLoader loader;
-  _sectionCollection.reset(loader.loadConfig(configPath));
+  _sectionCollection = loader.loadConfig(configPath);
   _blockManager.reset(new BlockManager(_sectionCollection->getConfig("")));
   _router.reset(new Router(_sectionCollection->getConfig("")));
   _dispatcher.reset(new Dispatcher(_sectionCollection->getConfig(""), this));

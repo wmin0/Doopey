@@ -4,6 +4,6 @@
 
 using namespace Doopey;
 
-SectionCollection* ConfigLoader::loadConfig(const char* path) {
-  return new SectionCollection();
+SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
+  return SectionCollectionSPtr(new SectionCollection());
 }
