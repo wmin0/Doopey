@@ -12,8 +12,11 @@ namespace Doopey {
     ST_UDP = 1
   }; // enum SocketType
 
+  class Message;
+
   class Socket {
     typedef shared_ptr<Socket> SocketSPtr;
+    typedef shared_ptr<Message> MessageSPtr;
 
     public:
       Socket(SocketType type);
@@ -23,9 +26,19 @@ namespace Doopey {
       bool listen();
       SocketSPtr accept();
 
+      bool send(const MessageSPtr& msg);
+      MessageSPtr recieve();
+      // TODO: complete UDP later
+      // bool sendTo
+
+    private:
+      Socket(SocketType type, int fd, bool conn):
+        _type(type), _fd(fd), _isConnected(conn) {}
+
     private:
       SocketType _type;
       int _fd;
+      bool _isConnected;
 
   }; // class Socket
 

@@ -1,6 +1,8 @@
 #include "network/Socket.h"
 // udp ref: http://www.abc.se/~m6695/udp.html
+
 #include "common/Doopey.h"
+#include "network/Message.h"
 
 #include <arpa/inet.h>
 #include <memory.h>
@@ -11,7 +13,8 @@
 
 using namespace Doopey;
 
-Socket::Socket(SocketType type): _fd(-1) {
+Socket::Socket(SocketType type):
+  _type(type), _fd(-1), _isConnected(false) {
   switch (type) {
     case ST_TCP:
       _fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -57,6 +60,7 @@ bool Socket::connect(const char* servername, int port) {
     log.error("socket connect error\n");
     return false;
   }
+  _isConnected = true;
   return true;
 }
 
@@ -74,5 +78,29 @@ bool Socket::bind(int port) {
     log.error("socket bind server error\n");
     return false;
   }
+  _isConnected = true;
   return true;
+}
+
+SocketSPtr Socket::accept() {
+  if (_fd < 0) {
+    log.error("socket open error\n");
+    return SocketSPtr(NULL);
+  }
+  int conn, conn_len;
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  conn = accept(_fd, (struct sockaddr*)&addr, (socklen_t*)&conn_len);
+  if (conn < 0) {
+    return SocketSPtr(NULL);
+  }
+  return SocketSPtr(new Socket(_type, conn, true));
+}
+
+bool Socket::send(const MessageSPtr& msg) {
+  return false;
+}
+
+MessageSPtr Socket::recieve() {
+  return MessageSPtr(NULL);
 }

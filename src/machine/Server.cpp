@@ -43,11 +43,13 @@ void Server::attachSignal() {
   Server::_this = this;
   signal(SIGTERM, Server::handleTERM);
   signal(SIGSREQ, Server::handleSREQ);
+  signal(SIGPIPE, SIG_IGN);
 }
 
 void Server::detachSignal() {
   signal(SIGTERM, NULL);
   signal(SIGSREQ, NULL);
+  signal(SIGPIPE, SIG_DFL);
   Server::_this = NULL;
 }
 
