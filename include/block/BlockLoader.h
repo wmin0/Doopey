@@ -22,9 +22,12 @@ namespace Doopey {
       ~BlockLoader();
       BlockSPtr loadData(const BlockLocationAttrSPtr& attr) const;
       BlockSPtr loadMeta(const BlockLocationAttrSPtr& attr) const;
+      BlockSPtr newData() const;
+      BlockSPtr newMeta() const;
 
     private:
       unsigned char* getData(const BlockLocationAttrSPtr& attr) const;
+      unsigned char* allocateMem() const;
       const BlockManager* _manager;
 
   }; // class BlockLoader

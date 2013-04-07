@@ -33,3 +33,17 @@ BlockSPtr BlockLoader::loadMeta(const BlockLocationAttrSPtr& attr) const {
 unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
   return NULL;
 }
+
+BlockSPtr BlockLoader::newData() const {
+  // TODO: check allocate success
+  // NOTE: allocate id by Saver, because Saver know about local information
+  return BlockSPtr(new MetaBlock(allocateMem(), 0));
+}
+BlockSPtr BlockLoader::newMeta() const {
+  // TODO: check allocate success
+  return BlockSPtr(new DataBlock(allocateMem(), 0));
+}
+
+unsigned char* BlockLoader::allocateMem() const {
+  return NULL;
+}

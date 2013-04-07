@@ -3,24 +3,27 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 using std::map;
 using std::shared_ptr;
+using std::string;
 
 namespace Doopey {
 
   class Block;
   class DataInfo;
 
+  typedef shared_ptr<DataInfo> DataInfoSPtr;
+
   class OperationDelegate {
     typedef shared_ptr<Block> BlockSPtr;
-    typedef shared_ptr<DataInfo> DataInfoSPtr;
 
     public:
       OperationDelegate() {}
       virtual ~OperationDelegate() {}
 
-      DataInfoWPtr getDataInfoFromBlock(
+      DataInfoSPtr getDataInfoFromBlock(
         const char* name, const BlockSPtr& block) const;
 
     protected:
@@ -31,7 +34,7 @@ namespace Doopey {
           size_t size;
       }; // class ColumnLocation
 
-      map<const char*, ColumnLocation> _locationMap;
+      map<string, ColumnLocation> _locationMap;
 
   }; // class OperationDelegate
 

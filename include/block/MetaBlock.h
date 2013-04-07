@@ -2,12 +2,17 @@
 #define _DOOPEY_META_BLOCK_H_
 
 #include "block/Block.h"
-
 #include "common/Doopey.h"
+
+#include <memory>
+
+using std::shared_ptr;
 
 namespace Doopey {
 
   class OperationDelegate;
+
+  typedef shared_ptr<OperationDelegate> OperationDelegateSPtr;
 
   class MetaBlock: public Block {
     public:
@@ -16,13 +21,12 @@ namespace Doopey {
 
     public:
       // override declaration
-      static OperationDelegate* Delegate;
+      static OperationDelegateSPtr delegate;
 
     private:
       friend class OperationDelegate;
   }; // class Block
 
-  OperationDelegate* MetaBlock::Delegate = NULL;
 
 };  // namespace Doopey
 

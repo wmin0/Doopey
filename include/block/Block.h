@@ -3,9 +3,15 @@
 
 #include "common/Doopey.h"
 
+#include <memory>
+
+using std::shared_ptr;
+
 namespace Doopey {
 
   class OperationDelegate;
+
+  typedef shared_ptr<OperationDelegate> OperationDelegateSPtr;
 
   class Block {
     public:
@@ -17,8 +23,8 @@ namespace Doopey {
       }
     public:
       // initial by block manager
-      static OperationDelegate* Delegate;
-      const static size_t BlockSize;
+      static OperationDelegateSPtr delegate;
+      const static size_t blockSize;
 
     protected:
       // NOTICE:
@@ -31,10 +37,6 @@ namespace Doopey {
 
       friend class OperationDelegate;
   }; // class Block
-
-  OperationDelegate* Block::Delegate = NULL;
-  // const size_t Block::BlockSize = 1024 * 64;
-  const size_t Block::BlockSize = 1024000 * 64;
 
 };  // namespace Doopey
 
