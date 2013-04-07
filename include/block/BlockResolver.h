@@ -16,10 +16,10 @@ using std::string;
 namespace Doopey {
 
   class Config;
-  class BlockLoactionAttr;
+  class BlockLocationAttr;
   class BlockManager;
 
-  typedef shared_ptr<BlockLoactionAttr> BlockLoactionAttrSPtr;
+  typedef shared_ptr<BlockLocationAttr> BlockLocationAttrSPtr;
 
   class BlockResolver {
     typedef shared_ptr<Config> ConfigSPtr;
@@ -27,14 +27,14 @@ namespace Doopey {
       BlockResolver(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockResolver();
 
-      BlockLoactionAttrSPtr askBlock(BlockID id);
+      BlockLocationAttrSPtr askBlock(BlockID id);
       void addLocalID(BlockID id);
       //void removeID(BlockID id);
 
     private:
       void loadLocalIDs();
       void cleanCache();
-      BlockLoactionAttrSPtr askRemoteBlock(BlockID id);
+      BlockLocationAttrSPtr askRemoteBlock(BlockID id);
 
     private:
       const BlockManager* _manager;
@@ -43,7 +43,7 @@ namespace Doopey {
       size_t _cacheRemoteSize;
 
       set<BlockID> _localIDs;
-      map<BlockID, BlockLoactionAttrSPtr> _remoteIDs;
+      map<BlockID, BlockLocationAttrSPtr> _remoteIDs;
 
   }; // class BlockResolver
 

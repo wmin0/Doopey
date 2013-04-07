@@ -10,10 +10,10 @@ using std::string;
 
 namespace Doopey {
 
-  class BlockLoactionAttr {
+  class BlockLocationAttr {
     public:
-      BlockLoactionAttr(): block(0), machine(0), ts(0) {}
-      BlockLoactionAttr(BlockID b, MachineID m, time_t t):
+      BlockLocationAttr(): block(0), machine(0), ts(0) {}
+      BlockLocationAttr(BlockID b, MachineID m, time_t t):
         block(b), machine(m), ts(t) {}
       void set(BlockID b, MachineID m, time_t t) {
         block = b; machine = m; ts = t;
@@ -24,7 +24,7 @@ namespace Doopey {
       MachineID machine;
       // for replacement alg
       time_t ts;
-  }; // class BlockLoactionAttr
+  }; // class BlockLocationAttr
 
 };  // namespace Doopey
 

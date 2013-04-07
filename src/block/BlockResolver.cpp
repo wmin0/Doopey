@@ -52,7 +52,7 @@ void BlockResolver::loadLocalIDs() {
 void BlockResolver::addLocalID(BlockID id) {
   // TODO: check local file exist
   char buf[1024] = {0};
-  sprintf(buf, "%s/%lld", _localDir.data(), id);
+  sprintf(buf, "%s/%ld", _localDir.data(), id);
   ifstream file(buf, ifstream::in);
   if (file.good()) {
     _localIDs.insert(id);
@@ -66,27 +66,27 @@ void BlockResolver::cleanCache() {
   // TODO: maybe use LRU?
 }
 
-BlockLoactionAttrSPtr BlockResolver::askBlock(BlockID id) {
+BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   if (_localIDs.end() != _localIDs.find(id)) {
     // machineID = 0 is local
-    return BlockLoactionAttrSPtr(new BlockLoactionAttr(id, 0, 0));
+    return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, 0));
   }
-  map<BlockID, BlockLoactionAttrSPtr>::iterator it = _remoteIDs.find(id);
+  map<BlockID, BlockLocationAttrSPtr>::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
     return it->second;
   }
-  BlockLoactionAttrSPtr tmp = askRemoteBlock(id);
+  BlockLocationAttrSPtr tmp = askRemoteBlock(id);
   if (NULL != tmp) {
     if (_cacheRemoteSize <= _remoteIDs.size()) {
       cleanCache();
     }
-    _remoteIDs.insert(pair<BlockID, BlockLoactionAttrSPtr>(id, tmp));
+    _remoteIDs.insert(pair<BlockID, BlockLocationAttrSPtr>(id, tmp));
   }
   return tmp;
 }
 
-BlockLoactionAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
+BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   // TODO: _manager->_router
-  return BlockLoactionAttrSPtr(NULL);
+  return BlockLocationAttrSPtr(NULL);
 }
