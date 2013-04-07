@@ -10,6 +10,8 @@ MAIN=main
 
 all: libs main
 test: libs utest runtest
+clean: cleansrc cleantest
+retest: cleantest utest runtest
 
 libs:
 	@for pkg in $(SRCPKGS); do \
@@ -33,14 +35,10 @@ runtest:
 		make -C test/$$pkg --no-print-directory run; \
 	done
 
-clean:
+cleansrc:
 	@for pkg in $(SRCPKGS); do \
 		echo "clean $$pkg"; \
 		make -C src/$$pkg --no-print-directory clean; \
-	done
-	@for pkg in $(TESTPKGS); do \
-		echo "clean test $$pkg"; \
-		make -C test/$$pkg --no-print-directory clean; \
 	done
 	@echo "clean $(MAIN)";
 	@make -C src/$(MAIN) --no-print-directory clean;
@@ -48,3 +46,10 @@ clean:
 	@cd lib; rm -f $(SRCLIBS)
 	@echo "removing bin"
 	@rm -f bin/*
+
+cleantest:
+	@for pkg in $(TESTPKGS); do \
+		echo "clean test $$pkg"; \
+		make -C test/$$pkg --no-print-directory clean; \
+	done
+
