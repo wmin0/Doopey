@@ -42,6 +42,7 @@ namespace Doopey {
       BlockSaverSPtr _saver;
       BlockUpdaterSPtr _updater;
 
+    friend class BlockResolver;
   }; // class BlockManager
 
 };  // namespace Doopey

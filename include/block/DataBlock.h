@@ -3,7 +3,7 @@
 
 #include "block/Block.h"
 
-#include <cstdint>
+#include "common/Doopey.h"
 
 namespace Doopey {
 
@@ -11,7 +11,7 @@ namespace Doopey {
 
   class DataBlock: public Block {
     public:
-      DataBlock(unsigned char* data, uint64_t id): Block(data, id) {}
+      DataBlock(unsigned char* data, BlockID id): Block(data, id) {}
       virtual ~DataBlock() {}
 
     public:

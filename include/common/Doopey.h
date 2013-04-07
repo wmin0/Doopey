@@ -4,6 +4,7 @@
 #include "logger/Logger.h"
 
 #include <csignal>
+#include <cstdint>
 
 namespace Doopey {
 
@@ -21,6 +22,10 @@ namespace Doopey {
   #define SIGDSTOP SIGRTMAX - 2
   #define SIGSREQ SIGRTMAX - 3
   #define SIGRREQ SIGRTMAX - 4
+
+  // general type
+  typedef uint64_t BlockID;
+  typedef uint32_t MachineID;
 
 };  // namespace Doopey
 

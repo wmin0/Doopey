@@ -1,7 +1,7 @@
 #ifndef _DOOPEY_BLOCK_H_
 #define _DOOPEY_BLOCK_H_
 
-#include <cstdint>
+#include "common/Doopey.h"
 
 namespace Doopey {
 
@@ -9,7 +9,7 @@ namespace Doopey {
 
   class Block {
     public:
-      Block(unsigned char* data, uint64_t id): _data(data), _id(id) {}
+      Block(unsigned char* data, BlockID id): _data(data), _id(id) {}
       virtual ~Block() {
         // TODO:
         // munmap(map, FILESIZE)
@@ -27,7 +27,7 @@ namespace Doopey {
       // Because of that, we can do mmap by loader, but maybe it's a ill
       // designed protocal.
       unsigned char* _data;
-      uint64_t _id;
+      BlockID _id;
 
       friend class OperationDelegate;
   }; // class Block
