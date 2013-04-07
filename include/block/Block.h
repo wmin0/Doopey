@@ -11,8 +11,6 @@ namespace Doopey {
 
   class OperationDelegate;
 
-  typedef shared_ptr<OperationDelegate> OperationDelegateSPtr;
-
   class Block {
     public:
       Block(unsigned char* data, BlockID id): _data(data), _id(id) {}
@@ -23,7 +21,6 @@ namespace Doopey {
       }
     public:
       // initial by block manager
-      static OperationDelegateSPtr delegate;
       const static size_t blockSize;
 
     protected:
@@ -35,7 +32,6 @@ namespace Doopey {
       unsigned char* _data;
       BlockID _id;
 
-      friend class OperationDelegate;
   }; // class Block
 
 };  // namespace Doopey
