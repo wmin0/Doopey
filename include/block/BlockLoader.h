@@ -7,12 +7,14 @@ using std::shared_ptr;
 
 namespace Doopey {
 
-  class Block;
   class BlockLocationAttr;
   class BlockManager;
   class Config;
+  class DataBlock;
+  class MetaBlock;
 
-  typedef shared_ptr<Block> BlockSPtr;
+  typedef shared_ptr<DataBlock> DataBlockSPtr;
+  typedef shared_ptr<MetaBlock> MetaBlockSPtr;
 
   class BlockLoader {
     typedef shared_ptr<BlockLocationAttr> BlockLocationAttrSPtr;
@@ -20,10 +22,10 @@ namespace Doopey {
     public:
       BlockLoader(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockLoader();
-      BlockSPtr loadData(const BlockLocationAttrSPtr& attr) const;
-      BlockSPtr loadMeta(const BlockLocationAttrSPtr& attr) const;
-      BlockSPtr newData() const;
-      BlockSPtr newMeta() const;
+      DataBlockSPtr loadBlock(const BlockLocationAttrSPtr& attr) const;
+      MetaBlockSPtr loadBlock(const BlockLocationAttrSPtr& attr) const;
+      DataBlockSPtr newBlock() const;
+      MetaBlockSPtr newBlock() const;
 
     private:
       unsigned char* getData(const BlockLocationAttrSPtr& attr) const;

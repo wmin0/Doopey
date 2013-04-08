@@ -1,17 +1,36 @@
 #ifndef _DOOPEY_MESSAGE_H_
 #define _DOOPEY_MESSAGE_H_
 
+#include <memory>
+
+using std::shared_ptr;
+
 namespace Doopey {
 
-  class Message {
-    public:
-      Message() {}
-      ~Message() {}
+  enum MessageType {
+  }; // enum MessageType
 
-      unsigned char* serilize();
-      void deserilize(unsigned char* data);
+  enum MessageCmd {
+  }; // enum MessageCmd
+
+  class Message {
+    typedef shared_ptr<unsigned char> UCharSPtr;
+    public:
+      Message(MessageType type, MessageCmd cmd, size_t size);
+      // deserialize
+      Message(const UCharSPtr& data);
+      ~Message();
+
+      bool addData(const UCharSPtr& data, size_t s, size_t len);
+      bool addData(const unsigned char* data, size_t s, size_t len);
+
+      UCharSPtr serilize();
 
     private:
+      MessageType _type;
+      MessageCmd _cmd;
+      size_t _size;
+      unsigned char* _data;
 
   }; // class Message
 
