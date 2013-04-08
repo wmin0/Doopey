@@ -2,8 +2,10 @@
 #define _DOOPEY_CONFIG_H_
 
 #include <string>
+#include <map>
 
 using std::string;
+using std::map;
 
 namespace Doopey {
 
@@ -11,13 +13,16 @@ namespace Doopey {
   class SectionCollection;
 
   class Config {
+    typedef map<const char*, char*> MAP_CONFIG_VALUE;
 
     public:
       ~Config() {}
-      string getValue(const char* key) { return ""; }
+      string getValue(const char* key);
+      MAP_CONFIG_VALUE values;
+      char *name;//config name
 
     private:
-      Config() {}
+      Config(char *);
 
     friend ConfigLoader;
     friend SectionCollection;

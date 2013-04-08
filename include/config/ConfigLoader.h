@@ -13,7 +13,7 @@ namespace Doopey {
       ~ConfigLoader() {}
 
       // TODO: consider to be static
-      SectionCollection* loadConfig(const char* path);
+      static SectionCollection* loadConfig(const char* path);
 
     private:
   }; // class ConfigLoader

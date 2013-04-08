@@ -1,0 +1,3 @@
+[config1]
+con1_property1
+con1_property2
