@@ -12,12 +12,14 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <sys/types.h>
 
 using namespace Doopey;
 
 using std::pair;
 using std::ifstream;
+using std::stringstream;
 
 BlockResolver::BlockResolver(const BlockManager* manager, const ConfigSPtr& config):
   _manager(manager), _localDir("."), _cacheRemoteSize(0) {
@@ -51,9 +53,9 @@ void BlockResolver::loadLocalIDs() {
 
 void BlockResolver::addLocalID(BlockID id) {
   // TODO: check local file exist
-  char buf[1024] = {0};
-  sprintf(buf, "%s/%ld", _localDir.data(), id);
-  ifstream file(buf, ifstream::in);
+  stringstream ss("");
+  ss << _localDir << "/" << id;
+  ifstream file(ss.str(), ifstream::in);
   if (file.good()) {
     _localIDs.insert(id);
   } else {

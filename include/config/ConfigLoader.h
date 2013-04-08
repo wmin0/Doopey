@@ -10,15 +10,14 @@ namespace Doopey {
   class Config;
   class SectionCollection;
 
-  typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
-
   class ConfigLoader {
+    typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
     public:
       ConfigLoader() {}
       ~ConfigLoader() {}
 
       // TODO: consider to be static
-      static SectionCollection* loadConfig(const char* path);
+      static SectionCollectionSPtr loadConfig(const char* path);
 
     private:
   }; // class ConfigLoader

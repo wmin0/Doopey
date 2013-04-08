@@ -2,6 +2,8 @@
 
 using namespace Doopey;
 
+typedef shared_ptr<unsigned char> UCharSPtr;
+
 Message::Message(MessageType type, MessageCmd cmd, size_t size):
   _type(type), _cmd(cmd), _size(size), _data(0) {
   _data = new unsigned char[_size];

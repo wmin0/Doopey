@@ -13,6 +13,9 @@
 
 using namespace Doopey;
 
+typedef shared_ptr<Socket> SocketSPtr;
+typedef shared_ptr<Message> MessageSPtr;
+
 Socket::Socket(SocketType type):
   _type(type), _fd(-1), _isConnected(false) {
   switch (type) {
@@ -90,7 +93,7 @@ SocketSPtr Socket::accept() {
   int conn, conn_len;
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
-  conn = accept(_fd, (struct sockaddr*)&addr, (socklen_t*)&conn_len);
+  conn = ::accept(_fd, (struct sockaddr*)&addr, (socklen_t*)&conn_len);
   if (conn < 0) {
     return SocketSPtr(NULL);
   }

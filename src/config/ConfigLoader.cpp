@@ -9,7 +9,9 @@
 using namespace std;
 using namespace Doopey;
 
-SectionCollection* ConfigLoader::loadConfig(const char* path) {
+typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
+
+SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
   char line[20];
   char configName[20];
   char temp[20];
@@ -34,5 +36,5 @@ SectionCollection* ConfigLoader::loadConfig(const char* path) {
     }
   }
 
-  return new SectionCollection();
+  return SectionCollectionSPtr(new SectionCollection());
 }

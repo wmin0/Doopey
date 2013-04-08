@@ -1,6 +1,8 @@
 #ifndef _DOOPEY_BLOCK_MANAGER_H_
 #define _DOOPEY_BLOCK_MANAGER_H_
 
+#include "common/Doopey.h"
+
 #include <cstdint>
 #include <memory>
 
@@ -36,11 +38,11 @@ namespace Doopey {
       void setRouter(const RouterSPtr& router) { _router = router; }
 
       // request handle interface
-      MetaBlockSPtr getBlock(uint64_t id) { return MetaBlockSPtr(NULL); }
-      DataBlockSPtr getBlock(uint64_t id) { return DataBlockSPtr(NULL); }
+      MetaBlockSPtr getMeta(uint64_t id) { return MetaBlockSPtr(NULL); }
+      DataBlockSPtr getData(uint64_t id) { return DataBlockSPtr(NULL); }
 
-      MetaBlockSPtr newBlock() { return MetaBlockSPtr(NULL); }
-      DataBlockSPtr newBlock() { return DataBlockSPtr(NULL); }
+      MetaBlockSPtr newMeta() { return MetaBlockSPtr(NULL); }
+      DataBlockSPtr newData() { return DataBlockSPtr(NULL); }
 
       BlockID saveBlock(const BlockSPtr& block) { return 0; }
 
