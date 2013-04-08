@@ -2,27 +2,21 @@
 #define _DOOPEY_META_BLOCK_H_
 
 #include "block/Block.h"
+#include "common/Doopey.h"
 
-#include <cstdint>
+#include <memory>
+
+using std::shared_ptr;
 
 namespace Doopey {
 
-  class OperationDelegate;
-
   class MetaBlock: public Block {
     public:
-      MetaBlock(unsigned char* data, uint64_t id): Block(data, id) {}
+      MetaBlock(unsigned char* data, BlockID id): Block(data, id) {}
       virtual ~MetaBlock() {}
 
-    public:
-      // override declaration
-      static OperationDelegate* Delegate;
-
-    private:
-      friend class OperationDelegate;
   }; // class Block
 
-  OperationDelegate* MetaBlock::Delegate = NULL;
 
 };  // namespace Doopey
 

@@ -1,7 +1,11 @@
 #ifndef _DOOPEY_BLOCK_H_
 #define _DOOPEY_BLOCK_H_
 
-#include <cstdint>
+#include "common/Doopey.h"
+
+#include <memory>
+
+using std::shared_ptr;
 
 namespace Doopey {
 
@@ -9,7 +13,7 @@ namespace Doopey {
 
   class Block {
     public:
-      Block(unsigned char* data, uint64_t id): _data(data), _id(id) {}
+      Block(unsigned char* data, BlockID id): _data(data), _id(id) {}
       virtual ~Block() {
         // TODO:
         // munmap(map, FILESIZE)
@@ -17,8 +21,7 @@ namespace Doopey {
       }
     public:
       // initial by block manager
-      static OperationDelegate* Delegate;
-      const static size_t BlockSize;
+      const static size_t blockSize;
 
     protected:
       // NOTICE:
@@ -27,14 +30,9 @@ namespace Doopey {
       // Because of that, we can do mmap by loader, but maybe it's a ill
       // designed protocal.
       unsigned char* _data;
-      uint64_t _id;
+      BlockID _id;
 
-      friend class OperationDelegate;
   }; // class Block
-
-  OperationDelegate* Block::Delegate = NULL;
-  // const size_t Block::BlockSize = 1024 * 64;
-  const size_t Block::BlockSize = 1024000 * 64;
 
 };  // namespace Doopey
 
