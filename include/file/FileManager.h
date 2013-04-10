@@ -15,14 +15,16 @@ namespace Doopey{
   class MetaDecoder;
   class FileUploader;
   class Config;
+  class BlockManager;
 
   class FileManager{
     typedef shared_ptr<Config> ConfigSPtr;
+    typedef shared_ptr<BlockManager> BlockManagerSPtr;
     typedef shared_ptr<MetaDecoder> MetaDecoderSPtr;
     typedef shared_ptr<FileUploader> FileUploaderSPtr;
 
     public:
-      FileManager(const ConfigSPtr& config);
+      FileManager(const ConfigSPtr& config, BlockManagerSPtr);
       ~FileManager();
 
       //TODO: design the interface of upload file;
@@ -38,6 +40,7 @@ namespace Doopey{
     private:
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;
+      BlockManagerSPtr _blockManager;
 
       map<string, uint64_t> _fileTable;
   };//class FileManager
