@@ -1,28 +1,44 @@
 #include "network/Message.h"
 
+#include <cmemory>
+
 using namespace Doopey;
 
 typedef shared_ptr<unsigned char> UCharSPtr;
 
-Message::Message(MessageType type, MessageCmd cmd, size_t size):
-  _type(type), _cmd(cmd), _size(size) {
-  _data.reset(new unsigned char[_size]);
+Message::Message(MessageType type, MessageCmd cmd):
+  _type(type), _cmd(cmd) {
 }
 
-Message::Message(const UCharSPtr& data) {
+Message::Message(const vector<unsigned char>& data) {
+  size_t off = 0;
+  memcpy(&_type, data.data(), sizeof(MessageType));
+  off += sizeof(MessageType);
+  memcpy(&_cmd, data.data() + off, sizeof(MessageCmd));
+  off += sizeof(MessageCmd);
+  _data.reserve(data.size() - off);
+  memcpy(_data.data(), data.data() + off, data.size() - off);
 }
 
 Message::~Message() {
 }
 
-bool Message::addData(const UCharSPtr& data, size_t s, size_t len) {
-  return addData(data.get(), s, len);
-}
-
 bool Message::addData(const unsigned char* data, size_t s, size_t len) {
+  if (s + len >= _data.size()) {
+    _data.reserve(s + len);
+  }
+  memcpy(_data.data() + s, data, len);
   return true;
 }
 
-UCharSPtr Message::serilize() {
-  return UCharSPtr(NULL);
+vector<unsigned char> Message::serilize() {
+  vector<unsigned char> ret(
+    _data.size() + sizeof(MessageType) + sizeof(MessageCmd));
+  size_t off = 0;
+  memcpy(ret.data(), &_type, sizeof(MessageType));
+  off += sizeof(MessageType);
+  memcpy(ret.data() + off, &_cmd, sizeof(MessageCmd));
+  off += sizeof(MessageCmd);
+  memcpy(ret.data() + off, _data.data(), _data.size());
+  return ret;
 }

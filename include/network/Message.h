@@ -1,9 +1,11 @@
 #ifndef _DOOPEY_MESSAGE_H_
 #define _DOOPEY_MESSAGE_H_
 
+#include <vector>
 #include <memory>
 
 using std::shared_ptr;
+using std::vector;
 
 namespace Doopey {
 
@@ -14,23 +16,20 @@ namespace Doopey {
   }; // enum MessageCmd
 
   class Message {
-    typedef shared_ptr<unsigned char> UCharSPtr;
     public:
-      Message(MessageType type, MessageCmd cmd, size_t size);
+      Message(MessageType type, MessageCmd cmd);
       // deserialize
-      Message(const UCharSPtr& data);
+      Message(const vector<unsigned char>& data);
       ~Message();
 
-      bool addData(const UCharSPtr& data, size_t s, size_t len);
       bool addData(const unsigned char* data, size_t s, size_t len);
 
-      UCharSPtr serilize();
+      vector<unsigned char> serilize();
 
     private:
       MessageType _type;
       MessageCmd _cmd;
-      UCharSPtr _data;
-      size_t _size;
+      vector _data;
   }; // class Message
 
 };  // namespace Doopey
