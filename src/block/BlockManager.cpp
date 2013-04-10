@@ -10,6 +10,10 @@
 
 using namespace Doopey;
 
+typedef shared_ptr<MetaBlock> MetaBlockSPtr;
+typedef shared_ptr<DataBlock> DataBlockSPtr;
+typedef shared_ptr<Block> BlockSPtr;
+
 BlockManager::BlockManager(const ConfigSPtr& config) {
   _resolver.reset(new BlockResolver(this, config));
   _loader.reset(new BlockLoader(this, config));
@@ -19,5 +23,17 @@ BlockManager::BlockManager(const ConfigSPtr& config) {
 
 BlockManager::~BlockManager() {}
 
+MetaBlockSPtr BlockManager::newMeta()
+{
+  return _loader->newMeta();
+}
 
+DataBlockSPtr BlockManager::newData()
+{
+  return _loader->newData();
+}
 
+BlockID saveBlock(const BlockSPtr& block)
+{
+  return 0; 
+}
