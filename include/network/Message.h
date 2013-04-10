@@ -29,9 +29,8 @@ namespace Doopey {
     private:
       MessageType _type;
       MessageCmd _cmd;
+      UCharSPtr _data;
       size_t _size;
-      unsigned char* _data;
-
   }; // class Message
 
 };  // namespace Doopey

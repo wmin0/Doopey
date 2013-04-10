@@ -5,15 +5,14 @@ using namespace Doopey;
 typedef shared_ptr<unsigned char> UCharSPtr;
 
 Message::Message(MessageType type, MessageCmd cmd, size_t size):
-  _type(type), _cmd(cmd), _size(size), _data(0) {
-  _data = new unsigned char[_size];
+  _type(type), _cmd(cmd), _size(size) {
+  _data.reset(new unsigned char[_size]);
 }
 
 Message::Message(const UCharSPtr& data) {
 }
 
 Message::~Message() {
-  delete[] _data;
 }
 
 bool Message::addData(const UCharSPtr& data, size_t s, size_t len) {
