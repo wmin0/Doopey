@@ -1,3 +1,13 @@
 [config1]
-con1_property1
-con1_property2
+BlockDir1=/tmp1
+BlockDir1-2=value1-2
+
+
+
+[config2]
+BlockDir2=/tmp2
+BlockDir2-2=value2-2
+
+
+[config3]
+BlockDir3=/tmp3

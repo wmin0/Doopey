@@ -13,16 +13,16 @@ namespace Doopey {
   class SectionCollection;
 
   class Config {
-    typedef map<const char*, char*> MAP_CONFIG_VALUE;
+    typedef map<string, string> MapConfigValue;
 
     public:
       ~Config() {}
       string getValue(const char* key);
-      MAP_CONFIG_VALUE values;
-      char *name;//config name
+      MapConfigValue values;
+      string name;//config name
 
     private:
-      Config(char *);
+      Config(string);
 
     friend ConfigLoader;
     friend SectionCollection;

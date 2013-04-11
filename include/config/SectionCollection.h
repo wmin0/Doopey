@@ -2,8 +2,12 @@
 #define _DOOPEY_SECTION_COLLECTION_H_
 
 #include <memory>
+#include <map>
+#include <string>
 
 using std::shared_ptr;
+using std::map;
+using std::string;
 
 namespace Doopey {
 
@@ -12,11 +16,14 @@ namespace Doopey {
 
   class SectionCollection {
     typedef shared_ptr<Config> ConfigSPtr;
+    typedef map<string ,ConfigSPtr> MapSectionCollection;
 
     public:
       ~SectionCollection() {}
 
-      ConfigSPtr getConfig(const char* section) { return NULL; }
+      ConfigSPtr getConfig(const char* section);
+
+      MapSectionCollection configTable;
 
     private:
       SectionCollection() {}

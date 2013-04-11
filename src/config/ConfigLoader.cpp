@@ -1,7 +1,7 @@
 #include "config/ConfigLoader.h"
 #include "config/Config.h"
 #include "config/SectionCollection.h"
-//#include <iostream>
+
 #include <fstream>
 #include <cstring>
 #include <cstdio>
@@ -12,29 +12,31 @@ using namespace Doopey;
 typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
 
 SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
-  char line[20];
-  char configName[20];
-  char temp[20];
-
+  char line[50];
+  SectionCollectionSPtr sectionCollection(new SectionCollection());
   fstream file;
   file.open(path,ios::in);
-  while(file.getline(line,sizeof(line),'\n')){
+
+  while(file.getline(line,sizeof(line))){
+
     if(line[0]=='['){
-      //cout<<line<<endl;
+      char configName[20];
       for(unsigned int i=0;i<strlen(line)-2;i++) configName[i]=line[i+1];
 
       configName[strlen(line)-2]='\0';
 
-      Config config(configName);
+      shared_ptr<Config> config(new Config(configName));
 
-      int i=1;
-      while(file.getline(line,sizeof(line),'\n') && line[0] != '['){
-        sprintf(temp, "%u", i);
-        config.values[temp]=line;
-        i++;
+      while(file.getline(line,sizeof(line)) && strlen(line)>0){
+        string tempKey,tempValue;
+        tempKey=strtok(line, "=");
+        tempValue=strtok(NULL, "=");
+        config->values[tempKey]=tempValue;
       }
+
+      sectionCollection->configTable[config->name]=config;
     }
   }
 
-  return SectionCollectionSPtr(new SectionCollection());
+  return sectionCollection;
 }

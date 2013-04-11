@@ -1,17 +1,18 @@
 #include "config/Config.h"
-#include <map>
+
 #include <iostream>
 
 using namespace Doopey;
 using namespace std;
 
-Config::Config(char *configName){
+Config::Config(string configName){
   name = configName;
 }
 
 string Config::getValue(const char* key){
-  map<const char*, char*>::iterator findValue;
-  findValue = values.find(key);
+  string keyValue = key;
+  map<string, string>::iterator findValue;
+  findValue = values.find(keyValue);
   string result = "";
   if(findValue!=values.end())
     result = findValue->second;
