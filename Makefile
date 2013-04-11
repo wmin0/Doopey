@@ -11,7 +11,7 @@ MAIN=main
 all: libs main
 test: libs utest runtest
 clean: cleansrc cleantest
-retest: cleansrc cleantest libs utest runtest
+retest: cleantest libs utest runtest
 
 libs:
 	@for pkg in $(SRCPKGS); do \
