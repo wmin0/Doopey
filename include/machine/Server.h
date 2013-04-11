@@ -1,6 +1,8 @@
 #ifndef _DOOPEY_SERVER_H_
 #define _DOOPEY_SERVER_H_
 
+#include "common/Doopey.h"
+
 #include <memory>
 #include <pthread.h>
 
@@ -26,6 +28,11 @@ namespace Doopey {
       ~Server();
       bool start();
 
+      const BlockManagerSPtr getBlockManager() const { return _blockManager; }
+      const RouterSPtr getRouter() const { return _router; }
+      const FileManagerSPtr getFileManager() const { return _fileManager; }
+      MachineID getMachineID() const { return _machineID; }
+
     private:
       static void handleTERM(int sig);
       static void handleSREQ(int sig);
@@ -37,13 +44,14 @@ namespace Doopey {
     private:
       static Server* _this;
 
+      MachineID _machineID;
+
       SectionCollectionSPtr _sectionCollection;
       BlockManagerSPtr _blockManager;
       DispatcherSPtr _dispatcher;
       RouterSPtr _router;
       FileManagerSPtr _fileManager;
       pthread_t _thread;
-
   }; // class Server
 
 };  // namespace Doopey

@@ -17,7 +17,7 @@ namespace Doopey {
     typedef shared_ptr<Config> ConfigSPtr;
 
     public:
-      Dispatcher(const ConfigSPtr& config, const Server* server);
+      Dispatcher(const Server* server, const ConfigSPtr& config);
       ~Dispatcher();
 
       bool start();

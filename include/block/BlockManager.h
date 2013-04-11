@@ -19,6 +19,7 @@ namespace Doopey {
   class Config;
   class DataBlock;
   class MetaBlock;
+  class Server;
 
   class BlockManager {
     typedef shared_ptr<Config> ConfigSPtr;
@@ -32,11 +33,8 @@ namespace Doopey {
     typedef shared_ptr<MetaBlock> MetaBlockSPtr;
 
     public:
-      BlockManager(const ConfigSPtr& config);
+      BlockManager(const Server* server, const ConfigSPtr& config);
       ~BlockManager();
-
-      void setRouter(const RouterSPtr& router) { _router = router; }
-
       // request handle interface
       MetaBlockSPtr getMeta(uint64_t id) { return MetaBlockSPtr(NULL); }
       DataBlockSPtr getData(uint64_t id) { return DataBlockSPtr(NULL); }
@@ -46,7 +44,16 @@ namespace Doopey {
 
       BlockID saveBlock(const BlockSPtr& block);
 
+      const BlockLoaderSPtr getBlockLoader() const { return _loader; }
+      const BlockResolverSPtr getBlockResolver() const { return _resolver; }
+      const BlockSaverSPtr getBlockSaver() const { return _saver; }
+      const BlockUpdaterSPtr getBlockUpdater() const { return _updater; }
+
+      MachineID getMachineID() const;
     private:
+
+      const Server* _server;
+
       RouterSPtr _router;
 
       BlockLoaderSPtr _loader;
@@ -54,7 +61,6 @@ namespace Doopey {
       BlockSaverSPtr _saver;
       BlockUpdaterSPtr _updater;
 
-    friend class BlockResolver;
   }; // class BlockManager
 
 };  // namespace Doopey

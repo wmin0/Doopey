@@ -16,12 +16,13 @@ using std::string;
 namespace Doopey {
 
   class Config;
+  class Server;
 
   class Router {
     typedef shared_ptr<Config> ConfigSPtr;
 
     public:
-      Router(const ConfigSPtr& config);
+      Router(const Server* server, const ConfigSPtr& config);
       ~Router();
 
       // we need pass this to pthread, so we can't do so in constructor
@@ -40,6 +41,8 @@ namespace Doopey {
 
     private:
       static Router* _this;
+
+      const Server* _server;
 
       pthread_t _thread;
       ThreadState _threadState;

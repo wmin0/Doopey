@@ -1,6 +1,8 @@
 #ifndef _DOOPEY_BLOCK_SAVER_H_
 #define _DOOPEY_BLOCK_SAVER_H_
 
+#include "common/Doopey.h"
+
 #include <memory>
 #include <string>
 
@@ -20,7 +22,7 @@ namespace Doopey {
     public:
       BlockSaver(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockSaver();
-      bool saveBlock(const BlockSPtr& block);
+      BlockID saveBlock(const BlockSPtr& block);
 
     private:
       const BlockManager* _manager;

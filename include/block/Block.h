@@ -19,6 +19,10 @@ namespace Doopey {
     public:
       // initial by block manager
       const static size_t blockSize;
+      BlockID getID() const { return _id; }
+
+    protected:
+      void setID(BlockID id) { _id = id; }
 
     protected:
       // NOTICE:
@@ -29,6 +33,7 @@ namespace Doopey {
       unsigned char* _data;
       BlockID _id;
 
+    friend class BlockSaver;
   }; // class Block
 
 };  // namespace Doopey

@@ -21,9 +21,9 @@ Server::Server(const char* configPath) {
 
   ConfigLoader loader;
   _sectionCollection = loader.loadConfig(configPath);
-  _blockManager.reset(new BlockManager(_sectionCollection->getConfig("")));
-  _router.reset(new Router(_sectionCollection->getConfig("")));
-  _dispatcher.reset(new Dispatcher(_sectionCollection->getConfig(""), this));
+  _blockManager.reset(new BlockManager(this, _sectionCollection->getConfig("")));
+  _router.reset(new Router(this, _sectionCollection->getConfig("")));
+  _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
 }
 
 Server::~Server() {

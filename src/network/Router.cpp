@@ -10,7 +10,7 @@ using namespace Doopey;
 
 Router* Router::_this = NULL;
 
-Router::Router(const ConfigSPtr& config): _thread(0), _threadState(TS_None) {
+Router::Router(const Server* server, const ConfigSPtr& config): _server(server), _thread(0), _threadState(TS_None) {
 }
 
 Router::~Router() {

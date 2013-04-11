@@ -10,7 +10,7 @@ using namespace Doopey;
 
 Dispatcher* Dispatcher::_this = NULL;
 
-Dispatcher::Dispatcher(const ConfigSPtr& config, const Server* server):
+Dispatcher::Dispatcher(const Server* server, const ConfigSPtr& config):
   _server(server), _thread(0), _threadState(TS_None) {
 }
 
