@@ -10,8 +10,6 @@ using std::shared_ptr;
 
 namespace Doopey {
 
-  class OperationDelegate;
-
   class DataBlock: public Block {
     public:
       DataBlock(unsigned char* data, BlockID id): Block(data, id) {}

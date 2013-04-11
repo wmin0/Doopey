@@ -41,10 +41,10 @@ namespace Doopey {
       MetaBlockSPtr getMeta(uint64_t id) { return MetaBlockSPtr(NULL); }
       DataBlockSPtr getData(uint64_t id) { return DataBlockSPtr(NULL); }
 
-      MetaBlockSPtr newMeta();// { return MetaBlockSPtr(NULL); }
-      DataBlockSPtr newData();// { return DataBlockSPtr(NULL); }
+      MetaBlockSPtr newMeta();
+      DataBlockSPtr newData();
 
-      BlockID saveBlock(const BlockSPtr& block);// { return 0; }
+      BlockID saveBlock(const BlockSPtr& block);
 
     private:
       RouterSPtr _router;

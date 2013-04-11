@@ -8,8 +8,6 @@ using std::shared_ptr;
 namespace Doopey {
 
   class Block;
-  class OperationDelegate;
-
   class DataInfo {
     typedef shared_ptr<Block> BlockSPtr;
 
@@ -24,8 +22,6 @@ namespace Doopey {
         data(s), size(len), _block(block) {}
       // keep reference count
       BlockSPtr _block;
-
-    friend class OperationDelegate;
   }; // class DataInfo
 
 };  // namespace Doopey

@@ -9,15 +9,12 @@ using std::shared_ptr;
 
 namespace Doopey {
 
-  class OperationDelegate;
-
   class Block {
     public:
       Block(unsigned char* data, BlockID id): _data(data), _id(id) {}
       virtual ~Block() {
-        // TODO:
-        // munmap(map, FILESIZE)
-        delete _data;
+        // NOTE: mmap when open file and memcpy
+        delete[] _data;
       }
     public:
       // initial by block manager

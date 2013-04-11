@@ -39,15 +39,28 @@ unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
 }
 
 DataBlockSPtr BlockLoader::newData() const {
-  // TODO: check allocate success
   // NOTE: allocate id by Saver, because Saver know about local information
-  return DataBlockSPtr(new DataBlock(allocateMem(), 0));
+  // NOTE: don't use vector here for controlling memory.
+  unsigned char* mem = allocateMem();
+  if (NULL == mem) {
+    return DataBlockSPtr(NULL);
+  }
+  return DataBlockSPtr(new DataBlock(mem, 0));
 }
 MetaBlockSPtr BlockLoader::newMeta() const {
-  // TODO: check allocate success
-  return MetaBlockSPtr(new MetaBlock(allocateMem(), 0));
+  unsigned char* mem = allocateMem();
+  if (NULL == mem) {
+    return MetaBlockSPtr(NULL);
+  }
+  return MetaBlockSPtr(new MetaBlock(mem, 0));
 }
 
 unsigned char* BlockLoader::allocateMem() const {
-  return NULL;
+  unsigned char* mem = NULL;
+  try {
+    mem = new unsigned char[Block::blockSize];
+  } catch (...) {
+    mem = NULL;
+  }
+  return mem;
 }

@@ -18,22 +18,18 @@ BlockManager::BlockManager(const ConfigSPtr& config) {
   _resolver.reset(new BlockResolver(this, config));
   _loader.reset(new BlockLoader(this, config));
   _saver.reset(new BlockSaver(this, config));
-
 }
 
 BlockManager::~BlockManager() {}
 
-MetaBlockSPtr BlockManager::newMeta()
-{
+MetaBlockSPtr BlockManager::newMeta() {
   return _loader->newMeta();
 }
 
-DataBlockSPtr BlockManager::newData()
-{
+DataBlockSPtr BlockManager::newData() {
   return _loader->newData();
 }
 
-BlockID saveBlock(const BlockSPtr& block)
-{
+BlockID saveBlock(const BlockSPtr& block) {
   return 0; 
 }
