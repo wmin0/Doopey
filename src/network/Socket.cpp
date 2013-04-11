@@ -11,7 +11,11 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
+#include <cstdint>
+#include <vector>
+
 using namespace Doopey;
+using std::vector;
 
 typedef shared_ptr<Socket> SocketSPtr;
 typedef shared_ptr<Message> MessageSPtr;
@@ -81,6 +85,13 @@ bool Socket::bind(int port) {
     log.error("socket bind server error\n");
     return false;
   }
+  return true;
+}
+
+bool Socket::listen() {
+  if (::listen(_fd, 1024) < 0) {
+    return false;
+  }
   _isConnected = true;
   return true;
 }
@@ -101,9 +112,75 @@ SocketSPtr Socket::accept() {
 }
 
 bool Socket::send(const MessageSPtr& msg) {
-  return false;
+  vector<unsigned char> data;
+  msg->serilize(data);
+  uint64_t len = data.size();
+  ssize_t ret = 0;
+  uint64_t count = 0;
+  //log.debug("send start\n");
+  do {
+    ret = write(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
+    if (0 >= ret) {
+      //log.debug("send len fail %d\n", ret);
+      _isConnected = false;
+      return false;
+    }
+    //log.debug("send len %d\n", ret);
+    count += ret;
+  } while (count < sizeof(uint64_t));
+  //log.debug("send len %lld done\n", len);
+  count = 0;
+  do {
+    if (count + Socket::sliceSize > len) {
+      ret = write(_fd, data.data() + count, len - count);
+    } else {
+      ret = write(_fd, data.data() + count, Socket::sliceSize);
+    }
+    if (0 >= ret) {
+      //log.debug("send data fail %d\n", ret);
+      _isConnected = false;
+      return false;
+    }
+    //log.debug("send data %d\n", ret);
+    count += ret;
+  } while (count < len);
+  //log.debug("send data done\n");
+  return true;
 }
 
 MessageSPtr Socket::recieve() {
-  return MessageSPtr(NULL);
+  uint64_t len;
+  ssize_t ret = 0;
+  uint64_t count = 0;
+  vector <unsigned char> data;
+  //log.debug("recieve start\n");
+  do {
+    ret = read(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
+    if (0 >= ret) {
+      //log.debug("len read fail %d\n", ret);
+      _isConnected = false;
+      return MessageSPtr(NULL);
+    }
+    //log.debug("read len %d\n", ret);
+    count += ret;
+  } while (count < sizeof(uint64_t));
+  //log.debug("read len done %lld\n", len);
+  count = 0;
+  data.resize(len);
+  do {
+    if (count + Socket::sliceSize > len) {
+      ret = read(_fd, data.data() + count, len - count);
+    } else {
+      ret = read(_fd, data.data() + count, Socket::sliceSize);
+    }
+    if (0 >= ret) {
+      //log.debug("data read fail %d\n", ret);
+      _isConnected = false;
+      return MessageSPtr(NULL);
+    }
+    //log.debug("read data %d\n", ret);
+    count += ret;
+  } while (count < len);
+  //log.debug("read done\n");
+  return MessageSPtr(new Message(data));
 }

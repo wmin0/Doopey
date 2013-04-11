@@ -31,14 +31,22 @@ namespace Doopey {
       // TODO: complete UDP later
       // bool sendTo
 
+      bool isConnected() const { return _isConnected; }
+
     private:
       Socket(SocketType type, int fd, bool conn):
         _type(type), _fd(fd), _isConnected(conn) {}
 
     private:
+      // 64k
+      static const size_t sliceSize = 65536;
+
+    private:
       SocketType _type;
       int _fd;
       bool _isConnected;
+
+
 
   }; // class Socket
 

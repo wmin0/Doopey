@@ -10,9 +10,11 @@ using std::vector;
 namespace Doopey {
 
   enum MessageType {
+    MT_None = 0,
   }; // enum MessageType
 
   enum MessageCmd {
+    MC_None = 0,
   }; // enum MessageCmd
 
   class Message {
@@ -24,12 +26,13 @@ namespace Doopey {
 
       bool addData(const unsigned char* data, size_t s, size_t len);
 
-      vector<unsigned char> serilize();
+      bool serilize(vector<unsigned char>& output) const;
 
     private:
       MessageType _type;
       MessageCmd _cmd;
-      vector _data;
+      vector<unsigned char> _data;
+    friend class SocketTest;
   }; // class Message
 
 };  // namespace Doopey
