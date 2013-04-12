@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-#include <pthread.h>
 #include <string>
 
 using std::map;
@@ -17,15 +16,16 @@ namespace Doopey {
 
   class Config;
   class Server;
+  class Thread;
 
   class Router {
     typedef shared_ptr<Config> ConfigSPtr;
+    typedef shared_ptr<Thread> ThreadSPtr;
 
     public:
       Router(const Server* server, const ConfigSPtr& config);
       ~Router();
 
-      // we need pass this to pthread, so we can't do so in constructor
       bool start();
       bool stop();
 
@@ -33,19 +33,20 @@ namespace Doopey {
 
 
     private:
-      static void* threadFunc(void* obj);
-      static void handleRSTOP(int sig);
+      static void threadFunc(void* obj);
+      static void threadStop(void* obj);
+
       static void handleRREQ(int sig);
 
-      void* mainLoop();
+      void mainLoop();
 
     private:
       static Router* _this;
 
       const Server* _server;
 
-      pthread_t _thread;
-      ThreadState _threadState;
+      ThreadSPtr _thread;
+      bool _run;
 
       map<uint64_t, string> _routingTable;
       // queue requestQueue;

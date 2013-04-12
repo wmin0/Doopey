@@ -4,17 +4,18 @@
 #include "common/Doopey.h"
 
 #include <memory>
-#include <pthread.h>
 
 using std::shared_ptr;
 
 namespace Doopey {
 
   class Config;
+  class Thread;
   class Server;
 
   class Dispatcher {
     typedef shared_ptr<Config> ConfigSPtr;
+    typedef shared_ptr<Thread> ThreadSPtr;
 
     public:
       Dispatcher(const Server* server, const ConfigSPtr& config);
@@ -24,19 +25,18 @@ namespace Doopey {
       bool stop();
 
     private:
-      static void* threadFunc(void* obj);
-      static void handleDSTOP(int sig);
+      static void threadFunc(void* obj);
+      static void threadStop(void* obj);
 
-      void* mainLoop();
+      void mainLoop();
 
     private:
-      static Dispatcher* _this;
-
       // do not delete it!!
       const Server* _server;
 
-      pthread_t _thread;
-      ThreadState _threadState;
+      ThreadSPtr _thread;
+
+      bool _run;
 
   }; // class Dispatcher
 

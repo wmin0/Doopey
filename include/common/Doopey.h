@@ -10,18 +10,10 @@ namespace Doopey {
 
   extern Logger log;
 
-  enum ThreadState {
-    TS_None = 0,
-    TS_Start = 1,
-    TS_Run = 2,
-    TS_Terminate = 3
-  };
-
   // signal
-  #define SIGRSTOP SIGRTMAX - 1
-  #define SIGDSTOP SIGRTMAX - 2
-  #define SIGSREQ SIGRTMAX - 3
-  #define SIGRREQ SIGRTMAX - 4
+  #define SIGTSTOP SIGRTMAX - 1
+  #define SIGSREQ SIGRTMAX - 2
+  #define SIGRREQ SIGRTMAX - 3
 
   // general type
   typedef uint64_t BlockID;
