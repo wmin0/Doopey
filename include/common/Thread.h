@@ -15,24 +15,24 @@ namespace Doopey {
   class Thread {
 
     public:
-      Thread(void (*run)(void*), void (*stop)(void*));
-      ~Thread();
+      Thread(void (*run)(void* arg), void (*stop)(void* arg));
+      virtual ~Thread();
       bool start(void* arg);
       bool stop(void* arg);
       ThreadState getState() const { return _state; }
 
-    private:
-      static Thread* _this;
+      // init in doopey_init
       static pthread_mutex_t _lock;
+      static pthread_mutex_t _sig_lock;
+    protected:
+      static Thread* _this;
 
       static Thread* _sig_this;
-      static pthread_mutex_t _sig_lock;
 
       static void* _stop_arg;
 
       static void* threadProc(void* arg);
       static void handleTSTOP(int sig);
-
 
       pthread_t _thread;
       ThreadState _state;

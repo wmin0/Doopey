@@ -19,6 +19,9 @@ namespace Doopey {
   typedef uint64_t BlockID;
   typedef uint32_t MachineID;
 
+  extern bool DoopeyInit();
+  extern bool DoopeyFinal();
+
 };  // namespace Doopey
 
 #endif

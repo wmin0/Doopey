@@ -4,9 +4,6 @@
 #include "common/Doopey.h"
 #include "common/Thread.h"
 
-#include <csignal>
-#include <pthread.h>
-
 using namespace Doopey;
 
 Router* Router::_this = NULL;

@@ -14,7 +14,7 @@ pthread_mutex_t Thread::_sig_lock;
 
 void* Thread::_stop_arg = NULL;
 
-Thread::Thread(void (*run)(void*), void (*stop)(void*)):
+Thread::Thread(void (*run)(void* arg), void (*stop)(void* arg)):
   _thread(0), _state(TS_None), _run(run), _stop(stop) {
 }
 

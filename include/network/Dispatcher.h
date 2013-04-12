@@ -3,19 +3,23 @@
 
 #include "common/Doopey.h"
 
+#include <vector>
 #include <memory>
 
 using std::shared_ptr;
+using std::vector;
 
 namespace Doopey {
 
   class Config;
+  class TaskThread;
   class Thread;
   class Server;
 
   class Dispatcher {
     typedef shared_ptr<Config> ConfigSPtr;
     typedef shared_ptr<Thread> ThreadSPtr;
+    typedef shared_ptr<TaskThread> TaskThreadSPtr;
 
     public:
       Dispatcher(const Server* server, const ConfigSPtr& config);
@@ -37,6 +41,8 @@ namespace Doopey {
       ThreadSPtr _thread;
 
       bool _run;
+      vector <TaskThreadSPtr> _threadPool;
+
 
   }; // class Dispatcher
 

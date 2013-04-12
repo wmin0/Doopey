@@ -2,6 +2,7 @@
 
 #include "common/Doopey.h"
 #include "common/Thread.h"
+#include "common/TaskThread.h"
 #include "machine/Server.h"
 
 #include <pthread.h>
@@ -11,6 +12,12 @@ using namespace Doopey;
 Dispatcher::Dispatcher(const Server* server, const ConfigSPtr& config):
   _server(server), _run(false) {
   _thread.reset(new Thread(threadFunc, threadStop));
+  // TODO: deciede threadPool num by config
+  size_t threadNum = 4;
+  _threadPool.resize(threadNum);
+  for (size_t i = 0; i < threadNum; ++i) {
+    _threadPool[i] = TaskThreadSPtr(new TaskThread());
+  }
 }
 
 Dispatcher::~Dispatcher() {
