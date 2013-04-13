@@ -17,16 +17,13 @@ namespace Doopey {
   class SectionCollection {
     typedef shared_ptr<Config> ConfigSPtr;
     typedef map<string ,ConfigSPtr> MapSectionCollection;
-
     public:
       ~SectionCollection() {}
-
-      ConfigSPtr getConfig(const char* section);
-
-      MapSectionCollection configTable;
+      ConfigSPtr getConfig(const char* section) const;
 
     private:
       SectionCollection() {}
+      MapSectionCollection _configTable;
 
     friend ConfigLoader;
   }; // class SectionCollection

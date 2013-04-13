@@ -1,4 +1,5 @@
 #include "config/SectionCollection.h"
+#include "logger/Logger.h"
 
 #include <iostream>
 
@@ -7,15 +8,17 @@ using namespace std;
 
 typedef shared_ptr<Config> ConfigSPtr;
 
-ConfigSPtr SectionCollection::getConfig(const char* section){
-  ConfigSPtr result;
+ConfigSPtr SectionCollection::getConfig(const char* section) const{
+  ConfigSPtr result(NULL);
   string sectionIndex=section;
-  map<string, ConfigSPtr>::iterator findConfig;
-  findConfig = configTable.find(sectionIndex);
+  map<string, ConfigSPtr>::const_iterator findConfig;
+  findConfig = _configTable.find(sectionIndex);
 
-  if(findConfig!=configTable.end())
+  if(findConfig!= _configTable.end())
     result=findConfig->second;
-  else cout<<"Config not found"<<endl;
-
+  else{
+    Logger logger(LL_Info);
+    logger.info("config not found");
+  }
   return result;
 }

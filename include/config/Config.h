@@ -17,12 +17,12 @@ namespace Doopey {
 
     public:
       ~Config() {}
-      string getValue(const char* key);
-      MapConfigValue values;
-      string name;//config name
+      string getValue(const char* key) const;
 
     private:
-      Config(string);
+      Config(string&);
+      MapConfigValue _values;
+      string _name;//config name
 
     friend ConfigLoader;
     friend SectionCollection;

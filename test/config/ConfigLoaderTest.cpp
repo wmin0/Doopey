@@ -19,24 +19,20 @@ using namespace std;
 void ConfigLoaderTest::testFunc() {
   //CPPUNIT_ASSERT(1 == 1);
   const char *path="TestConfig.txt";
-
-  shared_ptr<SectionCollection> sectionCollection;
-  shared_ptr<Config> config;
+  shared_ptr<SectionCollection> sectionCollection(NULL);
+  shared_ptr<Config> config(NULL);
   sectionCollection=ConfigLoader::loadConfig(path);
 
   config=sectionCollection->getConfig("config1");
-  cout<<"config name is "<<config->name<<endl;
-  cout<<"config property is "<<config->getValue("BlockDir1")<<endl;
-  cout<<"config property is "<<config->getValue("BlockDir1-2")<<endl;
+  CPPUNIT_ASSERT(config->getValue("BlockDir1")=="/tmp1");
+  CPPUNIT_ASSERT(config->getValue("BlockDir1-2")=="value1-2");
 
   config=sectionCollection->getConfig("config3");
-  cout<<"config name is "<<config->name<<endl;
-  cout<<"config property is "<<config->getValue("BlockDir3")<<endl;
+  CPPUNIT_ASSERT(config->getValue("BlockDir3")=="/tmp3");
 
   config=sectionCollection->getConfig("config2");
-  cout<<"config name is "<<config->name<<endl;
-  cout<<"config property is "<<config->getValue("BlockDir2")<<endl;
-  cout<<"config property is "<<config->getValue("BlockDir2-2")<<endl;
+  CPPUNIT_ASSERT(config->getValue("BlockDir2")=="/tmp2");
+  CPPUNIT_ASSERT(config->getValue("BlockDir2-2")=="value2-2");
 }
 
 CppUnit::Test* ConfigLoaderTest::suite() {
