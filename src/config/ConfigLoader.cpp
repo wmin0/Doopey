@@ -6,7 +6,6 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
-#include <iostream>
 
 using namespace std;
 using namespace Doopey;
@@ -31,7 +30,6 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
       strcpy(temp, line.c_str());
       configName=strtok(temp , "[");
       configName.erase(configName.size()-1);
-//cout<<configName<<endl;
       ConfigSPtr config(new Config(configName));
 
       while(getline(file, line) && line.size()>0){
@@ -50,7 +48,6 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
           continue;
         }
         config->_values.insert(pair<string, string>(tempKey, tempValue));
-//cout<<tempKey<<" "<<tempValue<<endl;
       }
       sectionCollection->
       _configTable.insert(pair<string, ConfigSPtr>(config->_name, config));
