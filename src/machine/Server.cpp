@@ -17,7 +17,8 @@ Server* Server::_this = NULL;
 
 Server::Server(const char* configPath) {
   attachSignal();
-  _thread = pthread_self();
+
+  pthread_mutex_init(&_mutex, NULL);
 
   ConfigLoader loader;
   _sectionCollection = loader.loadConfig(configPath);
@@ -28,35 +29,43 @@ Server::Server(const char* configPath) {
 
 Server::~Server() {
   detachSignal();
+  pthread_mutex_destroy(&_mutex);
 }
 
 bool Server::start() {
-  _router->start();
-  _dispatcher->start();
-  return true;
+  return _dispatcher->start() && _router->start();
 }
 
 void Server::serve() {
+  pthread_mutex_lock(&_mutex);
+  pthread_mutex_lock(&_mutex);
+  pthread_mutex_unlock(&_mutex);
 }
 
 void Server::attachSignal() {
   Server::_this = this;
   signal(SIGTERM, Server::handleTERM);
-  signal(SIGSREQ, Server::handleSREQ);
+  signal(SIGINT, Server::handleINT);
   signal(SIGPIPE, SIG_IGN);
 }
 
 void Server::detachSignal() {
   signal(SIGTERM, NULL);
-  signal(SIGSREQ, NULL);
+  signal(SIGINT, NULL);
   signal(SIGPIPE, SIG_DFL);
   Server::_this = NULL;
 }
 
 void Server::handleTERM(int sig) {
   log.debug("Server Recieve TERM\n");
+  signalStop();
 }
 
-void Server::handleSREQ(int sig) {
+void Server::handleINT(int sig) {
+  log.debug("Server Recieve INT\n");
+  signalStop();
 }
 
+void Server::signalStop() {
+  pthread_mutex_unlock(&(Server::_this->_mutex));
+}

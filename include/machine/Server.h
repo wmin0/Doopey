@@ -33,13 +33,14 @@ namespace Doopey {
       const FileManagerSPtr getFileManager() const { return _fileManager; }
       MachineID getMachineID() const { return _machineID; }
 
+      void serve();
     private:
       static void handleTERM(int sig);
-      static void handleSREQ(int sig);
+      static void handleINT(int sig);
+      static void signalStop();
 
       void attachSignal();
       void detachSignal();
-      void serve();
 
     private:
       static Server* _this;
@@ -51,7 +52,9 @@ namespace Doopey {
       DispatcherSPtr _dispatcher;
       RouterSPtr _router;
       FileManagerSPtr _fileManager;
-      pthread_t _thread;
+
+      // wait lock
+      pthread_mutex_t _mutex;
   }; // class Server
 
 };  // namespace Doopey

@@ -7,7 +7,9 @@ int main() {
   DoopeyInit();
   Server server("");
   log.info("Server Start!\n");
-  server.start();
+  if (server.start()) {
+    server.serve();
+  }
   DoopeyFinal();
   return 0;
 }

@@ -86,9 +86,11 @@ void Dispatcher::mainLoop() {
 
 void Dispatcher::dispatch(void* dispatch, void* sock) {
   Dispatcher* dispatcher = (Dispatcher*)dispatch;
-  SocketSPtr* socket = (SocketSPtr*)socket;
+  SocketSPtr* socket = (SocketSPtr*)sock;
   MessageSPtr msg = (*socket)->recieve();
   if (NULL != msg) {
+    log.debug("Thread %d: get request from client %d %d\n",
+              pthread_self(), msg->getType(), msg->getCmd());
     switch (msg->getType()) {
       default:
         break;

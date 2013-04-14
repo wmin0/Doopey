@@ -109,9 +109,9 @@ SocketSPtr Socket::accept() {
   int conn, conn_len = 0;
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
-  log.debug("Accepting!\n");
+  //log.debug("Accepting!\n");
   conn = ::accept(_fd, (struct sockaddr*)&addr, (socklen_t*)&conn_len);
-  log.debug("Accept done %d!\n", conn);
+  //log.debug("Accept done %d!\n", conn);
   if (conn < 0) {
     return SocketSPtr(NULL);
   }
