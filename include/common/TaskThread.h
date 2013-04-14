@@ -14,9 +14,8 @@ namespace Doopey {
       virtual ~TaskThread();
 
       bool setTask(void (*task)(void* input, void* output));
-      bool setTaskData(void* input, void* output);
       bool isFree() const { return _free; }
-      bool runTask();
+      bool runTask(void* input, void* output);
 
     private:
       static void threadFunc(void* obj);

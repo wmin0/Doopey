@@ -28,6 +28,9 @@ namespace Doopey {
 
       bool serilize(vector<unsigned char>& output) const;
 
+      MessageType getType() const { return _type; }
+      MessageCmd getCmd() const { return _cmd; }
+
     private:
       MessageType _type;
       MessageCmd _cmd;

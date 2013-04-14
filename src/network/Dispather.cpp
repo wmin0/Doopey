@@ -3,20 +3,28 @@
 #include "common/Doopey.h"
 #include "common/Thread.h"
 #include "common/TaskThread.h"
+#include "logger/Logger.h"
 #include "machine/Server.h"
+#include "network/Socket.h"
+#include "network/Message.h"
 
 #include <pthread.h>
+#include <memory>
 
 using namespace Doopey;
 
+typedef shared_ptr<Message> MessageSPtr;
+
 Dispatcher::Dispatcher(const Server* server, const ConfigSPtr& config):
   _server(server), _run(false) {
+  _socket.reset(new Socket(ST_TCP));
   _thread.reset(new Thread(threadFunc, threadStop));
   // TODO: deciede threadPool num by config
-  size_t threadNum = 4;
-  _threadPool.resize(threadNum);
-  for (size_t i = 0; i < threadNum; ++i) {
-    _threadPool[i] = TaskThreadSPtr(new TaskThread());
+  _threadNum = 4;
+  _port = 9876;
+  _threadPool.resize(_threadNum);
+  for (size_t i = 0; i < _threadNum; ++i) {
+    _threadPool[i] = TaskThreadSPtr(new TaskThread(Dispatcher::dispatch));
   }
 }
 
@@ -26,6 +34,9 @@ Dispatcher::~Dispatcher() {
 
 bool Dispatcher::start() {
   log.debug("Dispatcher Thread start!!\n");
+  if (!_socket->bind(_port) || _socket->listen()) {
+    log.error("Dispatcher Socket bind Err!!\n");
+  }
   return _thread->start(this);
 }
 
@@ -47,6 +58,40 @@ void Dispatcher::threadStop(void* obj) {
 }
 
 void Dispatcher::mainLoop() {
-  while (_run);
+  while (_run) {
+    SocketSPtr conn = _socket->accept();
+    if (NULL != conn) {
+      bool serve = false;
+      for (size_t i = 0; i < _threadNum; ++i) {
+        if (_threadPool[i]->isFree()) {
+          // Note: Hack Orz
+          SocketSPtr* ptr = new SocketSPtr(conn);
+          // and abuse Orz
+          if (!_threadPool[i]->runTask(this, ptr)) {
+            delete ptr;
+            log.warning("start task thread err\n");
+          } else {
+            serve = true;
+          }
+        }
+      }
+      if (!serve) {
+        log.info("server busy!\n");
+        // connect will delete by local variable
+      }
+    }
+  }
 }
 
+void Dispatcher::dispatch(void* dispatch, void* sock) {
+  Dispatcher* dispatcher = (Dispatcher*)dispatch;
+  SocketSPtr* socket = (SocketSPtr*)socket;
+  MessageSPtr msg = (*socket)->recieve();
+  if (NULL != msg) {
+    switch (msg->getType()) {
+      default:
+        break;
+    }
+  }
+  delete socket;
+}

@@ -51,6 +51,8 @@ void TaskThread::mainLoop() {
     }
     _task(_task_input, _task_output);
     _free = true;
+    _task_input = NULL;
+    _task_output = NULL;
   }
 }
 
@@ -62,18 +64,12 @@ bool TaskThread::setTask(void (*task)(void* input, void* output)) {
   return false;
 }
 
-bool TaskThread::setTaskData(void* input, void* output) {
-  if (_free) {
+bool TaskThread::runTask(void* input, void* output) {
+  if (_free && _run && NULL != _task) {
+    // TODO: lock
+    _free = false;
     _task_input = input;
     _task_output = output;
-    return true;
-  }
-  return false;
-}
-
-bool TaskThread::runTask() {
-  if (_free && _run && NULL != _task) {
-    _free = false;
     pthread_mutex_unlock(&_task_lock);
     return true;
   }

@@ -14,12 +14,14 @@ namespace Doopey {
   class Config;
   class TaskThread;
   class Thread;
+  class Socket;
   class Server;
 
   class Dispatcher {
     typedef shared_ptr<Config> ConfigSPtr;
     typedef shared_ptr<Thread> ThreadSPtr;
     typedef shared_ptr<TaskThread> TaskThreadSPtr;
+    typedef shared_ptr<Socket> SocketSPtr;
 
     public:
       Dispatcher(const Server* server, const ConfigSPtr& config);
@@ -31,6 +33,7 @@ namespace Doopey {
     private:
       static void threadFunc(void* obj);
       static void threadStop(void* obj);
+      static void dispatch(void* dispatch, void* sock);
 
       void mainLoop();
 
@@ -43,7 +46,10 @@ namespace Doopey {
       bool _run;
       vector <TaskThreadSPtr> _threadPool;
 
+      SocketSPtr _socket;
 
+      int _port;
+      size_t _threadNum;
   }; // class Dispatcher
 
 };  // namespace Doopey
