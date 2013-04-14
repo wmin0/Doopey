@@ -22,7 +22,7 @@ using std::ifstream;
 using std::stringstream;
 
 BlockResolver::BlockResolver(const BlockManager* manager, const ConfigSPtr& config):
-  _manager(manager), _localDir("."), _cacheRemoteSize(0) {
+  _manager(manager), _localDir("."), _cacheRemoteSize(0), _localMax(0) {
   // some setup
   loadLocalIDs();
 }
@@ -30,12 +30,19 @@ BlockResolver::BlockResolver(const BlockManager* manager, const ConfigSPtr& conf
 BlockResolver::~BlockResolver() {
 }
 
+BlockID BlockResolver::newLocalID() {
+  return buildBlockID(_manager->getMachineID(), ++_localMax);
+}
+
+
 void BlockResolver::loadLocalIDs() {
   DIR* dir;
   struct dirent* file;
   dir = opendir(_localDir.data());
   unsigned long long int tmp;
   // clear
+  // TODO: save in encode64?
+  MachineID machine = _manager->getMachineID();
   _localIDs.clear();
   while (NULL != (file = readdir(dir))) {
     if (0 == strcmp(file->d_name, ".") ||
@@ -46,6 +53,14 @@ void BlockResolver::loadLocalIDs() {
       log.warning("detect illegel file %s\n", file->d_name);
     } else {
       _localIDs.insert(tmp);
+      // TODO: if change to new Machine ID...
+      MachineID mid = getMachineIDFromBlockID(tmp);
+      if (machine == mid) {
+        LocalBlockID bid = getLocalIDFromBlockID(tmp);
+        if (bid > _localMax) {
+          _localMax = bid;
+        }
+      }
     }
   }
   closedir(dir);

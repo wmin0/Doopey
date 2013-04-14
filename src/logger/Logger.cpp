@@ -28,7 +28,9 @@ Logger::Logger(LogLevel level, const char* dir):
 }
 
 Logger::~Logger() {
-  fclose(_logFile);
+  if (stderr != _logFile) {
+    fclose(_logFile);
+  }
 }
 
 void Logger::error(const char* format, ...) {

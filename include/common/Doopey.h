@@ -17,7 +17,12 @@ namespace Doopey {
 
   // general type
   typedef uint64_t BlockID;
+  typedef uint32_t LocalBlockID;
   typedef uint32_t MachineID;
+
+  extern MachineID getMachineIDFromBlockID(BlockID block);
+  extern MachineID getLocalIDFromBlockID(BlockID block);
+  extern BlockID buildBlockID(MachineID machine, LocalBlockID local);
 
   extern bool DoopeyInit();
   extern bool DoopeyFinal();

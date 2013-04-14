@@ -28,6 +28,7 @@ namespace Doopey {
       ~BlockResolver();
 
       BlockLocationAttrSPtr askBlock(BlockID id);
+      BlockID newLocalID();
       void addLocalID(BlockID id);
       //void removeID(BlockID id);
 
@@ -44,6 +45,7 @@ namespace Doopey {
 
       set<BlockID> _localIDs;
       map<BlockID, BlockLocationAttrSPtr> _remoteIDs;
+      LocalBlockID _localMax;
 
   }; // class BlockResolver
 
