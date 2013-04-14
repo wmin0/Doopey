@@ -1,7 +1,5 @@
 #include "config/SectionCollection.h"
-#include "logger/Logger.h"
-
-#include <iostream>
+#include "common/Doopey.h"
 
 using namespace Doopey;
 using namespace std;
@@ -16,9 +14,8 @@ ConfigSPtr SectionCollection::getConfig(const char* section) const{
 
   if(findConfig!= _configTable.end())
     result=findConfig->second;
-  else{
-    Logger logger(LL_Info);
-    logger.info("config not found");
-  }
+  else
+    log.info("config not found\n");
+
   return result;
 }

@@ -1,12 +1,10 @@
 #include "config/Config.h"
-#include "logger/Logger.h"
-
-#include <iostream>
+#include "common/Doopey.h"
 
 using namespace Doopey;
 using namespace std;
 
-Config::Config(string& configName):_name(configName) {
+Config::Config(const string& configName):_name(configName) {
 }
 
 string Config::getValue(const char* key) const{
@@ -16,10 +14,8 @@ string Config::getValue(const char* key) const{
   string result = "";
   if(findValue!=_values.end())
     result = findValue->second;
-  else{
-    Logger logger(LL_Info);
-    logger.info("value not found");
-  }
+  else
+    log.info("value not found\n");
 
   return result;
 }

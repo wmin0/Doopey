@@ -1,7 +1,7 @@
 #include "config/ConfigLoader.h"
 #include "config/Config.h"
 #include "config/SectionCollection.h"
-#include "logger/Logger.h"
+#include "common/Doopey.h"
 
 #include <fstream>
 #include <cstring>
@@ -15,7 +15,6 @@ typedef shared_ptr<Config> ConfigSPtr;
 
 SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
   string line;
-  Logger logger(LL_Warning);
   bool ignoreProperties=false;
   SectionCollectionSPtr sectionCollection(new SectionCollection());
   fstream file;
@@ -34,7 +33,7 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
 
       while(getline(file, line) && line.size()>0){
         if(line.find('=')==line.npos){
-          logger.warning("wrong property format of [%s]\n", configName.c_str());
+          log.warning("wrong property format of [%s]\n", configName.c_str());
           continue;
         }
 
@@ -44,17 +43,16 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
         tempKey=strtok(temp , "=");
         tempValue=strtok(NULL, "=");
         if(config->_values.count(tempKey)>0){
-          logger.warning("key is pre-existing\n");
+          log.warning("key is pre-existing in [%s]\n", configName.c_str());
           continue;
         }
         config->_values.insert(pair<string, string>(tempKey, tempValue));
       }
-      sectionCollection->
-      _configTable.insert(pair<string, ConfigSPtr>(config->_name, config));
+      sectionCollection->_configTable.insert(pair<string, ConfigSPtr>(config->_name, config));
     }
     else if(ignoreProperties==false && line.size()>0){
       ignoreProperties=true;
-      logger.warning("wrong format of config name %s, whose properties are ignored\n", line.c_str());
+      log.warning("wrong format of config name %s, whose properties are ignored\n", line.c_str());
     }
   }
 

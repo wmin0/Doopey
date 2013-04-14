@@ -20,7 +20,7 @@ namespace Doopey {
       string getValue(const char* key) const;
 
     private:
-      Config(string&);
+      Config(const string&);
       MapConfigValue _values;
       string _name;//config name
 
