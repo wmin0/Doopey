@@ -27,8 +27,8 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
       string configName;
 
       strcpy(temp, line.c_str());
-      configName=strtok(temp , "[");
-      configName.erase(configName.size()-1);
+      configName=strtok(temp , "[]");
+
       ConfigSPtr config(new Config(configName));
 
       while(getline(file, line) && line.size()>0){
@@ -40,8 +40,8 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
         char temp[line.size()+1];
         strcpy(temp, line.c_str());
         string tempKey,tempValue;
-        tempKey=strtok(temp , "=");
-        tempValue=strtok(NULL, "=");
+        tempKey=strtok(temp , " =");
+        tempValue=strtok(NULL, " =");
         if(config->_values.count(tempKey)>0){
           log.warning("key is pre-existing in [%s]\n", configName.c_str());
           continue;
@@ -55,6 +55,6 @@ SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
       log.warning("wrong format of config name %s, whose properties are ignored\n", line.c_str());
     }
   }
-
+  file.close();
   return sectionCollection;
 }
