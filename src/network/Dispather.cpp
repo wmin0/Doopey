@@ -73,6 +73,7 @@ void Dispatcher::mainLoop() {
             log.warning("start task thread err\n");
           } else {
             serve = true;
+            break;
           }
         }
       }
