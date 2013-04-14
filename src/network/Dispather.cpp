@@ -21,7 +21,7 @@ Dispatcher::Dispatcher(const Server* server, const ConfigSPtr& config):
   _thread.reset(new Thread(threadFunc, threadStop));
   // TODO: deciede threadPool num by config
   _threadNum = 4;
-  _port = 9876;
+  _port = 10090;
   _threadPool.resize(_threadNum);
   for (size_t i = 0; i < _threadNum; ++i) {
     _threadPool[i] = TaskThreadSPtr(new TaskThread(Dispatcher::dispatch));
@@ -34,7 +34,7 @@ Dispatcher::~Dispatcher() {
 
 bool Dispatcher::start() {
   log.debug("Dispatcher Thread start!!\n");
-  if (!_socket->bind(_port) || _socket->listen()) {
+  if (!_socket->bind(_port) || !_socket->listen()) {
     log.error("Dispatcher Socket bind Err!!\n");
   }
   return _thread->start(this);
@@ -55,6 +55,7 @@ void Dispatcher::threadFunc(void* obj) {
 void Dispatcher::threadStop(void* obj) {
   Dispatcher* dispatcher = (Dispatcher*)obj;
   dispatcher->_run = false;
+  dispatcher->_socket->close();
 }
 
 void Dispatcher::mainLoop() {
