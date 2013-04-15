@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 
+#include "common/Doopey.h"
 #include "network/Socket.h"
 #include "block/BlockManager.h"
 
@@ -15,20 +16,20 @@ namespace Doopey{
 
   class MetaBlock;
   class DataBlock;
+  class Message;
 
   class FileUploader{
-
-    typedef shared_ptr<MetaBlock> MetaBlockSPtr;
-    typedef shared_ptr<BlockManager> BlockManagerSPtr;
 
     friend class FileManager;
 
     public:
       ~FileUploader();
-      bool receiveFile(Socket socket);
+      bool receiveFile(SocketSPtr socket);
       void setBlockManager(const BlockManagerSPtr blockManager);
     private:
       FileUploader();
+      bool setupMeta(MetaBlockSPtr meta, const MessageSPtr msg);
+
       BlockManagerSPtr _blockManager;
   };//class FileUploader
 
