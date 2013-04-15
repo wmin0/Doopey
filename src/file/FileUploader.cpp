@@ -1,22 +1,26 @@
 #include "file/FileUploader.h"
+#include "common/Doopey.h"
 
 using namespace Doopey;
 
+typedef shared_ptr<BlockManager> BlockManagerSPtr;
+
 FileUploader::FileUploader()
 {
+  _blockManager = NULL;
 }
 
 FileUploader::~FileUploader()
 {
 }
 
-bool FileUploader::receiveFile(MetaBlockSPtr meta, uint64_t port, string IP)
+bool FileUploader::receiveFile(Socket socket)
 {
-  return true;
-}
-
-bool FileUploader::receiveFile(MetaBlockSPtr meta, string path)
-{
+  if(_blockManager == NULL)
+  {
+    log.error("FileUploader Error: haven't initialize block manager");
+    return false;
+  }
   //fill name field in meta
   
   //1.receive file and split file
@@ -25,4 +29,7 @@ bool FileUploader::receiveFile(MetaBlockSPtr meta, string path)
   return true;
 }
 
-
+void FileUploader::setBlockManager(const BlockManagerSPtr blockManager)
+{
+  _blockManager = blockManager;
+}

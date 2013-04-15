@@ -4,6 +4,8 @@
 #include "block/BlockManager.h"
 #include "block/Block.h"
 #include "block/MetaBlock.h"
+#include "common/Doopey.h"
+#include "machine/Server.h"
 
 using namespace Doopey;
 
@@ -11,10 +13,9 @@ typedef shared_ptr<MetaBlock> MetaBlockSPtr;
 typedef shared_ptr<BlockManager> BlockManagerSPtr;
 typedef shared_ptr<Block> BlockSPtr;
 
-FileManager::FileManager(const ConfigSPtr& config, BlockManagerSPtr blockManager){
+FileManager::FileManager(const Server* server, const ConfigSPtr& config):_server(server){
   _decoder.reset(new MetaDecoder());
   _uploader.reset(new FileUploader());
-  _blockManager = blockManager;
 }
 
 FileManager::~FileManager()
@@ -22,34 +23,20 @@ FileManager::~FileManager()
 
 }
 
-bool FileManager::uploadFile(uint64_t port, string IP, string filename, string pathRemote)
+bool FileManager::uploadFile(Socket socket)
 {
-  MetaBlockSPtr meta;
-
-  bool result = _uploader->receiveFile(meta, port, IP);
-
-
-  return result;
-}
-
-bool FileManager::uploadFile(string pathUpload, string pathRemote)
-{
-  //create meta
-  MetaBlockSPtr meta = _blockManager->newMeta();
-
-  //transmit meta to FileUploader and receive and split file
-  bool result = _uploader->receiveFile(meta, pathUpload);
-
-  //send meta to block manager to get meta's ID
-  BlockSPtr block = std::static_pointer_cast<Block>(meta);
-  BlockID metaID = _blockManager->saveBlock(block);
+  //let uploader to create meta, receive file and create data block
+  _uploader->setBlockManager(_server->getBlockManager());
+  bool result = _uploader->receiveFile(socket);
 
   //add file into map
-  _fileTable[pathRemote] = metaID;
 
   //broadcast that here have a new file
 
   return result;
 }
 
-
+bool FileManager::getFile(string path) const
+{
+  return true;
+}

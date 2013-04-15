@@ -6,12 +6,15 @@
 #include <map>
 #include <string>
 
+#include "network/Socket.h"
+
 using std::shared_ptr;
 using std::string;
 using std::map;
 
 namespace Doopey{
 
+  class Server;
   class MetaDecoder;
   class FileUploader;
   class Config;
@@ -19,12 +22,11 @@ namespace Doopey{
 
   class FileManager{
     typedef shared_ptr<Config> ConfigSPtr;
-    typedef shared_ptr<BlockManager> BlockManagerSPtr;
     typedef shared_ptr<MetaDecoder> MetaDecoderSPtr;
     typedef shared_ptr<FileUploader> FileUploaderSPtr;
 
     public:
-      FileManager(const ConfigSPtr& config, BlockManagerSPtr);
+      FileManager(const Server* server, const ConfigSPtr& config);
       ~FileManager();
 
       //TODO: design the interface of upload file;
@@ -32,16 +34,14 @@ namespace Doopey{
       //         second step: receive entire file, then
       //                      1.split file into different blocks
       //                      2.create meta block(need to design the meta block
-      bool uploadFile(uint64_t port, string IP, string filename, string pathRemote);
-      //parameter with path used for test in single machine
-      bool uploadFile(string pathUpload, string pathRemote);
-      bool getFile(string filename);
+      bool uploadFile(Socket socket); 
+      bool getFile(string path) const;
 
     private:
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;
-      BlockManagerSPtr _blockManager;
 
+      const Server* _server;
       map<string, uint64_t> _fileTable;
   };//class FileManager
 
