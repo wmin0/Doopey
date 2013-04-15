@@ -66,7 +66,7 @@ void Client::run(int argc, char** argv) {
 
 void Client::go() {
   Socket socket(ST_TCP);
-  if (!socket.connect("localhost", 10090)) {
+  if (!socket.connect("localhost", DoopeyPort)) {
     cerr << "connect server error" << endl;
     return;
   }

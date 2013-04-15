@@ -26,6 +26,7 @@ namespace Doopey {
   extern bool DoopeyInit();
   extern bool DoopeyFinal();
 
+  const int DoopeyPort = 10090;
 };  // namespace Doopey
 
 #endif

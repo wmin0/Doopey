@@ -48,7 +48,6 @@ namespace Doopey {
 
       SocketSPtr _socket;
 
-      int _port;
       size_t _threadNum;
   }; // class Dispatcher
 
