@@ -5,6 +5,9 @@
 #include <string>
 #include <memory>
 
+#include "network/Socket.h"
+#include "block/BlockManager.h"
+
 using std::shared_ptr;
 using std::string;
 
@@ -16,16 +19,17 @@ namespace Doopey{
   class FileUploader{
 
     typedef shared_ptr<MetaBlock> MetaBlockSPtr;
+    typedef shared_ptr<BlockManager> BlockManagerSPtr;
 
     friend class FileManager;
 
     public:
       ~FileUploader();
-      bool receiveFile(MetaBlockSPtr meta, uint64_t port, string IP);
-      //parameter with path used for test in single machine
-      bool receiveFile(MetaBlockSPtr meta, string path);
+      bool receiveFile(Socket socket);
+      void setBlockManager(const BlockManagerSPtr blockManager);
     private:
       FileUploader();
+      BlockManagerSPtr _blockManager;
   };//class FileUploader
 
 }//namespace Doopey
