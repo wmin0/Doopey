@@ -12,10 +12,16 @@ namespace Doopey {
 
   enum MessageType {
     MT_None = 0,
+    MT_File = 1,
   }; // enum MessageType
 
   enum MessageCmd {
     MC_None = 0,
+    //Command used by FileManager ------------------
+    MC_FileMeta = 1,
+    MC_FileData = 2,
+    MC_FileEnd = 3,
+    //---------------------------------------------
   }; // enum MessageCmd
 
   class Message {

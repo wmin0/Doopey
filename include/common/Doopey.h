@@ -22,6 +22,9 @@ namespace Doopey {
   registerClass(BlockResolver);
   registerClass(BlockSaver);
   registerClass(BlockUpdater);
+  registerClass(FileManager);
+  registerClass(FileUploader);
+  registerClass(MetaDecoder);
   registerClass(Config);
   registerClass(ConfigLoader);
   registerClass(DataBlock);
