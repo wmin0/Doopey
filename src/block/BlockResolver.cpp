@@ -48,6 +48,10 @@ void BlockResolver::loadLocalIDs() {
   DIR* dir;
   struct dirent* file;
   dir = opendir(_localDir.data());
+  if (NULL == dir) {
+    log->error("Open BlockDir fail: %s\n", _localDir.data());
+    return;
+  }
   unsigned long long int tmp;
   // clear
   // TODO: save in encode64?
