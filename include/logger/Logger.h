@@ -29,6 +29,8 @@ namespace Doopey {
     private:
       void writeLog(LogLevel level, const char* format, va_list ap);
 
+      void writeConsole(LogLevel level, const char* format, va_list ap);
+
     private:
       LogLevel _level;
       string _dir;

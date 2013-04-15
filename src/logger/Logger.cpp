@@ -62,6 +62,10 @@ void Logger::debug(const char* format, ...) {
 }
 
 void Logger::writeLog(LogLevel level, const char* format, va_list ap) {
+  if (stderr == _logFile) {
+    writeConsole(level, format, ap);
+    return;
+  }
   if (level > _level) {
     return;
   }
@@ -84,4 +88,30 @@ void Logger::writeLog(LogLevel level, const char* format, va_list ap) {
       break;
   }
   vfprintf(_logFile, format, ap);
+}
+
+void Logger::writeConsole(LogLevel level, const char* format, va_list ap) {
+  if (level > _level) {
+    return;
+  }
+
+  switch (level) {
+    case LL_Error:
+      fprintf(_logFile, "\033[1;31m[Error] ");
+      break;
+    case LL_Warning:
+      fprintf(_logFile, "\033[1;33m[Warn] ");
+      break;
+    case LL_Info:
+      fprintf(_logFile, "\033[1;34m[Info] ");
+      break;
+    case LL_Debug:
+      fprintf(_logFile, "\033[1;32m[Debug] ");
+      break;
+    default:
+      fprintf(_logFile, "\033[1;35m[Unknown] ");
+      break;
+  }
+  vfprintf(_logFile, format, ap);
+  fprintf(_logFile, "\033[m");
 }

@@ -56,12 +56,12 @@ void Server::detachSignal() {
 }
 
 void Server::handleTERM(int sig) {
-  log->debug("Server Recieve TERM\n");
+  log->info("Server Recieve TERM\n");
   signalStop();
 }
 
 void Server::handleINT(int sig) {
-  log->debug("Server Recieve INT\n");
+  log->info("Server Recieve INT\n");
   signalStop();
 }
 
