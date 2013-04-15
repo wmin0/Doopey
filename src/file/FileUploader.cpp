@@ -34,7 +34,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
       //TODO: release the thing has received
       return false;
     }else if( MT_File != msg->getType()){
-      log.error("FileUploader Error: error message type of %s in FileUploader\n", stringiz(msg->getType()));
+      log->error("FileUploader Error: error message type of %s in FileUploader\n", stringiz(msg->getType()));
     }
 
     //decide what to do depend on the command
@@ -54,7 +54,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         return true;
         break;
       default:
-        log.error("FileUploader Error: Unknown command!\n");
+        log->error("FileUploader Error: Unknown command!\n");
         break;
     }
   }
