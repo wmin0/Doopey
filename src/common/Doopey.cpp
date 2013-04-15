@@ -10,7 +10,7 @@
 
 using namespace Doopey;
 
-Logger Doopey::log(LL_Debug);
+LoggerSPtr Doopey::log(NULL);
 
 const int Doopey::DoopeyPort = 10090;
 
@@ -34,6 +34,7 @@ SectionCollectionSPtr Doopey::DoopeyInit(const char* path) {
   pthread_mutex_init(&Thread::_sig_lock, NULL);
   SectionCollectionSPtr section = ConfigLoader::loadConfig(path);
   // TODO: do log init
+  log.reset(new Logger(LL_Debug));
   return section;
 }
 

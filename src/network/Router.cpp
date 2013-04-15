@@ -17,17 +17,17 @@ Router::~Router() {
 }
 
 bool Router::start() {
-  log.debug("Router Thread start!!\n");
+  log->debug("Router Thread start!!\n");
   return _thread->start(this);
 }
 
 bool Router::stop() {
-  log.debug("Router Thread stop!!\n");
+  log->debug("Router Thread stop!!\n");
   return _thread->stop(this);
 }
 
 void Router::threadFunc(void* obj) {
-  log.debug("Router Func!!\n");
+  log->debug("Router Func!!\n");
   Router* router = (Router*)obj;
   router->_run = true;
   router->mainLoop();

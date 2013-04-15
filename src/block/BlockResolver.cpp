@@ -50,7 +50,7 @@ void BlockResolver::loadLocalIDs() {
       continue;
     }
     if (0 == (tmp = strtoull(file->d_name, NULL, 10))) {
-      log.warning("detect illegel file %s\n", file->d_name);
+      log->warning("detect illegel file %s\n", file->d_name);
     } else {
       _localIDs.insert(tmp);
       // TODO: if change to new Machine ID...
@@ -74,7 +74,7 @@ void BlockResolver::addLocalID(BlockID id) {
   if (file.good()) {
     _localIDs.insert(id);
   } else {
-    log.error("add invalid id\n");
+    log->error("add invalid id\n");
   }
   file.close();
 }

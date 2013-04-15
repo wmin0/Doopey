@@ -6,7 +6,7 @@ using namespace Doopey;
 int main() {
   SectionCollectionSPtr section = DoopeyInit("");
   Server server(section);
-  log.info("Server Start!\n");
+  log->info("Server Start!\n");
   if (server.start()) {
     server.serve();
   }

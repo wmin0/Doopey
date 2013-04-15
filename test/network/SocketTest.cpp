@@ -24,6 +24,7 @@ void SocketTest::setUp() {
   server = 0;
   client = 0;
   server_sock = new Socket(ST_TCP);
+  log.reset(new Logger(LL_Debug));
 }
 
 void SocketTest::tearDown() {
@@ -53,7 +54,7 @@ void SocketTest::testSocketConnectTCP() {
 }
 
 void* SocketTest::testSocketConnectTCPServer(void* sock) {
-  log.debug("Server Accepting\n");
+  log->debug("Server Accepting\n");
   Socket* welcome_sock = (Socket*)sock;
   SocketSPtr conn_sock = welcome_sock->accept();
   CPPUNIT_ASSERT(NULL != conn_sock);
@@ -70,7 +71,7 @@ void* SocketTest::testSocketConnectTCPServer(void* sock) {
 
 void* SocketTest::testSocketConnectTCPClient(void* sock) {
   sleep(3);
-  log.debug("Sleep Done\n");
+  log->debug("Sleep Done\n");
   Socket client_sock(ST_TCP);
   CPPUNIT_ASSERT(true == client_sock.connect("localhost", test_port));
   CPPUNIT_ASSERT(true == client_sock.isConnected());
@@ -78,7 +79,7 @@ void* SocketTest::testSocketConnectTCPClient(void* sock) {
   unsigned char buf[12];
   memcpy(buf, "Hello World!", 12);
   CPPUNIT_ASSERT(true == msg->addData(buf, 0, 12));
-  log.debug("%s\n", msg->_data.data());
+  log->debug("%s\n", msg->_data.data());
   CPPUNIT_ASSERT(
     0 == memcmp(msg->_data.data(), buf, 12));
   CPPUNIT_ASSERT(true == client_sock.send(msg));

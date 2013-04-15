@@ -19,7 +19,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
   //for sure that blockManager has been set up
   if(_blockManager == NULL)
   {
-    log.error("FileUploader Error: haven't initialize block manager");
+    log->error("FileUploader Error: haven't initialize block manager");
     return false;
   }
 

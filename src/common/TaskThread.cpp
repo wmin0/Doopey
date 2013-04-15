@@ -20,14 +20,14 @@ TaskThread::TaskThread(void (*task)(void* input, void* output)):
 TaskThread::~TaskThread() {
   pthread_mutex_destroy(&_task_lock);
   stop(this);
-  log.debug("TaskThread stop %d\n", _thread);
+  log->debug("TaskThread stop %d\n", _thread);
 }
 
 void TaskThread::init() {
   // TODO: check init return type
   pthread_mutex_init(&_task_lock, NULL);
   start(this);
-  log.debug("TaskThread start %d\n", _thread);
+  log->debug("TaskThread start %d\n", _thread);
 }
 
 void TaskThread::threadFunc(void* obj) {
