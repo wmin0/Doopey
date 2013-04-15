@@ -38,6 +38,8 @@ namespace Doopey {
       MessageType getType() const { return _type; }
       MessageCmd getCmd() const { return _cmd; }
 
+      vector<unsigned char> getData() const { return _data; }
+
     private:
       MessageType _type;
       MessageCmd _cmd;
