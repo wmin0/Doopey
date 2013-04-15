@@ -15,7 +15,7 @@ string Config::getValue(const char* key) const{
   if(findValue!=_values.end())
     result = findValue->second;
   else
-    log->info("value not found\n");
+    log->info("value not found: %s\n", key);
 
   return result;
 }

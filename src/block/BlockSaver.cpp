@@ -7,6 +7,7 @@
 #include "common/Doopey.h"
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 
@@ -26,7 +27,9 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   // get a new ID for file name
 
   stringstream ss("");
-  ss << _localDir << "/" << newLocalBID;
+  ss << _localDir << "/" 
+     << internal << setfill('0') << uppercase
+     << hex << setw(16) << newLocalBID;
 
   fstream file(ss.str(), fstream::out | fstream::binary);
   //create new file, filename is "locatDir+newLocalBID"

@@ -7,12 +7,37 @@
 #include "common/Config.h"
 
 #include <pthread.h>
+#include <string>
 
 using namespace Doopey;
+using namespace std;
+
+namespace {
+  string initRoot(char* argv0) {
+    char* path = realpath(argv0, NULL);
+    string root(path);
+    int count = 0;
+    size_t i = root.size() - 1;
+    for (; i >= 0; --i) {
+      if ('/' == root[i]) {
+        if (0 == count) {
+          ++count;
+        } else {
+          break;
+        }
+      }
+    }
+    free(path);
+    return root.substr(0, i + 1);
+  }
+};  // namespace
+
 
 LoggerSPtr Doopey::log(NULL);
 
 const int Doopey::DoopeyPort = 10090;
+
+string Doopey::DoopeyRoot("");
 
 MachineID Doopey::getMachineIDFromBlockID(BlockID block) {
   return block >> 32;
@@ -28,13 +53,16 @@ BlockID Doopey::buildBlockID(MachineID machine, LocalBlockID local) {
   return id;
 }
 
-SectionCollectionSPtr Doopey::DoopeyInit(const char* path) {
+SectionCollectionSPtr Doopey::DoopeyInit(const char* path, char* argv0) {
   // TODO: check return type
+  DoopeyRoot = initRoot(argv0);
   pthread_mutex_init(&Thread::_lock, NULL);
   pthread_mutex_init(&Thread::_sig_lock, NULL);
-  SectionCollectionSPtr section = ConfigLoader::loadConfig(path);
+  SectionCollectionSPtr section =
+     ConfigLoader::loadConfig((DoopeyRoot +  path).data());
   // TODO: do log init
   log.reset(new Logger(LL_Debug));
+  log->info("Root: %s\n", DoopeyRoot.data());
   return section;
 }
 

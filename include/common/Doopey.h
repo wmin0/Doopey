@@ -6,8 +6,10 @@
 #include <csignal>
 #include <cstdint>
 #include <memory>
+#include <string>
 
 using std::shared_ptr;
+using std::string;
 
 namespace Doopey {
 
@@ -42,6 +44,8 @@ namespace Doopey {
 
   extern LoggerSPtr log;
 
+  extern string DoopeyRoot;
+
   // signal
   #define SIGTSTOP SIGRTMAX - 1
   #define SIGRREQ SIGRTMAX - 2
@@ -55,7 +59,7 @@ namespace Doopey {
   extern MachineID getLocalIDFromBlockID(BlockID block);
   extern BlockID buildBlockID(MachineID machine, LocalBlockID local);
 
-  extern SectionCollectionSPtr DoopeyInit(const char* path);
+  extern SectionCollectionSPtr DoopeyInit(const char* path, char* argv0);
   extern bool DoopeyFinal();
 
   extern const int DoopeyPort;

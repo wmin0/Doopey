@@ -3,8 +3,8 @@
 
 using namespace Doopey;
 
-int main() {
-  SectionCollectionSPtr section = DoopeyInit("");
+int main(int argc, char** argv) {
+  SectionCollectionSPtr section = DoopeyInit("conf/server.conf", argv[0]);
   Server server(section);
   log->info("Server Start!\n");
   if (server.start()) {

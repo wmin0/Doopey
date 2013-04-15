@@ -21,7 +21,7 @@ Server::Server(const SectionCollectionSPtr& section):
   pthread_mutex_init(&_mutex, NULL);
 
   _blockManager.reset(
-    new BlockManager(this, _sectionCollection->getConfig("")));
+    new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
 }

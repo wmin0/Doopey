@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <sys/types.h>
 
@@ -19,10 +20,18 @@ using namespace Doopey;
 
 using std::pair;
 using std::ifstream;
+using std::string;
 using std::stringstream;
 
-BlockResolver::BlockResolver(const BlockManager* manager, const ConfigSPtr& config):
+BlockResolver::BlockResolver(
+  const BlockManager* manager, const ConfigSPtr& config):
   _manager(manager), _localDir("."), _cacheRemoteSize(0), _localMax(0) {
+  if (NULL != config) {
+    string tmp = config->getValue("BlockDir");
+    if ("" != tmp) {
+      _localDir = DoopeyRoot + tmp;
+    }
+  }
   // some setup
   loadLocalIDs();
 }
@@ -49,17 +58,22 @@ void BlockResolver::loadLocalIDs() {
         0 == strcmp(file->d_name, "..")) {
       continue;
     }
-    if (0 == (tmp = strtoull(file->d_name, NULL, 10))) {
+    if (16 != strlen(file->d_name)) {
       log->warning("detect illegel file %s\n", file->d_name);
-    } else {
-      _localIDs.insert(tmp);
-      // TODO: if change to new Machine ID...
-      MachineID mid = getMachineIDFromBlockID(tmp);
-      if (machine == mid) {
-        LocalBlockID bid = getLocalIDFromBlockID(tmp);
-        if (bid > _localMax) {
-          _localMax = bid;
-        }
+      continue;
+    }
+    if (0 == (tmp = strtoull(file->d_name, NULL, 16))) {
+      log->warning("detect illegel file %s\n", file->d_name);
+      continue;
+    }
+    log->info("found local block: %s\n", file->d_name);
+    _localIDs.insert(tmp);
+    // TODO: if change to new Machine ID...
+    MachineID mid = getMachineIDFromBlockID(tmp);
+    if (machine == mid) {
+      LocalBlockID bid = getLocalIDFromBlockID(tmp);
+      if (bid > _localMax) {
+        _localMax = bid;
       }
     }
   }
