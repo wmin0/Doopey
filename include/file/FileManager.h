@@ -34,7 +34,7 @@ namespace Doopey{
       //         second step: receive entire file, then
       //                      1.split file into different blocks
       //                      2.create meta block(need to design the meta block
-      bool uploadFile(Socket socket); 
+      bool uploadFile(SocketSPtr socket); 
       bool getFile(string path) const;
 
     private:

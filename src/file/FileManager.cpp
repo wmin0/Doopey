@@ -23,7 +23,7 @@ FileManager::~FileManager()
 
 }
 
-bool FileManager::uploadFile(Socket socket)
+bool FileManager::uploadFile(SocketSPtr socket)
 {
   //let uploader to create meta, receive file and create data block
   _uploader->setBlockManager(_server->getBlockManager());
