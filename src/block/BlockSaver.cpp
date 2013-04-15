@@ -32,7 +32,7 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   //create new file, filename is "locatDir+newLocalBID"
 
   if (!file.good()){
-    log.error("create file failed.");
+    log->error("create file failed.");
     return 0;
   } else {
     file << block->_data;

@@ -30,7 +30,7 @@ Socket::Socket(SocketType type):
       _fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
       break;
     default:
-      log.error("Unknown SocketType\n");
+      log->error("Unknown SocketType\n");
       break;
   }
 }
@@ -48,17 +48,17 @@ void Socket::close() {
 
 bool Socket::connect(const char* servername, int port) {
   if (_fd < 0) {
-    log.error("socket open error\n");
+    log->error("socket open error\n");
     return false;
   }
   if (ST_TCP != _type) {
-    log.error("error socket type\n");
+    log->error("error socket type\n");
     return false;
   }
   struct hostent* server = NULL;
   server = gethostbyname(servername);
   if (NULL == server) {
-    log.error("bad server address error\n");
+    log->error("bad server address error\n");
     return false;
   }
   struct sockaddr_in addr;
@@ -69,7 +69,7 @@ bool Socket::connect(const char* servername, int port) {
          server->h_addr_list[0],
          server->h_length);
   if (::connect(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-    log.error("socket connect error\n");
+    log->error("socket connect error\n");
     return false;
   }
   _isConnected = true;
@@ -78,7 +78,7 @@ bool Socket::connect(const char* servername, int port) {
 
 bool Socket::bind(int port) {
   if (_fd < 0) {
-    log.error("socket open error\n");
+    log->error("socket open error\n");
     return false;
   }
   struct sockaddr_in addr;
@@ -87,7 +87,7 @@ bool Socket::bind(int port) {
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port = htons(port);
   if (::bind(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-    log.error("socket bind server error\n");
+    log->error("socket bind server error\n");
     return false;
   }
   return true;
@@ -103,15 +103,15 @@ bool Socket::listen() {
 
 SocketSPtr Socket::accept() {
   if (_fd < 0) {
-    log.error("socket open error\n");
+    log->error("socket open error\n");
     return SocketSPtr(NULL);
   }
   int conn, conn_len = 0;
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
-  //log.debug("Accepting!\n");
+  //log->debug("Accepting!\n");
   conn = ::accept(_fd, (struct sockaddr*)&addr, (socklen_t*)&conn_len);
-  //log.debug("Accept done %d!\n", conn);
+  //log->debug("Accept done %d!\n", conn);
   if (conn < 0) {
     return SocketSPtr(NULL);
   }
@@ -124,18 +124,18 @@ bool Socket::send(const MessageSPtr& msg) {
   uint64_t len = data.size();
   ssize_t ret = 0;
   uint64_t count = 0;
-  //log.debug("send start\n");
+  //log->debug("send start\n");
   do {
     ret = write(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
     if (0 >= ret) {
-      //log.debug("send len fail %d\n", ret);
+      //log->debug("send len fail %d\n", ret);
       _isConnected = false;
       return false;
     }
-    //log.debug("send len %d\n", ret);
+    //log->debug("send len %d\n", ret);
     count += ret;
   } while (count < sizeof(uint64_t));
-  //log.debug("send len %lld done\n", len);
+  //log->debug("send len %lld done\n", len);
   count = 0;
   do {
     if (count + Socket::sliceSize > len) {
@@ -144,14 +144,14 @@ bool Socket::send(const MessageSPtr& msg) {
       ret = write(_fd, data.data() + count, Socket::sliceSize);
     }
     if (0 >= ret) {
-      //log.debug("send data fail %d\n", ret);
+      //log->debug("send data fail %d\n", ret);
       _isConnected = false;
       return false;
     }
-    //log.debug("send data %d\n", ret);
+    //log->debug("send data %d\n", ret);
     count += ret;
   } while (count < len);
-  //log.debug("send data done\n");
+  //log->debug("send data done\n");
   return true;
 }
 
@@ -160,18 +160,18 @@ MessageSPtr Socket::receive() {
   ssize_t ret = 0;
   uint64_t count = 0;
   vector <unsigned char> data;
-  //log.debug("receive start\n");
+  //log->debug("receive start\n");
   do {
     ret = read(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
     if (0 >= ret) {
-      //log.debug("len read fail %d\n", ret);
+      //log->debug("len read fail %d\n", ret);
       _isConnected = false;
       return MessageSPtr(NULL);
     }
-    //log.debug("read len %d\n", ret);
+    //log->debug("read len %d\n", ret);
     count += ret;
   } while (count < sizeof(uint64_t));
-  //log.debug("read len done %lld\n", len);
+  //log->debug("read len done %lld\n", len);
   count = 0;
   data.resize(len);
   do {
@@ -181,13 +181,13 @@ MessageSPtr Socket::receive() {
       ret = read(_fd, data.data() + count, Socket::sliceSize);
     }
     if (0 >= ret) {
-      //log.debug("data read fail %d\n", ret);
+      //log->debug("data read fail %d\n", ret);
       _isConnected = false;
       return MessageSPtr(NULL);
     }
-    //log.debug("read data %d\n", ret);
+    //log->debug("read data %d\n", ret);
     count += ret;
   } while (count < len);
-  //log.debug("read done\n");
+  //log->debug("read done\n");
   return MessageSPtr(new Message(data));
 }

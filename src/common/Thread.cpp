@@ -24,7 +24,7 @@ Thread::~Thread() {
 
 bool Thread::start(void* arg) {
   if (_state == TS_Terminate) {
-    log.error("Thread can't be restarted\n");
+    log->error("Thread can't be restarted\n");
     return false;
   }
   pthread_mutex_lock(&Thread::_lock);
@@ -32,7 +32,7 @@ bool Thread::start(void* arg) {
   _state = TS_Start;
   int ret = pthread_create(&_thread, NULL, Thread::threadProc, arg);
   if (0 != ret) {
-    log.error("Thread Start Fail: %d\n", ret);
+    log->error("Thread Start Fail: %d\n", ret);
   } else {
     while (_state != TS_Run && _state != TS_Terminate);
   }

@@ -32,20 +32,20 @@ Dispatcher::~Dispatcher() {
 }
 
 bool Dispatcher::start() {
-  log.debug("Dispatcher Thread start!!\n");
+  log->debug("Dispatcher Thread start!!\n");
   if (!_socket->bind(DoopeyPort) || !_socket->listen()) {
-    log.error("Dispatcher Socket bind Err!!\n");
+    log->error("Dispatcher Socket bind Err!!\n");
   }
   return _thread->start(this);
 }
 
 bool Dispatcher::stop() {
-  log.debug("Dispatcher Thread stop!!\n");
+  log->debug("Dispatcher Thread stop!!\n");
   return _thread->stop(this);
 }
 
 void Dispatcher::threadFunc(void* obj) {
-  log.debug("Dispatcher Func!!\n");
+  log->debug("Dispatcher Func!!\n");
   Dispatcher* dispatcher = (Dispatcher*)obj;
   dispatcher->_run = true;
   dispatcher->mainLoop();
@@ -69,7 +69,7 @@ void Dispatcher::mainLoop() {
           // and abuse Orz
           if (!_threadPool[i]->runTask(this, ptr)) {
             delete ptr;
-            log.warning("start task thread err\n");
+            log->warning("start task thread err\n");
           } else {
             serve = true;
             break;
@@ -77,7 +77,7 @@ void Dispatcher::mainLoop() {
         }
       }
       if (!serve) {
-        log.info("server busy!\n");
+        log->info("server busy!\n");
         // connect will delete by local variable
       }
     }
@@ -89,7 +89,7 @@ void Dispatcher::dispatch(void* dispatch, void* sock) {
   SocketSPtr* socket = (SocketSPtr*)sock;
   MessageSPtr msg = (*socket)->receive();
   if (NULL != msg) {
-    log.debug("Thread %d: get request from client %d %d\n",
+    log->debug("Thread %d: get request from client %d %d\n",
               pthread_self(), msg->getType(), msg->getCmd());
     switch (msg->getType()) {
       default:

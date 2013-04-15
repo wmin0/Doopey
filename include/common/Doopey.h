@@ -37,7 +37,7 @@ namespace Doopey {
   registerClass(TaskThread);
   registerClass(Thread);
 
-  extern Logger log;
+  extern LoggerSPtr log;
 
   // signal
   #define SIGTSTOP SIGRTMAX - 1

@@ -18,7 +18,7 @@ bool FileUploader::receiveFile(Socket socket)
 {
   if(_blockManager == NULL)
   {
-    log.error("FileUploader Error: haven't initialize block manager");
+    log->error("FileUploader Error: haven't initialize block manager");
     return false;
   }
   //fill name field in meta
