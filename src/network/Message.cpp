@@ -4,8 +4,6 @@
 
 using namespace Doopey;
 
-typedef shared_ptr<unsigned char> UCharSPtr;
-
 Message::Message(MessageType type, MessageCmd cmd):
   _type(type), _cmd(cmd) {
 }

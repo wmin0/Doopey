@@ -9,9 +9,6 @@ using std::map;
 
 namespace Doopey {
 
-  class ConfigLoader;
-  class SectionCollection;
-
   class Config {
     typedef map<string, string> MapConfigValue;
 
@@ -24,8 +21,8 @@ namespace Doopey {
       MapConfigValue _values;
       string _name;//config name
 
-    friend ConfigLoader;
-    friend SectionCollection;
+    friend class ConfigLoader;
+    friend class SectionCollection;
   }; // class Config
 
 };  // namespace Doopey

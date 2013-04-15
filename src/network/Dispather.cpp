@@ -87,7 +87,7 @@ void Dispatcher::mainLoop() {
 void Dispatcher::dispatch(void* dispatch, void* sock) {
   Dispatcher* dispatcher = (Dispatcher*)dispatch;
   SocketSPtr* socket = (SocketSPtr*)sock;
-  MessageSPtr msg = (*socket)->recieve();
+  MessageSPtr msg = (*socket)->receive();
   if (NULL != msg) {
     log.debug("Thread %d: get request from client %d %d\n",
               pthread_self(), msg->getType(), msg->getCmd());

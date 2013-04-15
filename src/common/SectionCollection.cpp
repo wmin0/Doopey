@@ -1,10 +1,8 @@
-#include "config/SectionCollection.h"
+#include "common/SectionCollection.h"
 #include "common/Doopey.h"
 
 using namespace Doopey;
 using namespace std;
-
-typedef shared_ptr<Config> ConfigSPtr;
 
 ConfigSPtr SectionCollection::getConfig(const char* section) const{
   ConfigSPtr result(NULL);

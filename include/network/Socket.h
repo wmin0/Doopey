@@ -1,9 +1,7 @@
 #ifndef _DOOPEY_SOCKET_H_
 #define _DOOPEY_SOCKET_H_
 
-#include <memory>
-
-using std::shared_ptr;
+#include "common/Doopey.h"
 
 namespace Doopey {
 
@@ -15,8 +13,6 @@ namespace Doopey {
   class Message;
 
   class Socket {
-    typedef shared_ptr<Socket> SocketSPtr;
-    typedef shared_ptr<Message> MessageSPtr;
 
     public:
       Socket(SocketType type);
@@ -27,7 +23,7 @@ namespace Doopey {
       SocketSPtr accept();
 
       bool send(const MessageSPtr& msg);
-      MessageSPtr recieve();
+      MessageSPtr receive();
       // TODO: complete UDP later
       // bool sendTo
 

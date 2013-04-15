@@ -11,10 +11,6 @@
 
 using namespace Doopey;
 
-typedef shared_ptr<MetaBlock> MetaBlockSPtr;
-typedef shared_ptr<DataBlock> DataBlockSPtr;
-typedef shared_ptr<Block> BlockSPtr;
-
 MachineID BlockManager::getMachineID() const {
   return _server->getMachineID();
 }

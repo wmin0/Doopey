@@ -155,12 +155,12 @@ bool Socket::send(const MessageSPtr& msg) {
   return true;
 }
 
-MessageSPtr Socket::recieve() {
+MessageSPtr Socket::receive() {
   uint64_t len;
   ssize_t ret = 0;
   uint64_t count = 0;
   vector <unsigned char> data;
-  //log.debug("recieve start\n");
+  //log.debug("receive start\n");
   do {
     ret = read(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
     if (0 >= ret) {

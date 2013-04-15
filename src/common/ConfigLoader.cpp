@@ -1,7 +1,6 @@
-#include "config/ConfigLoader.h"
-#include "config/Config.h"
-#include "config/SectionCollection.h"
-#include "common/Doopey.h"
+#include "common/ConfigLoader.h"
+#include "common/Config.h"
+#include "common/SectionCollection.h"
 
 #include <fstream>
 #include <cstring>
@@ -9,9 +8,6 @@
 
 using namespace std;
 using namespace Doopey;
-
-typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
-typedef shared_ptr<Config> ConfigSPtr;
 
 SectionCollectionSPtr ConfigLoader::loadConfig(const char* path) {
   string line;

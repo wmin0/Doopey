@@ -2,12 +2,17 @@
 
 #include "common/Thread.h"
 #include "logger/Logger.h"
+#include "common/ConfigLoader.h"
+#include "common/SectionCollection.h"
+#include "common/Config.h"
 
 #include <pthread.h>
 
 using namespace Doopey;
 
 Logger Doopey::log(LL_Debug);
+
+const int Doopey::DoopeyPort = 10090;
 
 MachineID Doopey::getMachineIDFromBlockID(BlockID block) {
   return block >> 32;
@@ -23,11 +28,13 @@ BlockID Doopey::buildBlockID(MachineID machine, LocalBlockID local) {
   return id;
 }
 
-bool Doopey::DoopeyInit() {
+SectionCollectionSPtr Doopey::DoopeyInit(const char* path) {
   // TODO: check return type
   pthread_mutex_init(&Thread::_lock, NULL);
   pthread_mutex_init(&Thread::_sig_lock, NULL);
-  return true;
+  SectionCollectionSPtr section = ConfigLoader::loadConfig(path);
+  // TODO: do log init
+  return section;
 }
 
 bool Doopey::DoopeyFinal() {

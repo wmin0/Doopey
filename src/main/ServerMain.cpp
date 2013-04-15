@@ -4,8 +4,8 @@
 using namespace Doopey;
 
 int main() {
-  DoopeyInit();
-  Server server("");
+  SectionCollectionSPtr section = DoopeyInit("");
+  Server server(section);
   log.info("Server Start!\n");
   if (server.start()) {
     server.serve();

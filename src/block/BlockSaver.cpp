@@ -9,12 +9,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <memory>
 
 using namespace Doopey;
 using namespace std;
-
-typedef shared_ptr<BlockResolver> BlockResolverSPtr;
 
 BlockSaver::BlockSaver(const BlockManager* manager, const ConfigSPtr& config):
   _manager(manager), _localDir(".") {

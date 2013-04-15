@@ -1,9 +1,9 @@
 #include "ConfigLoaderTest.h"
 
 #include "common/DoopeyTest.h"
-#include "config/ConfigLoader.h"
-#include "config/SectionCollection.h"
-#include "config/Config.h"
+#include "common/ConfigLoader.h"
+#include "common/SectionCollection.h"
+#include "common/Config.h"
 
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>

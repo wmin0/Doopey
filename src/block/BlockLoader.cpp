@@ -7,10 +7,6 @@
 
 using namespace Doopey;
 
-typedef shared_ptr<Config> ConfigSPtr;
-typedef shared_ptr<DataBlock> DataBlockSPtr;
-typedef shared_ptr<MetaBlock> MetaBlockSPtr;
-
 BlockLoader::BlockLoader(const BlockManager* manager, const ConfigSPtr& config):
   _manager(manager) {
 }

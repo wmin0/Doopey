@@ -3,10 +3,6 @@
 
 #include "common/Doopey.h"
 
-#include <memory>
-
-using std::shared_ptr;
-
 namespace Doopey {
 
   class Block {

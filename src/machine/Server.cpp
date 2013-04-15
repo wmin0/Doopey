@@ -2,9 +2,8 @@
 
 #include "block/BlockManager.h"
 #include "common/Doopey.h"
-#include "config/Config.h"
-#include "config/ConfigLoader.h"
-#include "config/SectionCollection.h"
+#include "common/Config.h"
+#include "common/SectionCollection.h"
 #include "network/Dispatcher.h"
 #include "network/Router.h"
 
@@ -15,14 +14,14 @@ using namespace Doopey;
 
 Server* Server::_this = NULL;
 
-Server::Server(const char* configPath) {
+Server::Server(const SectionCollectionSPtr& section):
+  _sectionCollection(section) {
   attachSignal();
 
   pthread_mutex_init(&_mutex, NULL);
 
-  ConfigLoader loader;
-  _sectionCollection = loader.loadConfig(configPath);
-  _blockManager.reset(new BlockManager(this, _sectionCollection->getConfig("")));
+  _blockManager.reset(
+    new BlockManager(this, _sectionCollection->getConfig("")));
   _router.reset(new Router(this, _sectionCollection->getConfig("")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
 }
