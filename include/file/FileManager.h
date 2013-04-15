@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 
+#include "common/Doopey.h"
 #include "network/Socket.h"
 
 using std::shared_ptr;
@@ -21,23 +22,24 @@ namespace Doopey{
   class BlockManager;
 
   class FileManager{
-    typedef shared_ptr<Config> ConfigSPtr;
-    typedef shared_ptr<MetaDecoder> MetaDecoderSPtr;
-    typedef shared_ptr<FileUploader> FileUploaderSPtr;
 
     public:
       FileManager(const Server* server, const ConfigSPtr& config);
       ~FileManager();
 
-      //TODO: design the interface of upload file;
-      //Thought: first message: tell server the socket used to transmit file
-      //         second step: receive entire file, then
-      //                      1.split file into different blocks
-      //                      2.create meta block(need to design the meta block
-      bool uploadFile(SocketSPtr socket); 
-      bool getFile(string path) const;
+      //this function is used to tell which work is requested in msg 
+      void receiveQuest(SocketSPtr socket);
 
     private:
+      //three function belonging is used to handle different msg
+      //which will be catch by receiveQuest()
+      bool uploadFile(SocketSPtr socket); 
+      bool getFile(SocketSPtr socket);
+      bool searchList(SocketSPtr socket);
+
+      //check the msg type is for FileManager 
+      bool checkMsg(const MessageSPtr msg) const;
+
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;
 

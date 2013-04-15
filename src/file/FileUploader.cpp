@@ -41,16 +41,16 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     switch(msg->getCmd())
     {
       //the msg is about the file meta, like filenam, creat time, etc.
-      case MC_FileMeta:
+      case MC_UpFileMeta:
         setupMeta(meta, msg);
         break;
       //the msg is the file data, just receive and split it into different data block and 
       //add the datablock ID into metablock
-      case MC_FileData:
+      case MC_UpFileData:
         break;
       //this msg means file has been transmitted successfully just check the meta ID 
       //and add it into file directory structure
-      case MC_FileEnd:
+      case MC_UpFileEnd:
         return true;
         break;
       default:
@@ -73,3 +73,4 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 
   return true;
 }
+

@@ -17,11 +17,14 @@ namespace Doopey {
 
   enum MessageCmd {
     MC_None = 0,
-    //Command used by FileManager ------------------
-    MC_FileMeta = 1,
-    MC_FileData = 2,
-    MC_FileEnd = 3,
-    //---------------------------------------------
+    //Command used by FileManager ---------------------------------------------
+    MC_UpFileStart = 1,//means the first message in file uploading
+    MC_UpFileMeta = 2, //means data in msg is meta information
+    MC_UpFileData = 3, //means data in msg is the data
+    MC_UpFileEnd = 4,  //means the last message in file uploading
+    MC_RequestFile = 5,//means client want to get file
+    MC_RequestList = 6,//means client want to see the list in the path he request
+    //-------------------------------------------------------------------------
   }; // enum MessageCmd
 
   class Message {
