@@ -5,8 +5,37 @@
 
 #include <csignal>
 #include <cstdint>
+#include <memory>
+
+using std::shared_ptr;
 
 namespace Doopey {
+
+  #define registerClass(T) \
+    class T; \
+    typedef shared_ptr<T> T##SPtr
+
+  registerClass(Block);
+  registerClass(BlockLoader);
+  registerClass(BlockLocationAttr);
+  registerClass(BlockManager);
+  registerClass(BlockResolver);
+  registerClass(BlockSaver);
+  registerClass(BlockUpdater);
+  registerClass(Config);
+  registerClass(ConfigLoader);
+  registerClass(DataBlock);
+  registerClass(DataInfo);
+  registerClass(Dispatcher);
+  registerClass(Logger);
+  registerClass(Message);
+  registerClass(MetaBlock);
+  registerClass(Router);
+  registerClass(SectionCollection);
+  registerClass(Server);
+  registerClass(Socket);
+  registerClass(TaskThread);
+  registerClass(Thread);
 
   extern Logger log;
 
@@ -23,9 +52,10 @@ namespace Doopey {
   extern MachineID getLocalIDFromBlockID(BlockID block);
   extern BlockID buildBlockID(MachineID machine, LocalBlockID local);
 
-  extern bool DoopeyInit();
+  extern SectionCollectionSPtr DoopeyInit(const char* path);
   extern bool DoopeyFinal();
 
+  extern const int DoopeyPort;
 };  // namespace Doopey
 
 #endif

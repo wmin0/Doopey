@@ -1,4 +1,4 @@
-#include "config/Config.h"
+#include "common/Config.h"
 #include "common/Doopey.h"
 
 using namespace Doopey;

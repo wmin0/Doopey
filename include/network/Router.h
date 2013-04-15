@@ -5,22 +5,14 @@
 
 #include <cstdint>
 #include <map>
-#include <memory>
 #include <string>
 
 using std::map;
-using std::shared_ptr;
 using std::string;
 
 namespace Doopey {
 
-  class Config;
-  class Server;
-  class Thread;
-
   class Router {
-    typedef shared_ptr<Config> ConfigSPtr;
-    typedef shared_ptr<Thread> ThreadSPtr;
 
     public:
       Router(const Server* server, const ConfigSPtr& config);

@@ -4,25 +4,12 @@
 #include "common/Doopey.h"
 
 #include <vector>
-#include <memory>
 
-using std::shared_ptr;
 using std::vector;
 
 namespace Doopey {
 
-  class Config;
-  class TaskThread;
-  class Thread;
-  class Socket;
-  class Server;
-
   class Dispatcher {
-    typedef shared_ptr<Config> ConfigSPtr;
-    typedef shared_ptr<Thread> ThreadSPtr;
-    typedef shared_ptr<TaskThread> TaskThreadSPtr;
-    typedef shared_ptr<Socket> SocketSPtr;
-
     public:
       Dispatcher(const Server* server, const ConfigSPtr& config);
       ~Dispatcher();
@@ -48,7 +35,6 @@ namespace Doopey {
 
       SocketSPtr _socket;
 
-      int _port;
       size_t _threadNum;
   }; // class Dispatcher
 

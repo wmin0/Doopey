@@ -4,25 +4,16 @@
 #include "common/Doopey.h"
 
 #include <map>
-#include <memory>
 #include <set>
 #include <string>
 
 using std::map;
 using std::set;
-using std::shared_ptr;
 using std::string;
 
 namespace Doopey {
 
-  class Config;
-  class BlockLocationAttr;
-  class BlockManager;
-
-  typedef shared_ptr<BlockLocationAttr> BlockLocationAttrSPtr;
-
   class BlockResolver {
-    typedef shared_ptr<Config> ConfigSPtr;
     public:
       BlockResolver(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockResolver();

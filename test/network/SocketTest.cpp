@@ -58,7 +58,7 @@ void* SocketTest::testSocketConnectTCPServer(void* sock) {
   SocketSPtr conn_sock = welcome_sock->accept();
   CPPUNIT_ASSERT(NULL != conn_sock);
 
-  MessageSPtr msg = conn_sock->recieve();
+  MessageSPtr msg = conn_sock->receive();
   CPPUNIT_ASSERT(NULL != msg);
   unsigned char buf[12];
   memcpy(buf, "Hello World!", 12);

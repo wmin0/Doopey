@@ -3,10 +3,8 @@
 
 #include "common/Doopey.h"
 
-#include <memory>
 #include <string>
 
-using std::shared_ptr;
 using std::string;
 
 namespace Doopey {
@@ -16,8 +14,6 @@ namespace Doopey {
   class Config;
 
   class BlockSaver {
-    typedef shared_ptr<Block> BlockSPtr;
-    typedef shared_ptr<Config> ConfigSPtr;
 
     public:
       BlockSaver(const BlockManager* manager, const ConfigSPtr& config);

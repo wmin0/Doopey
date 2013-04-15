@@ -1,10 +1,11 @@
 #ifndef _DOOPEY_MESSAGE_H_
 #define _DOOPEY_MESSAGE_H_
 
-#include <vector>
-#include <memory>
+#include "common/Doopey.h"
 
-using std::shared_ptr;
+#include <unistd.h>
+#include <vector>
+
 using std::vector;
 
 namespace Doopey {

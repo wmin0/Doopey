@@ -14,17 +14,15 @@ namespace Doopey {
   class Dispatcher;
   class FileManager;
   class Router;
-  class SectionCollection;
 
   class Server {
-    typedef shared_ptr<SectionCollection> SectionCollectionSPtr;
     typedef shared_ptr<BlockManager> BlockManagerSPtr;
     typedef shared_ptr<Dispatcher> DispatcherSPtr;
     typedef shared_ptr<Router> RouterSPtr;
     typedef shared_ptr<FileManager> FileManagerSPtr;
 
     public:
-      Server(const char* configPath);
+      Server(const SectionCollectionSPtr& section);
       ~Server();
       bool start();
 

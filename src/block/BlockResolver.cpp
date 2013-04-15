@@ -3,7 +3,7 @@
 #include "block/BlockManager.h"
 #include "block/BlockLocationAttr.h"
 #include "common/Doopey.h"
-#include "config/Config.h"
+#include "common/Config.h"
 
 #include <cstdio>
 #include <cstdlib>

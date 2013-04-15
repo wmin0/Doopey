@@ -4,10 +4,6 @@
 #include "block/Block.h"
 #include "common/Doopey.h"
 
-#include <memory>
-
-using std::shared_ptr;
-
 namespace Doopey {
 
   class MetaBlock: public Block {

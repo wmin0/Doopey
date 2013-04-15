@@ -1,6 +1,6 @@
 EXTPKGS=
-SRCPKGS=machine network file block config logger common
-TESTPKGS=config
+SRCPKGS=machine network file block logger common
+TESTPKGS=common
 LIBPKGS=$(EXTPKGS) $(SRCPKGS)
 
 LIBS=$(addprefix -l, $(LIBPKGS)) -pthread

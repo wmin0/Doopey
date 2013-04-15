@@ -1,6 +1,6 @@
 #include "network/Router.h"
 
-#include "config/Config.h"
+#include "common/Config.h"
 #include "common/Doopey.h"
 #include "common/Thread.h"
 
