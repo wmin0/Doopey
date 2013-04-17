@@ -38,7 +38,7 @@ namespace Doopey{
       bool searchList(SocketSPtr socket);
 
       //check the msg type is for FileManager 
-      bool checkMsg(const MessageSPtr msg) const;
+      bool checkMsg(const MessageSPtr& msg) const;
 
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;

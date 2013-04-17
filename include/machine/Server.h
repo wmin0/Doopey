@@ -26,10 +26,10 @@ namespace Doopey {
       ~Server();
       bool start();
 
-      const BlockManagerSPtr getBlockManager() const { return _blockManager; }
-      const RouterSPtr getRouter() const { return _router; }
-      const FileManagerSPtr getFileManager() const { return _fileManager; }
-      MachineID getMachineID() const { return _machineID; }
+      const BlockManagerSPtr& getBlockManager() const { return _blockManager; }
+      const RouterSPtr& getRouter() const { return _router; }
+      const FileManagerSPtr& getFileManager() const { return _fileManager; }
+      const MachineID& getMachineID() const { return _machineID; }
 
       void serve();
     private:

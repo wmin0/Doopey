@@ -11,7 +11,7 @@
 
 using namespace Doopey;
 
-MachineID BlockManager::getMachineID() const {
+const MachineID& BlockManager::getMachineID() const {
   return _server->getMachineID();
 }
 

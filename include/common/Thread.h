@@ -19,7 +19,7 @@ namespace Doopey {
       virtual ~Thread();
       bool start(void* arg);
       bool stop(void* arg);
-      ThreadState getState() const { return _state; }
+      const ThreadState& getState() const { return _state; }
 
       // init in doopey_init
       static pthread_mutex_t _lock;

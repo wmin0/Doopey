@@ -20,12 +20,12 @@ namespace Doopey {
 
       BlockID saveBlock(const BlockSPtr& block);
 
-      const BlockLoaderSPtr getBlockLoader() const { return _loader; }
-      const BlockResolverSPtr getBlockResolver() const { return _resolver; }
-      const BlockSaverSPtr getBlockSaver() const { return _saver; }
-      const BlockUpdaterSPtr getBlockUpdater() const { return _updater; }
+      const BlockLoaderSPtr& getBlockLoader() const { return _loader; }
+      const BlockResolverSPtr& getBlockResolver() const { return _resolver; }
+      const BlockSaverSPtr& getBlockSaver() const { return _saver; }
+      const BlockUpdaterSPtr& getBlockUpdater() const { return _updater; }
 
-      MachineID getMachineID() const;
+      const MachineID& getMachineID() const;
     private:
 
       const Server* _server;

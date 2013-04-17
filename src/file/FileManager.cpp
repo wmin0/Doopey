@@ -56,7 +56,7 @@ bool FileManager::getFile(SocketSPtr socket)
   return true;
 }
 
-bool FileManager::checkMsg(const MessageSPtr msg) const
+bool FileManager::checkMsg(const MessageSPtr& msg) const
 {
   if(msg == NULL)
   {
