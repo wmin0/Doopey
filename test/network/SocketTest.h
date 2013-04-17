@@ -17,5 +17,6 @@ namespace Doopey {
       pthread_t client;
       Socket* server_sock;
       static const int test_port = 10061;
+      static unsigned char* refData;
   };
 }

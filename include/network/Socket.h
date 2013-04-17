@@ -42,9 +42,7 @@ namespace Doopey {
       SocketType _type;
       int _fd;
       bool _isConnected;
-
-
-
+    friend class SocketTest;
   }; // class Socket
 
 };  // namespace Doopey

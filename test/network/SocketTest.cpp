@@ -9,6 +9,7 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
+#include <cstdlib>
 #include <memory>
 #include <pthread.h>
 #include <unistd.h>
@@ -19,6 +20,8 @@ using namespace Doopey;
 
 typedef shared_ptr<Message> MessageSPtr;
 typedef shared_ptr<Socket> SocketSPtr;
+
+unsigned char* SocketTest::refData = NULL;
 
 void SocketTest::setUp() {
   server = 0;
@@ -40,6 +43,10 @@ void SocketTest::tearDown() {
 }
 
 void SocketTest::testSocketConnectTCP() {
+  refData = new unsigned char[Socket::sliceSize * 2];
+  for (size_t i = 0; i < Socket::sliceSize * 2; ++i) {
+    refData[i] = rand() % 256;
+  }
   CPPUNIT_ASSERT(true == server_sock->bind(test_port));
   CPPUNIT_ASSERT(true == server_sock->listen());
   CPPUNIT_ASSERT(true == server_sock->isConnected());
@@ -51,6 +58,7 @@ void SocketTest::testSocketConnectTCP() {
   pthread_join(server, NULL);
   client = 0;
   server = 0;
+  delete[] refData;
 }
 
 void* SocketTest::testSocketConnectTCPServer(void* sock) {
@@ -63,9 +71,16 @@ void* SocketTest::testSocketConnectTCPServer(void* sock) {
   CPPUNIT_ASSERT(NULL != msg);
   unsigned char buf[12];
   memcpy(buf, "Hello World!", 12);
+  CPPUNIT_ASSERT(13 == msg->_data.size());
   CPPUNIT_ASSERT(
-    0 == memcmp(msg->_data.data(), buf, 12));
-
+    0 == memcmp(msg->_data.data(), buf, 13));
+  log->debug("Server Receive2\n");
+  MessageSPtr msg2 = conn_sock->receive();
+  CPPUNIT_ASSERT(NULL != msg2);
+  CPPUNIT_ASSERT(Socket::sliceSize + 1 == msg2->_data.size());
+CPPUNIT_ASSERT(
+    0 == memcmp((msg2->_data.data() + 1), refData, Socket::sliceSize));
+  CPPUNIT_ASSERT(buf[0] == msg2->_data[0]);
   return NULL;
 }
 
@@ -78,10 +93,17 @@ void* SocketTest::testSocketConnectTCPClient(void* sock) {
   MessageSPtr msg(new Message(MT_None, MC_None));
   unsigned char buf[12];
   memcpy(buf, "Hello World!", 12);
-  CPPUNIT_ASSERT(true == msg->addData(buf, 0, 12));
+  CPPUNIT_ASSERT(true == msg->addData(buf, 0, 13));
   log->debug("%s\n", msg->_data.data());
   CPPUNIT_ASSERT(
-    0 == memcmp(msg->_data.data(), buf, 12));
+    0 == memcmp(msg->_data.data(), buf, 13));
+  CPPUNIT_ASSERT(13 == msg->_data.size());
+  CPPUNIT_ASSERT(true == client_sock.send(msg));
+  CPPUNIT_ASSERT(true == msg->addData(refData, 1, Socket::sliceSize));
+  CPPUNIT_ASSERT(
+    0 == memcmp((msg->_data.data() + 1), refData, Socket::sliceSize));
+  CPPUNIT_ASSERT(buf[0] == msg->_data[0]);
+  CPPUNIT_ASSERT(Socket::sliceSize + 1 == msg->_data.size());
   CPPUNIT_ASSERT(true == client_sock.send(msg));
   return NULL;
 }
