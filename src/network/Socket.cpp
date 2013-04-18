@@ -160,6 +160,7 @@ MessageSPtr Socket::receive() {
   ssize_t ret = 0;
   uint64_t count = 0;
   vector <unsigned char> data;
+  // TODO: security and data integrity, but it's the last XD"
   //log->debug("receive start\n");
   do {
     ret = read(_fd, (unsigned char*)&len + count, sizeof(uint64_t));
