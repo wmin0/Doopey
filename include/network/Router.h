@@ -28,12 +28,12 @@ namespace Doopey {
       static void threadFunc(void* obj);
       static void threadStop(void* obj);
 
-      static void handleRREQ(int sig);
-
       void mainLoop();
 
     private:
       static Router* _this;
+      // second
+      const static uint32_t heartBeatInterval;
 
       const Server* _server;
 
@@ -41,7 +41,8 @@ namespace Doopey {
       bool _run;
 
       map<uint64_t, string> _routingTable;
-      // queue requestQueue;
+
+
   }; // class Router
 
 };  // namespace Doopey

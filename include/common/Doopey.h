@@ -48,7 +48,6 @@ namespace Doopey {
 
   // signal
   #define SIGTSTOP SIGRTMAX - 1
-  #define SIGRREQ SIGRTMAX - 2
 
   // general type
   typedef uint64_t BlockID;

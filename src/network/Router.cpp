@@ -4,9 +4,13 @@
 #include "common/Doopey.h"
 #include "common/Thread.h"
 
+#include <unistd.h>
+
 using namespace Doopey;
 
 Router* Router::_this = NULL;
+
+const uint32_t Router::heartBeatInterval = 30;
 
 Router::Router(const Server* server, const ConfigSPtr& config): _server(server), _run(false) {
   _thread.reset(new Thread(threadFunc, threadStop));
@@ -34,7 +38,9 @@ void Router::threadFunc(void* obj) {
 }
 
 void Router::mainLoop() {
-  while (_run);
+  while (_run) {
+    sleep(Router::heartBeatInterval);
+  }
 }
 
 void Router::threadStop(void* obj) {
@@ -42,5 +48,3 @@ void Router::threadStop(void* obj) {
   router->_run = false;
 }
 
-void Router::handleRREQ(int sig) {
-}
