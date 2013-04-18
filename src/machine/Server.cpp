@@ -19,7 +19,7 @@ Server::Server(const SectionCollectionSPtr& section):
   attachSignal();
 
   pthread_mutex_init(&_mutex, NULL);
-
+  // TODO: snapshot
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("")));
@@ -28,6 +28,7 @@ Server::Server(const SectionCollectionSPtr& section):
 
 Server::~Server() {
   detachSignal();
+  // TODO: snapshot
   pthread_mutex_destroy(&_mutex);
 }
 
