@@ -7,6 +7,7 @@
 #include "machine/Server.h"
 #include "network/Socket.h"
 #include "network/Message.h"
+#include "network/Router.h"
 
 #include <pthread.h>
 #include <memory>
@@ -92,6 +93,9 @@ void Dispatcher::dispatch(void* dispatch, void* sock) {
     log->debug("Thread %d: get request from client %d %d\n",
               pthread_self(), msg->getType(), msg->getCmd());
     switch (msg->getType()) {
+      case MT_Router:
+        dispatcher->_server->getRouter()->request(msg, *socket);
+        break;
       default:
         break;
     }

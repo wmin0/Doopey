@@ -35,6 +35,7 @@ namespace Doopey {
     // Command used by Router --------------------------------------------------
     // init msg to declare neighborhood
     MC_NeighborInit = 7,
+    MC_RouterACK = 8,
     // -------------------------------------------------------------------------
 
   }; // enum MessageCmd

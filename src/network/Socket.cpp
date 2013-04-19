@@ -91,8 +91,9 @@ bool Socket::connect(const char* servername, int port) {
     log->error("socket connect error\n");
     ret = false;
   }
-  pthread_mutex_unlock(&_sig_lock);
+  alarm(0);
   signal(SIGALRM, oldfunc);
+  pthread_mutex_unlock(&_sig_lock);
   _isConnected = true;
   return ret;
 }

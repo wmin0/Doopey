@@ -7,13 +7,15 @@
 #include <map>
 #include <string>
 
+using std::pair;
 using std::map;
 using std::string;
 
 namespace Doopey {
 
   class Router {
-
+    typedef pair<MachineID, string> RoutingPair;
+    typedef map<MachineID, string> RoutingMap;
     public:
       Router(const Server* server, const ConfigSPtr& config);
       ~Router();
@@ -21,8 +23,13 @@ namespace Doopey {
       bool start();
       bool stop();
 
-      // putRequest(class)
+      void request(const MessageSPtr& msg, const SocketSPtr& sock);
 
+      // routing operation functions
+      bool addRoutingPath(const MachineID id, const string& ip);
+      
+      // handle request functions
+      bool handleNeighborInit(const SocketSPtr& sock);
 
     private:
       static void threadFunc(void* obj);
@@ -42,7 +49,7 @@ namespace Doopey {
       ThreadSPtr _thread;
       bool _run;
 
-      map<uint64_t, string> _routingTable;
+      RoutingMap _routingTable;
 
 
   }; // class Router
