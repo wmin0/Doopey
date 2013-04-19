@@ -5,6 +5,7 @@
 #include "common/ConfigLoader.h"
 #include "common/SectionCollection.h"
 #include "common/Config.h"
+#include "network/Socket.h"
 
 #include <pthread.h>
 #include <string>
@@ -58,6 +59,7 @@ SectionCollectionSPtr Doopey::DoopeyInit(const char* path, char* argv0) {
   DoopeyRoot = initRoot(argv0);
   pthread_mutex_init(&Thread::_lock, NULL);
   pthread_mutex_init(&Thread::_sig_lock, NULL);
+  pthread_mutex_init(&Socket::_sig_lock, NULL);
   SectionCollectionSPtr section =
      ConfigLoader::loadConfig((DoopeyRoot +  path).data());
   // TODO: do log init
@@ -69,5 +71,6 @@ SectionCollectionSPtr Doopey::DoopeyInit(const char* path, char* argv0) {
 bool Doopey::DoopeyFinal() {
   pthread_mutex_destroy(&Thread::_lock);
   pthread_mutex_destroy(&Thread::_sig_lock);
+  pthread_mutex_destroy(&Socket::_sig_lock);
   return true;
 }

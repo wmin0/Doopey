@@ -3,6 +3,11 @@
 
 #include "common/Doopey.h"
 
+#include <pthread.h>
+#include <string>
+
+using std::string;
+
 namespace Doopey {
 
   enum SocketType {
@@ -17,6 +22,7 @@ namespace Doopey {
     public:
       Socket(SocketType type);
       ~Socket();
+      bool connect(const string& servername, int port);
       bool connect(const char* servername, int port);
       bool bind(int port);
       bool listen();
@@ -30,9 +36,14 @@ namespace Doopey {
       bool isConnected() const { return _isConnected; }
 
       void close();
+
+      static pthread_mutex_t _sig_lock;
     private:
       Socket(SocketType type, int fd, bool conn):
         _type(type), _fd(fd), _isConnected(conn) {}
+
+      static Socket* _this;
+      static void timeout(int sig);
 
     private:
       // 64k

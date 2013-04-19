@@ -30,6 +30,8 @@ namespace Doopey {
 
       void mainLoop();
 
+      bool initTopology(const string& list);
+      bool initConnectNeignbor(const string& ip);
     private:
       static Router* _this;
       // second

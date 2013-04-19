@@ -11,20 +11,32 @@ using std::vector;
 namespace Doopey {
 
   enum MessageType {
-    MT_None = 0,
-    MT_File = 1,
+    MT_None   = 0,
+    MT_File   = 1,
+    MT_Router = 2,
   }; // enum MessageType
 
   enum MessageCmd {
     MC_None = 0,
-    //Command used by FileManager ---------------------------------------------
-    MC_UpFileStart = 1,//means the first message in file uploading
-    MC_UpFileMeta = 2, //means data in msg is meta information
-    MC_UpFileData = 3, //means data in msg is the data
-    MC_UpFileEnd = 4,  //means the last message in file uploading
-    MC_RequestFile = 5,//means client want to get file
-    MC_RequestList = 6,//means client want to see the list in the path he request
-    //-------------------------------------------------------------------------
+    // Command used by FileManager ---------------------------------------------
+    // means the first message in file uploading
+    MC_UpFileStart  = 1,
+    // means data in msg is meta infomation
+    MC_UpFileMeta   = 2,
+    // means data in msg is the data
+    MC_UpFileData   = 3,
+    // means the last message in file uploading
+    MC_UpFileEnd    = 4,
+    // means client want to get file
+    MC_RequestFile  = 5,
+    // means client want to see the list in the path he requst
+    MC_RequestList  = 6,
+    // -------------------------------------------------------------------------
+    // Command used by Router --------------------------------------------------
+    // init msg to declare neighborhood
+    MC_NeighborInit = 7,
+    // -------------------------------------------------------------------------
+
   }; // enum MessageCmd
 
   class Message {

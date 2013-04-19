@@ -11,14 +11,19 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
+#include <string>
+#include <csignal>
 #include <cstdint>
 #include <vector>
+#include <pthread.h>
 
 using namespace Doopey;
 using std::vector;
+using std::string;
 
-typedef shared_ptr<Socket> SocketSPtr;
-typedef shared_ptr<Message> MessageSPtr;
+pthread_mutex_t Socket::_sig_lock;
+Socket* Socket::_this = NULL;
+
 
 Socket::Socket(SocketType type):
   _type(type), _fd(-1), _isConnected(false) {
@@ -46,6 +51,15 @@ void Socket::close() {
   }
 }
 
+void Socket::timeout(int sig) {
+  log->debug("socket timeout\n");
+  ::close(_this->_fd);
+}
+
+bool Socket::connect(const string& servername, int port) {
+  return connect(servername.data(), port);
+}
+
 bool Socket::connect(const char* servername, int port) {
   if (_fd < 0) {
     log->error("socket open error\n");
@@ -68,12 +82,19 @@ bool Socket::connect(const char* servername, int port) {
   memcpy(&addr.sin_addr.s_addr,
          server->h_addr_list[0],
          server->h_length);
+  pthread_mutex_lock(&_sig_lock);
+  bool ret = true;
+  void (*oldfunc)(int) = signal(SIGALRM, Socket::timeout);
+  _this = this;
+  alarm(1);
   if (::connect(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
     log->error("socket connect error\n");
-    return false;
+    ret = false;
   }
+  pthread_mutex_unlock(&_sig_lock);
+  signal(SIGALRM, oldfunc);
   _isConnected = true;
-  return true;
+  return ret;
 }
 
 bool Socket::bind(int port) {
