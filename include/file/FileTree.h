@@ -1,9 +1,9 @@
 #ifndef _DOOPEY_FILE_TREE_H_
 #define _DOOPEY_FILE_TREE_H_
 
-//#include <ext/hash_map>
 #include <string>
 #include <functional>
+#include <common/Doopey.h>
 
 using std::string;
 using std::hash;
@@ -22,6 +22,7 @@ namespace Doopey{
 
     public:
       HashList(uint64_t size = 3000);
+      ~HashList();
       bool add(const KEY& key, const VALUE& value);
       bool remove(const KEY& key);
       VALUE getValue(const KEY& key);
@@ -34,25 +35,42 @@ namespace Doopey{
   };//Class HashList
 
   class TreeNode{
-    friend class FileTree;
-
     public:
       ~TreeNode();
+      BlockID getID() const;
     private:
       TreeNode();
-      string filename;
-      TreeNode* children;
-      TreeNode* next;
+      bool _isFile;
+      string _name;
+      TreeNode* _children;
+      TreeNode* _next;
+      TreeNode* _last;
+      BlockID _metaID;
+
+    friend class FileTree;
   };//class TreeNode
 
   class FileTree{
     public:
-      FileTree();
       ~FileTree();
+      
+      bool addFile(const string& path, const BlockID metaID);
+      bool addDir(const string& path);
+      bool removeFile(const string& path);
+      bool removeDir(const string& path);
+      BlockID getMetaID(const string& filePath);
     private:
-      HashList<string, TreeNode*> _fileTable;
-  };//class FileTree
+      FileTree();
 
+      string getFileName(const string& path) const;
+      string getFirst(string& s);
+      bool removeNode(TreeNode* tn);
+      TreeNode* searchDir(const string& dirPath);
+      TreeNode* searchChild(TreeNode* node, const string& name) const;
+
+      TreeNode* _root;
+      HashList<string, TreeNode*>* _fileMap;
+  };//class FileTree
 
 }//namespace Doopey
 
