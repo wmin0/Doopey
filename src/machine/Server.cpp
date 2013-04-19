@@ -22,7 +22,7 @@ Server::Server(const SectionCollectionSPtr& section):
   // TODO: snapshot
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
-  _router.reset(new Router(this, _sectionCollection->getConfig("")));
+  _router.reset(new Router(this, _sectionCollection->getConfig("router")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
 }
 
@@ -33,7 +33,10 @@ Server::~Server() {
 }
 
 bool Server::start() {
-  return _dispatcher->start() && _router->start();
+
+  return _blockManager->isHealth() &&
+         _dispatcher->start() &&
+         _router->start();
 }
 
 void Server::serve() {

@@ -23,6 +23,8 @@ namespace Doopey {
       void addLocalID(BlockID id);
       //void removeID(BlockID id);
 
+      bool isHealth() const { return _health; }
+
     private:
       void loadLocalIDs();
       void cleanCache();
@@ -31,6 +33,7 @@ namespace Doopey {
     private:
       const BlockManager* _manager;
 
+
       string _localDir;
       size_t _cacheRemoteSize;
 
@@ -38,6 +41,7 @@ namespace Doopey {
       map<BlockID, BlockLocationAttrSPtr> _remoteIDs;
       LocalBlockID _localMax;
 
+      bool _health;
   }; // class BlockResolver
 
 };  // namespace Doopey

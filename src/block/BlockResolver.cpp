@@ -25,12 +25,17 @@ using std::stringstream;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
-  _manager(manager), _localDir("."), _cacheRemoteSize(0), _localMax(0) {
+  _manager(manager), _localDir("."), _cacheRemoteSize(0),
+  _localMax(0), _health(true) {
   if (NULL != config) {
     string tmp = config->getValue("BlockDir");
     if ("" != tmp) {
       _localDir = DoopeyRoot + tmp;
+    } else {
+      log->warning("Use Default BlockDir .\n");
     }
+  } else {
+    log->warning("Use Default BlockResolver .\n");
   }
   // some setup
   loadLocalIDs();
@@ -50,11 +55,11 @@ void BlockResolver::loadLocalIDs() {
   dir = opendir(_localDir.data());
   if (NULL == dir) {
     log->error("Open BlockDir fail: %s\n", _localDir.data());
+    _health = false;
     return;
   }
   unsigned long long int tmp;
   // clear
-  // TODO: save in encode64?
   MachineID machine = _manager->getMachineID();
   _localIDs.clear();
   while (NULL != (file = readdir(dir))) {

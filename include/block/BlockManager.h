@@ -26,6 +26,8 @@ namespace Doopey {
       const BlockUpdaterSPtr& getBlockUpdater() const { return _updater; }
 
       const MachineID& getMachineID() const;
+
+      bool isHealth() const;
     private:
 
       const Server* _server;

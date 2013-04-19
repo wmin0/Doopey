@@ -13,7 +13,7 @@ ConfigSPtr SectionCollection::getConfig(const char* section) const{
   if(findConfig!= _configTable.end())
     result=findConfig->second;
   else
-    log->info("config not found: %s\n", section);
+    log->warning("section not found: %s\n", section);
 
   return result;
 }

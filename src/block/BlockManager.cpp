@@ -39,3 +39,7 @@ BlockID BlockManager::saveBlock(const BlockSPtr& block) {
   }
   return newID;
 }
+
+bool BlockManager::isHealth() const {
+  return _resolver->isHealth();
+}
