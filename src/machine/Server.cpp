@@ -22,6 +22,7 @@ Server* Server::_this = NULL;
 Server::Server(const SectionCollectionSPtr& section):
   _sectionCollection(section) {
   attachSignal();
+  setupLocalIP();
 
   pthread_mutex_init(&_mutex, NULL);
   // TODO: snapshot
@@ -29,7 +30,6 @@ Server::Server(const SectionCollectionSPtr& section):
     new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
-  setupLocalIP();
 }
 
 Server::~Server() {
