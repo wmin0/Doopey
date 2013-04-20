@@ -83,42 +83,47 @@ void Router::initMachineID() {
     // NOTE: first node
     _server->setMachineIDMax(1);
     _server->setMachineID(1);
+    log->info("set MachineID(1)\n");
     return;
   }
   RoutingMap::iterator it = _routingTable.begin();
   MachineID max = 0;
   while (_routingTable.end() != it) {
-    Socket sock(ST_TCP);
-    if (!sock.connect(it->second.ip, DoopeyPort)) {
-      log->warning("connect to %s fail\n", it->second.ip.data());
-      continue;
-    }
-    MessageSPtr msg(new Message(MT_Router, MC_MachineIDMax));
-    if (!sock.send(msg)) {
-      log->warning("send MaxMachineID msg to %s fail\n", it->second.ip.data());
-      continue;
-    }
-    MessageSPtr ack = sock.receive();
-    if (NULL == ack) {
-      log->warning("recv msg from %s fail\n", it->second.ip.data());
-      continue;
-    }
-    if (MT_Router != ack->getType() && MC_RouterACK != ack->getCmd()) {
-      log->warning("MaxMachineID ack error from %s\n");
-      continue;
-    }
-    if (sizeof(MachineID) != ack->getData().size()) {
-      log->warning("wrong ack msg from %s\n");
-      continue;
-    }
-    MachineID id = *(MachineID*)(ack->getData().data());
-    if (id > max) {
-      max = id;
-    }
+    do {
+      Socket sock(ST_TCP);
+      if (!sock.connect(it->second.ip, DoopeyPort)) {
+        log->warning("connect to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr msg(new Message(MT_Router, MC_MachineIDMax));
+      if (!sock.send(msg)) {
+        log->warning("send MaxMachineID msg to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr ack = sock.receive();
+      if (NULL == ack) {
+        log->warning("recv msg from %s fail\n", it->second.ip.data());
+        break;
+      }
+      if (MT_Router != ack->getType() && MC_RouterACK != ack->getCmd()) {
+        log->warning("MaxMachineID ack error from %s\n");
+        break;
+      }
+      if (sizeof(MachineID) != ack->getData().size()) {
+        log->warning("wrong ack msg from %s\n");
+        break;
+      }
+      MachineID id = *(MachineID*)(ack->getData().data());
+      if (id > max) {
+        max = id;
+      }
+    } while(0);
+    ++it;
   }
   ++max;
   _server->setMachineIDMax(max);
   _server->setMachineID(max);
+  log->info("set MachineID(%d)\n", max);
   MessageSPtr update(new Message(MT_Router, MC_UpdateMachineIDMax));
   size_t off = 0;
   update->addData((unsigned char*)&max, off, sizeof(MachineID));
@@ -163,6 +168,7 @@ void Router::broadcast(const MessageSPtr& msg) const {
   RoutingMap::const_iterator it = _routingTable.begin();
   while (_routingTable.end() != it) {
     sendTo(it->first, msg);
+    ++it;
   }
 }
 
