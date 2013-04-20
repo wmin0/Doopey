@@ -20,22 +20,23 @@ namespace Doopey {
     MC_None = 0,
     // Command used by FileManager ---------------------------------------------
     // means the first message in file uploading
-    MC_UpFileStart  = 1,
+    MC_UpFileStart,
     // means data in msg is meta infomation
-    MC_UpFileMeta   = 2,
+    MC_UpFileMeta,
     // means data in msg is the data
-    MC_UpFileData   = 3,
+    MC_UpFileData,
     // means the last message in file uploading
-    MC_UpFileEnd    = 4,
+    MC_UpFileEnd,
     // means client want to get file
-    MC_RequestFile  = 5,
+    MC_RequestFile,
     // means client want to see the list in the path he requst
-    MC_RequestList  = 6,
+    MC_RequestList,
     // -------------------------------------------------------------------------
     // Command used by Router --------------------------------------------------
+    // Common Router ACK
+    MC_RouterACK,
     // init msg to declare neighborhood
-    MC_NeighborInit = 7,
-    MC_RouterACK = 8,
+    MC_NeighborInit,
     // -------------------------------------------------------------------------
 
   }; // enum MessageCmd
