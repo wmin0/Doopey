@@ -3,8 +3,8 @@
 
 namespace Doopey {
 
-#define addUnitTest(SuitePtr, Class, Func) \
-  SuitePtr->addTest(new CppUnit::TestCaller<Class>(#Func, &Class::Func))
+  #define addUnitTest(SuitePtr, Class, Func) \
+    SuitePtr->addTest(new CppUnit::TestCaller<Class>(#Func, &Class::Func))
 
 };  // namespace Doopey
 

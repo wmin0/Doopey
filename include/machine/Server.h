@@ -3,23 +3,14 @@
 
 #include "common/Doopey.h"
 
-#include <memory>
+#include <string>
 #include <pthread.h>
 
-using std::shared_ptr;
+using std::string;
 
 namespace Doopey {
 
-  class BlockManager;
-  class Dispatcher;
-  class FileManager;
-  class Router;
-
   class Server {
-    typedef shared_ptr<BlockManager> BlockManagerSPtr;
-    typedef shared_ptr<Dispatcher> DispatcherSPtr;
-    typedef shared_ptr<Router> RouterSPtr;
-    typedef shared_ptr<FileManager> FileManagerSPtr;
 
     public:
       Server(const SectionCollectionSPtr& section);
@@ -30,7 +21,10 @@ namespace Doopey {
       const RouterSPtr& getRouter() const { return _router; }
       const FileManagerSPtr& getFileManager() const { return _fileManager; }
       const MachineID& getMachineID() const { return _machineID; }
-
+      void setMachineID(const MachineID& id) { _machineID = id; }
+      const MachineID& getMachineIDMax() const { return _machineIDMax; }
+      void setMachineIDMax(const MachineID& id) { _machineIDMax = id; }
+      const string& getLocalIP() const { return _ip; }
       void serve();
     private:
       static void handleTERM(int sig);
@@ -39,11 +33,14 @@ namespace Doopey {
 
       void attachSignal();
       void detachSignal();
+      void setupLocalIP();
 
     private:
       static Server* _this;
 
       MachineID _machineID;
+      MachineID _machineIDMax;
+      string _ip;
 
       SectionCollectionSPtr _sectionCollection;
       BlockManagerSPtr _blockManager;

@@ -11,6 +11,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <vector>
+#include <memory.h>
 
 using namespace Doopey;
 using namespace std;
@@ -19,13 +20,14 @@ Router* Router::_this = NULL;
 
 const uint32_t Router::heartBeatInterval = 30;
 
-Router::Router(const Server* server, const ConfigSPtr& config):
+Router::Router(Server* server, const ConfigSPtr& config):
   _server(server), _run(false) {
   _thread.reset(new Thread(threadFunc, threadStop));
   string list = config->getValue("connectList");
   if ("" != list) {
     initTopology(DoopeyRoot + list);
   }
+  initMachineID();
 }
 
 Router::~Router() {
@@ -40,12 +42,12 @@ bool Router::initTopology(const string& list) {
   }
   string buf;
   while (getline(file, buf)) {
-    initConnectNeignbor(buf);
+    initConnectNeighbor(buf);
   }
   return true;
 }
 
-bool Router::initConnectNeignbor(const string& ip) {
+bool Router::initConnectNeighbor(const string& ip) {
   log->info("connect to %s\n", ip.data());
   Socket sock(ST_TCP);
   if (!sock.connect(ip, DoopeyPort)) {
@@ -73,7 +75,60 @@ bool Router::initConnectNeignbor(const string& ip) {
     return false;
   }
   MachineID id = *(MachineID*)(ack->getData().data());
-  return addRoutingPath(id, ip);
+  return addRoutingPath(id, ip, 1);
+}
+
+void Router::initMachineID() {
+  if (0 == _neighbors.size()) {
+    // NOTE: first node
+    _server->setMachineIDMax(1);
+    _server->setMachineID(1);
+    return;
+  }
+  RoutingMap::iterator it = _routingTable.begin();
+  MachineID max = 0;
+  while (_routingTable.end() != it) {
+    Socket sock(ST_TCP);
+    if (!sock.connect(it->second.ip, DoopeyPort)) {
+      log->warning("connect to %s fail\n", it->second.ip.data());
+      continue;
+    }
+    MessageSPtr msg(new Message(MT_Router, MC_MachineIDMax));
+    if (!sock.send(msg)) {
+      log->warning("send MaxMachineID msg to %s fail\n", it->second.ip.data());
+      continue;
+    }
+    MessageSPtr ack = sock.receive();
+    if (NULL == ack) {
+      log->warning("recv msg from %s fail\n", it->second.ip.data());
+      continue;
+    }
+    if (MT_Router != ack->getType() && MC_RouterACK != ack->getCmd()) {
+      log->warning("MaxMachineID ack error from %s\n");
+      continue;
+    }
+    if (sizeof(MachineID) != ack->getData().size()) {
+      log->warning("wrong ack msg from %s\n");
+      continue;
+    }
+    MachineID id = *(MachineID*)(ack->getData().data());
+    if (id > max) {
+      max = id;
+    }
+  }
+  ++max;
+  _server->setMachineIDMax(max);
+  _server->setMachineID(max);
+  MessageSPtr update(new Message(MT_Router, MC_UpdateMachineIDMax));
+  size_t off = 0;
+  update->addData((unsigned char*)&max, off, sizeof(MachineID));
+  off += sizeof(MachineID);
+  string local = _server->getLocalIP();
+  size_t len = local.size();
+  update->addData((unsigned char*)&len, off, sizeof(size_t));
+  off += sizeof(size_t);
+  update->addData((unsigned char*)local.data(), off, len);
+  broadcast(update);
 }
 
 bool Router::start() {
@@ -104,11 +159,39 @@ void Router::threadStop(void* obj) {
   router->_run = false;
 }
 
+void Router::broadcast(const MessageSPtr& msg) const {
+  RoutingMap::const_iterator it = _routingTable.begin();
+  while (_routingTable.end() != it) {
+    sendTo(it->first, msg);
+  }
+}
+
+bool Router::sendTo(MachineID id, const MessageSPtr& msg) const {
+  RoutingMap::const_iterator it = _routingTable.find(id);
+  if (_routingTable.end() == it) {
+    return false;
+  }
+  msg->setSrc(_server->getMachineID());
+  msg->setDest(id);
+  Socket sock(ST_TCP);
+  if (!sock.connect(it->second.ip, DoopeyPort)) {
+    // TODO: clear record
+    return false;
+  }
+  if (!sock.send(msg)) {
+    return false;
+  }
+  return true;
+}
 
 // routing operation functions
-bool Router::addRoutingPath(const MachineID id, const string& ip) {
+bool Router::addRoutingPath(
+  const MachineID id, const string& ip, const uint16_t& d) {
   // TODO: warning when rewrite
-  _routingTable[id] = ip;
+  _routingTable[id] = RoutingEntry(ip, d);
+  if (1 == d) {
+    _neighbors.insert(id);
+  }
   return true;
 }
 
@@ -121,8 +204,14 @@ void Router::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     case MC_NeighborInit:
       handleNeighborInit(sock);
       break;
+    case MC_MachineIDMax:
+      handleMachineIDMax(sock);
+      break;
+    case MC_UpdateMachineIDMax:
+      handleUpdateMachineIDMax(msg);
+      break;
     default:
-      return;
+      break;
   }
 }
 
@@ -135,4 +224,32 @@ bool Router::handleNeighborInit(const SocketSPtr& sock) {
     return false;
   }
   return true;
+}
+
+bool Router::handleMachineIDMax(const SocketSPtr& sock) {
+  MessageSPtr ack(new Message(MT_Router, MC_RouterACK));
+  MachineID id = _server->getMachineIDMax();
+  ack->addData((unsigned char*)&id, 0, sizeof(MachineID));
+  if (!sock->send(ack)) {
+    log->warning("send register ack fail\n");
+    return false;
+  }
+  return true;
+}
+
+bool Router::handleUpdateMachineIDMax(const MessageSPtr& msg) {
+  size_t off = 0;
+  MachineID max = *(MachineID*)(msg->getData().data());
+  off += sizeof(MachineID);
+  size_t len = *(size_t*)(msg->getData().data() + off);
+  off += sizeof(size_t);
+  string ip;
+  ip.resize(len);
+  char* buf = new char[len];
+  memcpy(buf, msg->getData().data() + off, len);
+  ip = buf;
+  delete[] buf;
+  _server->setMachineIDMax(max);
+  return addRoutingPath(msg->getSrc(), ip, 1);
+
 }

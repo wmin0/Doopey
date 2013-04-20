@@ -37,6 +37,10 @@ namespace Doopey {
     MC_RouterACK,
     // init msg to declare neighborhood
     MC_NeighborInit,
+    // request MachineIDMax
+    MC_MachineIDMax,
+    // update MachineIDMax
+    MC_UpdateMachineIDMax,
     // -------------------------------------------------------------------------
 
   }; // enum MessageCmd
@@ -54,14 +58,24 @@ namespace Doopey {
 
       const MessageType& getType() const { return _type; }
       const MessageCmd& getCmd() const { return _cmd; }
-
       const vector<unsigned char>& getData() const { return _data; }
+      const MachineID& getSrc() const { return _src; }
+      const MachineID& getDest() const { return _dest; }
+      const uint32_t& getHash() const { return _hash; }
+    private:
+      void setSrc(const MachineID& id) { _src = id; }
+      void setDest(const MachineID& id) { _dest = id; }
+      void setHash(const uint32_t& hash) { _hash = hash; }
 
     private:
       MessageType _type;
       MessageCmd _cmd;
+      MachineID _src;
+      MachineID _dest;
+      uint32_t _hash;
       vector<unsigned char> _data;
     friend class SocketTest;
+    friend class Router;
   }; // class Message
 
 };  // namespace Doopey

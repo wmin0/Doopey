@@ -7,6 +7,11 @@
 #include "network/Dispatcher.h"
 #include "network/Router.h"
 
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
 #include <csignal>
 #include <pthread.h>
 
@@ -24,12 +29,41 @@ Server::Server(const SectionCollectionSPtr& section):
     new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
+  setupLocalIP();
 }
 
 Server::~Server() {
   detachSignal();
   // TODO: snapshot
   pthread_mutex_destroy(&_mutex);
+}
+
+void Server::setupLocalIP() {
+  struct ifaddrs * ifAddrStruct=NULL;
+  struct ifaddrs * ifa=NULL;
+  void * tmpAddrPtr=NULL;
+
+  getifaddrs(&ifAddrStruct);
+
+  for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+      if (ifa ->ifa_addr->sa_family==AF_INET) { // check it is IP4
+        // is a valid IP4 Address
+        tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+        char addressBuffer[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+        if (0 == strncmp("eth", ifa->ifa_name, 3)) {
+          _ip = addressBuffer;
+          break;
+        }
+      }
+  }
+  if (ifAddrStruct!=NULL) {
+    freeifaddrs(ifAddrStruct);
+  }
+  log->info("Server IP: %s\n", _ip.data());
+  if ("" == _ip) {
+    // TODO: init fail tag;
+  }
 }
 
 bool Server::start() {
