@@ -200,7 +200,7 @@ bool Router::addRoutingPath(
   if (1 == d) {
     _neighbors.insert(id);
   }
-  log->info("update routing <&d, &s, &d>\n", id, ip.data(), d);
+  log->info("update routing <%d, %s, %d>\n", id, ip.data(), d);
   return true;
 }
 
