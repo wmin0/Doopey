@@ -7,7 +7,7 @@
 #include <string>
 
 #include "common/Doopey.h"
-#include "network/Socket.h"
+#include "common/Socket.h"
 
 using std::shared_ptr;
 using std::string;

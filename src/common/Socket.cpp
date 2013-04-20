@@ -1,8 +1,8 @@
-#include "network/Socket.h"
+#include "common/Socket.h"
 // udp ref: http://www.abc.se/~m6695/udp.html
 
 #include "common/Doopey.h"
-#include "network/Message.h"
+#include "common/Message.h"
 
 #include <arpa/inet.h>
 #include <memory.h>

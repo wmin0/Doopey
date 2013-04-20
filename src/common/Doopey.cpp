@@ -5,7 +5,7 @@
 #include "common/ConfigLoader.h"
 #include "common/SectionCollection.h"
 #include "common/Config.h"
-#include "network/Socket.h"
+#include "common/Socket.h"
 
 #include <pthread.h>
 #include <string>

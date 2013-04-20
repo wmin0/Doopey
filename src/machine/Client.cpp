@@ -1,8 +1,8 @@
 #include "machine/Client.h"
 
 #include "common/Doopey.h"
-#include "network/Socket.h"
-#include "network/Message.h"
+#include "common/Socket.h"
+#include "common/Message.h"
 
 #include <iostream>
 #include <memory>

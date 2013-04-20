@@ -21,12 +21,84 @@ namespace Doopey{
     };
 
     public:
-      HashList(uint64_t size = 3000);
-      ~HashList();
-      bool add(const KEY& key, const VALUE& value);
-      bool remove(const KEY& key);
-      VALUE getValue(const KEY& key);
-    
+      HashList(uint64_t size = 3000): _listSize(size)
+      {
+        _list = new HashItem*[size];
+        for(uint64_t i=0; i<size; i++)
+          _list[i] = NULL;
+      }
+      ~HashList()
+      {
+        for(uint64_t i=0; i<_listSize; i++)
+        {
+          HashItem* release = _list[i];
+          HashItem* next;
+          while(release!=NULL)
+          {
+            next = release->next;
+            free(release);
+            release = next;
+          }
+        }
+        free(_list);
+      }
+      bool add(const KEY& key, const VALUE& value)
+      {
+        uint64_t index = keyHash(key)%_listSize;
+        if(_list[index] == NULL)//means it is the first element
+        {
+          _list[index] = new HashItem();
+          _list[index]->key = key;
+          _list[index]->value = value;
+          _list[index]->next = NULL;
+        }else{//means it is not the first
+          HashItem* saveplace = _list[index];
+          while(saveplace->next != NULL)
+          {
+            saveplace = saveplace->next;
+          }
+          saveplace->next = new HashItem();
+          saveplace = saveplace->next;
+          saveplace->key = key;
+          saveplace->value = value;
+          saveplace->next = NULL;
+        }
+        return true;
+      }
+      bool remove(const KEY& key)
+      {
+        uint64_t index = keyHash(key)%_listSize;
+        HashItem* pos = _list[index];
+        if(_list[index]->key == key)
+        {
+          _list[index] = _list[index]->next;
+          free(pos);
+          return true;
+        }
+        pos = _list[index]->next;
+        HashItem* ppos = _list[index];
+        while(pos!=NULL)
+        {
+          if(pos->key == key)
+          {
+            ppos->next = pos->next;
+            free(pos);
+            return true;
+          }
+        }
+        return false;
+      }
+      VALUE getValue(const KEY& key)
+      {
+        uint64_t index = keyHash(key)%_listSize;
+        HashItem* pos = _list[index];
+        while(pos!=NULL)
+        {
+          if(pos->key == key)
+            return pos->value;
+        }
+        return NULL;
+      }
     private:
       hash<KEY> keyHash;
 
@@ -53,7 +125,7 @@ namespace Doopey{
   class FileTree{
     public:
       ~FileTree();
-      
+
       bool addFile(const string& path, const BlockID metaID);
       bool addDir(const string& path);
       bool removeFile(const string& path);

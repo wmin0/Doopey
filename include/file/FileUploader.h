@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "common/Doopey.h"
-#include "network/Socket.h"
+#include "common/Socket.h"
 #include "block/BlockManager.h"
 
 using std::shared_ptr;

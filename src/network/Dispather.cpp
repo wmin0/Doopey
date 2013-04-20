@@ -5,8 +5,8 @@
 #include "common/TaskThread.h"
 #include "logger/Logger.h"
 #include "machine/Server.h"
-#include "network/Socket.h"
-#include "network/Message.h"
+#include "common/Socket.h"
+#include "common/Message.h"
 #include "network/Router.h"
 
 #include <pthread.h>

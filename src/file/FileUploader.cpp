@@ -1,5 +1,5 @@
 #include "file/FileUploader.h"
-#include "network/Message.h"
+#include "common/Message.h"
 
 #define stringiz(arg) #arg //enum to string
 

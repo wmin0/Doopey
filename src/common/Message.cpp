@@ -1,4 +1,4 @@
-#include "network/Message.h"
+#include "common/Message.h"
 
 #include <memory.h>
 

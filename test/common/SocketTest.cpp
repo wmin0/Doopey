@@ -2,8 +2,8 @@
 
 #include "common/Doopey.h"
 #include "common/DoopeyTest.h"
-#include "network/Message.h"
-#include "network/Socket.h"
+#include "common/Message.h"
+#include "common/Socket.h"
 
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>

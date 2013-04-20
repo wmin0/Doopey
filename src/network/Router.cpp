@@ -4,8 +4,8 @@
 #include "common/Doopey.h"
 #include "common/Thread.h"
 #include "machine/Server.h"
-#include "network/Message.h"
-#include "network/Socket.h"
+#include "common/Message.h"
+#include "common/Socket.h"
 
 #include <iostream>
 #include <fstream>

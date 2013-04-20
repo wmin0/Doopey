@@ -5,7 +5,7 @@
 #include "block/Block.h"
 #include "block/MetaBlock.h"
 #include "machine/Server.h"
-#include "network/Message.h"
+#include "common/Message.h"
 
 using namespace Doopey;
 
