@@ -84,6 +84,7 @@ void Router::initMachineID() {
     _server->setMachineIDMax(1);
     _server->setMachineID(1);
     log->info("set MachineID(1)\n");
+    log->info("set MachineIDMax(1)\n");
     return;
   }
   RoutingMap::iterator it = _routingTable.begin();
@@ -124,6 +125,7 @@ void Router::initMachineID() {
   _server->setMachineIDMax(max);
   _server->setMachineID(max);
   log->info("set MachineID(%d)\n", max);
+  log->info("set MachineIDMax(%d)\n", max);
   MessageSPtr update(new Message(MT_Router, MC_UpdateMachineIDMax));
   size_t off = 0;
   update->addData((unsigned char*)&max, off, sizeof(MachineID));
@@ -198,6 +200,7 @@ bool Router::addRoutingPath(
   if (1 == d) {
     _neighbors.insert(id);
   }
+  log->info("update routing <&d, &s, &d>\n", id, ip.data(), d);
   return true;
 }
 
@@ -256,6 +259,6 @@ bool Router::handleUpdateMachineIDMax(const MessageSPtr& msg) {
   ip = buf;
   delete[] buf;
   _server->setMachineIDMax(max);
+  log->info("set MachineIDMax(%d)\n", max);
   return addRoutingPath(msg->getSrc(), ip, 1);
-
 }
