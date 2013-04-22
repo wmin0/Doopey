@@ -48,7 +48,7 @@ namespace Doopey {
       bool handleNeighborInit(const SocketSPtr& sock);
       bool handleMachineIDMax(const SocketSPtr& sock);
       bool handleUpdateMachineIDMax(const MessageSPtr& msg);
-
+      bool handleRequestRoutingTable(const SocketSPtr& sock);
 
     private:
       static void threadFunc(void* obj);
@@ -59,6 +59,8 @@ namespace Doopey {
       bool initTopology(const string& list);
       bool initConnectNeighbor(const string& ip);
       void initMachineID();
+      void initTable();
+      void updateMachineIDMax();
     private:
       static Router* _this;
       // second

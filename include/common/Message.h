@@ -41,6 +41,8 @@ namespace Doopey {
     MC_MachineIDMax,
     // update MachineIDMax
     MC_UpdateMachineIDMax,
+    // request routing table
+    MC_RequestRoutingTable,
     // -------------------------------------------------------------------------
 
   }; // enum MessageCmd

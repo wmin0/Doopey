@@ -28,6 +28,8 @@ Router::Router(Server* server, const ConfigSPtr& config):
     initTopology(DoopeyRoot + list);
   }
   initMachineID();
+  initTable();
+  updateMachineIDMax();
 }
 
 Router::~Router() {
@@ -126,14 +128,74 @@ void Router::initMachineID() {
   _server->setMachineID(max);
   log->info("set MachineID(%d)\n", max);
   log->info("set MachineIDMax(%d)\n", max);
+}
+
+void Router::initTable() {
+  if (0 == _neighbors.size()) {
+    return;
+  }
+  log->info("fetching routing table\n");
+  RoutingMap::iterator it = _routingTable.begin();
+  bool done = false;
+  while (_routingTable.end() != it) {
+    log->info("try to connect to %s\n", it->second.ip.data());
+    do {
+      Socket sock(ST_TCP);
+      if (!sock.connect(it->second.ip, DoopeyPort)) {
+        log->warning("connect to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr msg(new Message(MT_Router, MC_RequestRoutingTable));
+      if (!sock.send(msg)) {
+        log->warning("send RequestTable msg to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr ack = sock.receive();
+      if (NULL == ack) {
+        log->warning("recv msg from %s fail\n", it->second.ip.data());
+        break;
+      }
+      if (MT_Router != ack->getType() && MC_RouterACK != ack->getCmd()) {
+        log->warning("RequestTable ack error from %s\n");
+        break;
+      }
+      uint64_t total = ack->getData().size();
+      uint64_t off = 0;
+      while (total != off) {
+        MachineID id;
+        uint64_t len;
+        string ip;
+        uint16_t d;
+        memcpy(&id, ack->getData().data() + off, sizeof(MachineID));
+        off += sizeof(MachineID);
+        memcpy(&len, ack->getData().data() + off, sizeof(uint64_t));
+        off += sizeof(uint64_t);
+        ip.resize(len);
+        memcpy(&(ip[0]), ack->getData().data() + off, len);
+        off += len;
+        memcpy(&d, ack->getData().data() + off, sizeof(uint16_t));
+        off += sizeof(uint16_t);
+        log->info("get routing <%d, %s, %d>\n", id, ip.data(), d);
+        addRoutingPath(id, ip, d);
+      }
+    } while(0);
+    if (done) {
+      break;
+    }
+    ++it;
+  }
+}
+
+void Router::updateMachineIDMax() {
   MessageSPtr update(new Message(MT_Router, MC_UpdateMachineIDMax));
-  size_t off = 0;
+  uint64_t off = 0;
+  MachineID max = _server->getMachineIDMax();
   update->addData((unsigned char*)&max, off, sizeof(MachineID));
   off += sizeof(MachineID);
   string local = _server->getLocalIP();
-  size_t len = local.size();
-  update->addData((unsigned char*)&len, off, sizeof(size_t));
-  off += sizeof(size_t);
+  uint64_t len = local.size();
+  update->addData((unsigned char*)&len, off, sizeof(uint64_t));
+  off += sizeof(uint64_t);
   update->addData((unsigned char*)local.data(), off, len);
   broadcast(update);
 }
@@ -219,6 +281,9 @@ void Router::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     case MC_UpdateMachineIDMax:
       handleUpdateMachineIDMax(msg);
       break;
+    case MC_RequestRoutingTable:
+      handleRequestRoutingTable(sock);
+      break;
     default:
       break;
   }
@@ -247,18 +312,38 @@ bool Router::handleMachineIDMax(const SocketSPtr& sock) {
 }
 
 bool Router::handleUpdateMachineIDMax(const MessageSPtr& msg) {
-  size_t off = 0;
+  uint64_t off = 0;
   MachineID max = *(MachineID*)(msg->getData().data());
   off += sizeof(MachineID);
-  size_t len = *(size_t*)(msg->getData().data() + off);
-  off += sizeof(size_t);
+  uint64_t len = *(uint64_t*)(msg->getData().data() + off);
+  off += sizeof(uint64_t);
   string ip;
   ip.resize(len);
-  char* buf = new char[len];
-  memcpy(buf, msg->getData().data() + off, len);
-  ip = buf;
-  delete[] buf;
+  memcpy(&(ip[0]), msg->getData().data() + off, len);
   _server->setMachineIDMax(max);
   log->info("set MachineIDMax(%d)\n", max);
   return addRoutingPath(msg->getSrc(), ip, 1);
+}
+
+bool Router::handleRequestRoutingTable(const SocketSPtr& sock) {
+  MessageSPtr ack(new Message(MT_Router, MC_RouterACK));
+  RoutingMap::const_iterator it = _routingTable.begin();
+  uint64_t off = 0;
+  while (_routingTable.end() != it) {
+    ack->addData((unsigned char*)&(it->first), off, sizeof(MachineID));
+    off += sizeof(MachineID);
+    uint64_t len = it->second.ip.size();
+    ack->addData((unsigned char*)&(len), off, sizeof(uint64_t));
+    off += sizeof(uint64_t);
+    ack->addData((unsigned char*)it->second.ip.data(), off, len);
+    off += len;
+    ack->addData((unsigned char*)&(it->second.d), off, sizeof(uint16_t));
+    off += sizeof(uint16_t);
+    ++it;
+  }
+  if (!sock->send(ack)) {
+    log->warning("send routing table ack fail\n");
+    return false;
+  }
+  return true;
 }
