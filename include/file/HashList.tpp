@@ -32,7 +32,7 @@ bool HashList<KEY,VALUE>::add(const KEY& key, const VALUE& value)
     _list[index] = new HashItem();
     _list[index]->key = key;
     _list[index]->value = value;
-    _list[index]->next = NULL;  
+    _list[index]->next = NULL;
   }else{//means it is not the first
     HashItem* saveplace = _list[index];
     while(saveplace->next != NULL)
@@ -44,7 +44,6 @@ bool HashList<KEY,VALUE>::add(const KEY& key, const VALUE& value)
     saveplace->key = key;
     saveplace->value = value;
     saveplace->next = NULL;
-    
   }
   return true;
 }
@@ -83,7 +82,8 @@ VALUE HashList<KEY, VALUE>::getValue(const KEY& key)
   {
     if(pos->key == key)
       return pos->value;
+    pos = pos->next;
   }
-  return NULL;
+  return VALUE();
 }
 

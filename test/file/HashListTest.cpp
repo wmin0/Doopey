@@ -33,6 +33,7 @@ void HashListTest::testHashList()
   CPPUNIT_ASSERT("test1" == map->getValue("test1"));
   log->debug("Remove test2\n");
   CPPUNIT_ASSERT(map->remove("test2"));
+  CPPUNIT_ASSERT("" == map->getValue("test2"));
   log->debug("Remove test1\n");
   CPPUNIT_ASSERT(map->remove("test1"));
 }
