@@ -175,8 +175,9 @@ void Router::initTable() {
         off += len;
         memcpy(&d, ack->getData().data() + off, sizeof(uint16_t));
         off += sizeof(uint16_t);
-        log->info("get routing <%d, %s, %d>\n", id, ip.data(), d);
-        addRoutingPath(id, ip, d);
+        // TODO: len
+        addRoutingPath(id, ip, d + 1);
+        done = true;
       }
     } while(0);
     if (done) {
@@ -258,6 +259,7 @@ bool Router::sendTo(MachineID id, const MessageSPtr& msg) const {
 bool Router::addRoutingPath(
   const MachineID id, const string& ip, const uint16_t& d) {
   // TODO: warning when rewrite
+  // TODO: choose short if rewrite
   _routingTable[id] = RoutingEntry(ip, d);
   if (1 == d) {
     _neighbors.insert(id);
