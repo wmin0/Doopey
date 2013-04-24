@@ -54,15 +54,13 @@ namespace Doopey{
   class FileTree{
     public:
       ~FileTree();
-
+      FileTree();
       bool addFile(const string& path, const BlockID metaID);
       bool addDir(const string& path);
       bool removeFile(const string& path);
       bool removeDir(const string& path);
       BlockID getMetaID(const string& filePath);
     private:
-      FileTree();
-
       string getFileName(const string& path) const;
       string getFirst(string& s);
       bool removeNode(TreeNode* tn);
