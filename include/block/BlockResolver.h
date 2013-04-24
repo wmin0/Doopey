@@ -10,10 +10,13 @@
 using std::map;
 using std::set;
 using std::string;
+using std::pair;
 
 namespace Doopey {
 
   class BlockResolver {
+    typedef map<BlockID, BlockLocationAttrSPtr> BlockMap;
+    typedef pair<BlockID, BlockLocationAttrSPtr> BlockPair;
     public:
       BlockResolver(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockResolver();
@@ -25,6 +28,8 @@ namespace Doopey {
 
       bool isHealth() const { return _health; }
 
+      bool handleRequestBlockLocation(const MessageSPtr& msg);
+      bool handleRequestBlockLocationACK(const MessageSPtr& msg);
     private:
       void loadLocalIDs();
       void cleanCache();
@@ -33,15 +38,17 @@ namespace Doopey {
     private:
       const BlockManager* _manager;
 
-
       string _localDir;
       size_t _cacheRemoteSize;
 
       set<BlockID> _localIDs;
-      map<BlockID, BlockLocationAttrSPtr> _remoteIDs;
+      BlockMap _remoteIDs;
       LocalBlockID _localMax;
 
       bool _health;
+
+      static const int waitRemote;
+      static const size_t remoteSizeMax;
   }; // class BlockResolver
 
 };  // namespace Doopey

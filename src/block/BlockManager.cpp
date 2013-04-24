@@ -7,12 +7,17 @@
 //#include "block/BlockUpdater.h"
 #include "block/DataBlock.h"
 #include "block/MetaBlock.h"
+#include "common/Message.h"
 #include "machine/Server.h"
 
 using namespace Doopey;
 
 const MachineID& BlockManager::getMachineID() const {
   return _server->getMachineID();
+}
+
+const RouterSPtr& BlockManager::getRouter() const {
+  return _server->getRouter();
 }
 
 BlockManager::BlockManager(const Server* server, const ConfigSPtr& config): _server(server) {
@@ -42,4 +47,17 @@ BlockID BlockManager::saveBlock(const BlockSPtr& block) {
 
 bool BlockManager::isHealth() const {
   return _resolver->isHealth();
+}
+
+void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
+  switch (msg->getType()) {
+    case MC_RequestBlockLocation:
+      _resolver->handleRequestBlockLocation(msg);
+      break;
+    case MC_RequestBlockLocationACK:
+      _resolver->handleRequestBlockLocationACK(msg);
+      break;
+    default:
+      break;
+  }
 }

@@ -1,5 +1,6 @@
 #include "network/Dispatcher.h"
 
+#include "block/BlockManager.h"
 #include "common/Doopey.h"
 #include "common/Thread.h"
 #include "common/TaskThread.h"
@@ -96,6 +97,8 @@ void Dispatcher::dispatch(void* dispatch, void* sock) {
       case MT_Router:
         dispatcher->_server->getRouter()->request(msg, *socket);
         break;
+      case MT_Block:
+        dispatcher->_server->getBlockManager()->request(msg, *socket);
       default:
         break;
     }
