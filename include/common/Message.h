@@ -14,6 +14,7 @@ namespace Doopey {
     MT_None   = 0,
     MT_File   = 1,
     MT_Router = 2,
+    MT_Block  = 3,
   }; // enum MessageType
 
   enum MessageCmd {
@@ -44,7 +45,11 @@ namespace Doopey {
     // request routing table
     MC_RequestRoutingTable,
     // -------------------------------------------------------------------------
-
+    // Command used by Block ---------------------------------------------------
+    // Ask for block location
+    MC_RequestBlockLocation,
+    // ACK for MC_RequestBlockLocation
+    MC_RequestBlockLocationACK,
   }; // enum MessageCmd
 
   class Message {

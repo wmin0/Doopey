@@ -4,6 +4,8 @@
 #include "block/BlockLocationAttr.h"
 #include "common/Doopey.h"
 #include "common/Config.h"
+#include "common/Message.h"
+#include "network/Router.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -15,6 +17,7 @@
 #include <string>
 #include <sstream>
 #include <sys/types.h>
+#include <unistd.h>
 
 using namespace Doopey;
 
@@ -22,6 +25,9 @@ using std::pair;
 using std::ifstream;
 using std::string;
 using std::stringstream;
+
+const int BlockResolver::waitRemote = 30;
+const size_t BlockResolver::remoteSizeMax = 1000;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
@@ -111,22 +117,70 @@ BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
     // machineID = 0 is local
     return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, 0));
   }
-  map<BlockID, BlockLocationAttrSPtr>::iterator it = _remoteIDs.find(id);
+  BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
     return it->second;
   }
   BlockLocationAttrSPtr tmp = askRemoteBlock(id);
-  if (NULL != tmp) {
-    if (_cacheRemoteSize <= _remoteIDs.size()) {
-      cleanCache();
-    }
-    _remoteIDs.insert(pair<BlockID, BlockLocationAttrSPtr>(id, tmp));
-  }
   return tmp;
 }
 
 BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
-  // TODO: _manager->_router
+  // TODO: check protocol
+  MessageSPtr msg(new Message(MT_Block, MC_RequestBlockLocation));
+  MachineID m = _manager->getMachineID();
+  msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
+  msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
+  _manager->getRouter()->broadcast(msg);
+  sleep(30);
+  BlockMap::iterator it = _remoteIDs.find(id);
+  if (_remoteIDs.end() != it) {
+    it->second->ts = time(0);
+    return it->second;
+  }
   return BlockLocationAttrSPtr(NULL);
+}
+
+bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
+  // TOOD: check protocol
+  MachineID m;
+  BlockID id;
+  memcpy(&m, msg->getData().data(), sizeof(MachineID));
+  memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
+  MessageSPtr ack(new Message(MT_Block, MC_RequestBlockLocationACK));
+  if (_localIDs.end() != _localIDs.find(id)) {
+     MachineID local = _manager->getMachineID();
+     ack->addData((unsigned char*)&local, 0, sizeof(MachineID));
+     ack->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
+  }
+  _manager->getRouter()->sendTo(m, msg);
+  return true;
+}
+
+bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
+  if (0 == msg->getData().size()) {
+    return true;
+  }
+  MachineID m;
+  BlockID id;
+  memcpy(&m, msg->getData().data(), sizeof(MachineID));
+  memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
+  // check
+  BlockMap::iterator it = _remoteIDs.find(id);
+  if (_remoteIDs.end() != it) {
+    it->second->ts = time(0);
+    if (it->second->machine != m) {
+      log->debug("update block %ld %d->%d\n", id, it->second->machine, m);
+      it->second->machine = m;
+    }
+  } else {
+    if (_remoteIDs.size() >= remoteSizeMax) {
+      cleanCache();
+    }
+    _remoteIDs.insert(
+      BlockPair(id,
+                BlockLocationAttrSPtr(new BlockLocationAttr(id, m, time(0)))));
+  }
+  return true;
 }

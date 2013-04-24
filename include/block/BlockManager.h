@@ -20,10 +20,14 @@ namespace Doopey {
 
       BlockID saveBlock(const BlockSPtr& block);
 
+      void request(const MessageSPtr& msg, const SocketSPtr& sock);
+
       const BlockLoaderSPtr& getBlockLoader() const { return _loader; }
       const BlockResolverSPtr& getBlockResolver() const { return _resolver; }
       const BlockSaverSPtr& getBlockSaver() const { return _saver; }
       const BlockUpdaterSPtr& getBlockUpdater() const { return _updater; }
+
+      const RouterSPtr& getRouter() const;
 
       const MachineID& getMachineID() const;
 
@@ -31,8 +35,6 @@ namespace Doopey {
     private:
 
       const Server* _server;
-
-      RouterSPtr _router;
 
       BlockLoaderSPtr _loader;
       BlockResolverSPtr _resolver;
