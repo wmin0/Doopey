@@ -46,9 +46,11 @@ namespace Doopey{
       TreeNode* _children;
       TreeNode* _next;
       TreeNode* _last;
+      TreeNode* _parent;
       BlockID _metaID;
 
     friend class FileTree;
+    friend class FileTreeTest;
   };//class TreeNode
 
   class FileTree{
@@ -69,6 +71,8 @@ namespace Doopey{
 
       TreeNode* _root;
       HashList<string, TreeNode*>* _fileMap;
+
+    friend class FileTreeTest;
   };//class FileTree
 
 }//namespace Doopey

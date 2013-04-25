@@ -35,6 +35,11 @@ FileTree::~FileTree()
 string FileTree::getFirst(string& s)
 {
   size_t idx = s.find_first_of("/");
+  while (idx == 0){
+    s.erase(0, 1);
+    idx = s.find_first_of("/");
+  }
+    
   string get = s.substr(0, idx);
   s.erase(0, idx+1);
   return get;
@@ -90,13 +95,22 @@ bool FileTree::addFile(const string& path, const BlockID metaID)
   if(insert->_isFile == true)
     return false;
 
-  insert->_next = new TreeNode();
-  (insert->_next)->_last = insert;
-  insert = insert->_next;
+  if(insert->_children != NULL)
+  {
+    insert = insert->_children;
+    while(insert->_next != NULL)
+      insert = insert->_next;
+    insert->_next = new TreeNode();
+    (insert->_next)->_last = insert;
+    insert = insert->_next;
+  }else{
+    insert->_children = new TreeNode();
+    (insert->_children)->_parent = insert;
+    insert = insert->_children;
+  }
   insert->_name = name;
   insert->_isFile = metaID!=0?true:false;
   insert->_metaID = metaID;
-
   _fileMap->add(path, insert);
   return true;
 }
@@ -115,6 +129,8 @@ bool FileTree::removeNode(TreeNode* tn)
     (tn->_last)->_next = tn->_next;
   if(tn->_next != NULL)
     (tn->_next)->_last = tn->_last;
+  if( (tn->_parent)->_children == tn)
+    (tn->_parent)->_children = tn->_next;
 
   free(tn);
   return true;
@@ -157,7 +173,7 @@ bool FileTree::removeDir(const string& path)
     while(next!=NULL)
     {
       next->_isFile? removeFile(next->_name):removeDir(next->_name);
-      next = remove->_children;
+      next = remove->_next;
     }
   }
   removeNode(remove);
