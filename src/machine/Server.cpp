@@ -20,12 +20,13 @@ using namespace Doopey;
 Server* Server::_this = NULL;
 
 Server::Server(const SectionCollectionSPtr& section):
-  _sectionCollection(section) {
+  _sectionCollection(section), _machineID(0), _machineIDMax(0), _ip("") {
   attachSignal();
   setupLocalIP();
 
   pthread_mutex_init(&_mutex, NULL);
   // TODO: snapshot
+  loadSnapShot();
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
@@ -35,6 +36,7 @@ Server::Server(const SectionCollectionSPtr& section):
 Server::~Server() {
   detachSignal();
   // TODO: snapshot
+  saveSnapShot();
   pthread_mutex_destroy(&_mutex);
 }
 
@@ -46,9 +48,9 @@ void Server::setupLocalIP() {
   getifaddrs(&ifAddrStruct);
 
   for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-      if (ifa ->ifa_addr->sa_family==AF_INET) { // check it is IP4
+      if (AF_INET == ifa->ifa_addr->sa_family) { // check it is IP4
         // is a valid IP4 Address
-        tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+        tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
         char addressBuffer[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
         if (0 == strncmp("eth", ifa->ifa_name, 3)) {
@@ -67,7 +69,6 @@ void Server::setupLocalIP() {
 }
 
 bool Server::start() {
-
   return _blockManager->isHealth() &&
          _dispatcher->start() &&
          _router->start();
@@ -79,6 +80,7 @@ void Server::serve() {
   pthread_mutex_unlock(&_mutex);
 }
 
+// signal
 void Server::attachSignal() {
   Server::_this = this;
   signal(SIGTERM, Server::handleTERM);
@@ -105,4 +107,15 @@ void Server::handleINT(int sig) {
 
 void Server::signalStop() {
   pthread_mutex_unlock(&(Server::_this->_mutex));
+}
+
+// snapshot
+void Server::saveSnapShot() {
+  log->debug("save lalala %s\n", DoopeyRoot.data());
+  log->debug("save la %ld %ld\n", _machineID, _machineIDMax);
+}
+
+void Server::loadSnapShot() {
+  log->debug("load lalala %s\n", DoopeyRoot.data());
+  log->debug("load la %ld %ld\n", _machineID, _machineIDMax);
 }

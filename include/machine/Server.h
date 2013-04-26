@@ -35,14 +35,18 @@ namespace Doopey {
       void detachSignal();
       void setupLocalIP();
 
+      void loadSnapShot();
+      void saveSnapShot();
+
     private:
       static Server* _this;
+
+      SectionCollectionSPtr _sectionCollection;
 
       MachineID _machineID;
       MachineID _machineIDMax;
       string _ip;
 
-      SectionCollectionSPtr _sectionCollection;
       BlockManagerSPtr _blockManager;
       DispatcherSPtr _dispatcher;
       RouterSPtr _router;

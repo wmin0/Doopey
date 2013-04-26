@@ -40,7 +40,7 @@ BlockID BlockManager::saveBlock(const BlockSPtr& block) {
   BlockID oldID = block->getID();
   BlockID newID = _saver->saveBlock(block);
   if (0 != oldID && newID != oldID) {
-    // TODO: updater? invalid? 
+    // TODO: updater? invalid?
   }
   return newID;
 }
@@ -50,7 +50,7 @@ bool BlockManager::isHealth() const {
 }
 
 void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
-  switch (msg->getType()) {
+  switch (msg->getCmd()) {
     case MC_RequestBlockLocation:
       _resolver->handleRequestBlockLocation(msg);
       break;
