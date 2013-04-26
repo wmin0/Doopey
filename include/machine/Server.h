@@ -35,8 +35,8 @@ namespace Doopey {
       void detachSignal();
       void setupLocalIP();
 
-      void loadSnapShot();
-      void saveSnapShot();
+      void loadSnapshot();
+      void saveSnapshot();
 
     private:
       static Server* _this;

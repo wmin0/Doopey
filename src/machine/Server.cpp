@@ -4,6 +4,7 @@
 #include "common/Doopey.h"
 #include "common/Config.h"
 #include "common/SectionCollection.h"
+#include "machine/ServerSnapshot.h"
 #include "network/Dispatcher.h"
 #include "network/Router.h"
 
@@ -26,7 +27,7 @@ Server::Server(const SectionCollectionSPtr& section):
 
   pthread_mutex_init(&_mutex, NULL);
   // TODO: snapshot
-  loadSnapShot();
+  loadSnapshot();
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
@@ -36,7 +37,7 @@ Server::Server(const SectionCollectionSPtr& section):
 Server::~Server() {
   detachSignal();
   // TODO: snapshot
-  saveSnapShot();
+  saveSnapshot();
   pthread_mutex_destroy(&_mutex);
 }
 
@@ -110,12 +111,19 @@ void Server::signalStop() {
 }
 
 // snapshot
-void Server::saveSnapShot() {
-  log->debug("save lalala %s\n", DoopeyRoot.data());
-  log->debug("save la %ld %ld\n", _machineID, _machineIDMax);
+void Server::saveSnapshot() {
+  ServerSnapshot snapshot;
+  snapshot.setMachineID(_machineID);
+  if (!snapshot.save()) {
+    log->warning("can't save snapshot\n");
+  }
 }
 
-void Server::loadSnapShot() {
-  log->debug("load lalala %s\n", DoopeyRoot.data());
-  log->debug("load la %ld %ld\n", _machineID, _machineIDMax);
+void Server::loadSnapshot() {
+  ServerSnapshot snapshot;
+  if (!snapshot.load()) {
+    log->warning("can't find snapshot\n");
+    return;
+  }
+  _machineID = snapshot.getMachineID();
 }

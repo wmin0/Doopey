@@ -38,6 +38,7 @@ namespace Doopey {
   registerClass(Router);
   registerClass(SectionCollection);
   registerClass(Server);
+  registerClass(ServerSnapshot);
   registerClass(Socket);
   registerClass(TaskThread);
   registerClass(Thread);

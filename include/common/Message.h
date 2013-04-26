@@ -44,6 +44,8 @@ namespace Doopey {
     MC_UpdateMachineIDMax,
     // request routing table
     MC_RequestRoutingTable,
+    // check repeat id
+    MC_CheckRepeatMachineID,
     // -------------------------------------------------------------------------
     // Command used by Block ---------------------------------------------------
     // Ask for block location

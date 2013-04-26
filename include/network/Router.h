@@ -49,6 +49,7 @@ namespace Doopey {
       bool handleMachineIDMax(const SocketSPtr& sock);
       bool handleUpdateMachineIDMax(const MessageSPtr& msg);
       bool handleRequestRoutingTable(const SocketSPtr& sock);
+      bool handleCheckRepeatMachineID(const SocketSPtr& sock, const MessageSPtr& msg);
 
     private:
       static void threadFunc(void* obj);

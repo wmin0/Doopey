@@ -81,6 +81,50 @@ bool Router::initConnectNeighbor(const string& ip) {
 }
 
 void Router::initMachineID() {
+  if (0 != _server->getMachineID()) {
+    // have snapshot
+    MachineID oldID = _server->getMachineID();
+    log->info("try to reg old machineID %d\n", oldID);
+    if (0 == _neighbors.size()) {
+      _server->setMachineIDMax(oldID);
+      log->info("set MachineID(%d)\n", oldID);
+      log->info("set MachineIDMax(%d)\n", oldID);
+      return;
+    }
+    do {
+      RoutingMap::iterator it = _routingTable.begin();
+      Socket sock(ST_TCP);
+      if (!sock.connect(it->second.ip, DoopeyPort)) {
+        log->warning("connect to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr msg(new Message(MT_Router, MC_CheckRepeatMachineID));
+      msg->addData((unsigned char*)&oldID, 0, sizeof(MachineID));
+      if (!sock.send(msg)) {
+        log->warning("send CheckRepeatMachineID msg to %s fail\n", it->second.ip.data());
+        break;
+      }
+      MessageSPtr ack = sock.receive();
+      if (NULL == ack) {
+        log->warning("recv msg from %s fail\n", it->second.ip.data());
+        break;
+      }
+      if (MT_Router != ack->getType() && MC_RouterACK != ack->getCmd()) {
+        log->warning("CheckRepeatMachineID ack error from %s\n");
+        break;
+      }
+      bool ans;
+      MachineID max;
+      memcpy(&ans, ack->getData().data(), sizeof(bool));
+      memcpy(&max, ack->getData().data() + sizeof(bool), sizeof(MachineID));
+      if (ans) {
+        _server->setMachineIDMax(max);
+        log->info("set MachineID(%d)\n", oldID);
+        log->info("set MachineIDMax(%d)\n", max);
+        return;
+      }
+    } while(0);
+  }
   if (0 == _neighbors.size()) {
     // NOTE: first node
     _server->setMachineIDMax(1);
@@ -286,6 +330,9 @@ void Router::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     case MC_RequestRoutingTable:
       handleRequestRoutingTable(sock);
       break;
+    case MC_CheckRepeatMachineID:
+      handleCheckRepeatMachineID(sock, msg);
+      break;
     default:
       break;
   }
@@ -345,6 +392,26 @@ bool Router::handleRequestRoutingTable(const SocketSPtr& sock) {
   }
   if (!sock->send(ack)) {
     log->warning("send routing table ack fail\n");
+    return false;
+  }
+  return true;
+}
+
+bool Router::handleCheckRepeatMachineID(
+  const SocketSPtr& sock, const MessageSPtr& msg) {
+  MachineID req;
+  memcpy(&req, msg->getData().data(), sizeof(MachineID));
+  bool ans = true;
+  if (_server->getMachineID() == req ||
+      _routingTable.end() != _routingTable.find(req)) {
+    ans = false;
+  }
+  MessageSPtr ack(new Message(MT_Router, MC_RouterACK));
+  ack->addData((unsigned char*)&ans, 0, sizeof(bool));
+  MachineID max = _server->getMachineIDMax();
+  ack->addData((unsigned char*)&max, sizeof(bool), sizeof(MachineID));
+  if (!sock->send(ack)) {
+    log->warning("send CheckRepeatMachineID ack fail\n");
     return false;
   }
   return true;
