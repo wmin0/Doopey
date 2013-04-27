@@ -369,8 +369,13 @@ bool Router::handleUpdateMachineIDMax(const MessageSPtr& msg) {
   string ip;
   ip.resize(len);
   memcpy(&(ip[0]), msg->getData().data() + off, len);
-  _server->setMachineIDMax(max);
-  log->info("set MachineIDMax(%d)\n", max);
+  MachineID localMax = _server->getMachineIDMax();
+  if (localMax >= max) {
+    log->warning("ignore max: %d, local max: %d\n", max, localMax);
+  } else {
+    _server->setMachineIDMax(max);
+    log->info("set MachineIDMax(%d)\n", max);
+  }
   return addRoutingPath(msg->getSrc(), ip, 1);
 }
 
