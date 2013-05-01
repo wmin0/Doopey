@@ -15,6 +15,7 @@ namespace Doopey {
     public:
       // initial by block manager
       const static size_t blockSize;
+      static size_t blockReplica;
       const BlockID& getID() const { return _id; }
 
     protected:

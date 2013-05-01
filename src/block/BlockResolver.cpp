@@ -82,7 +82,7 @@ void BlockResolver::loadLocalIDs() {
       continue;
     }
     log->info("found local block: %s\n", file->d_name);
-    _localIDs.insert(tmp);
+    forceAddLocalID(tmp);
     // TODO: if change to new Machine ID...
     MachineID mid = getMachineIDFromBlockID(tmp);
     if (machine == mid) {
@@ -101,11 +101,23 @@ void BlockResolver::addLocalID(BlockID id) {
   ss << _localDir << "/" << id;
   ifstream file(ss.str(), ifstream::in);
   if (file.good()) {
-    _localIDs.insert(id);
+    forceAddLocalID(id);
   } else {
     log->error("add invalid id\n");
   }
   file.close();
+}
+
+void BlockResolver::forceAddLocalID(BlockID id) {
+  BlockLocationAttrSPtr attr(new BlockLocationAttr(id, 0, BS_Available));
+  attr->addMachine(_manager->getMachineID());
+  _localIDs[id] = attr;
+}
+
+void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
+  BlockLocationAttrSPtr attr(new BlockLocationAttr(id, 0, BS_Available));
+  attr->addMachine(id);
+  _remoteIDs[id] = attr;
 }
 
 void BlockResolver::cleanCache() {
@@ -115,7 +127,7 @@ void BlockResolver::cleanCache() {
 BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   if (_localIDs.end() != _localIDs.find(id)) {
     // machineID = 0 is local
-    return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, 0));
+    return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, BS_Available));
   }
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
@@ -170,17 +182,12 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
-    if (it->second->machine != m) {
-      log->debug("update block %ld %d->%d\n", id, it->second->machine, m);
-      it->second->machine = m;
-    }
+    it->second->addMachine(m);
   } else {
     if (_remoteIDs.size() >= remoteSizeMax) {
       cleanCache();
     }
-    _remoteIDs.insert(
-      BlockPair(id,
-                BlockLocationAttrSPtr(new BlockLocationAttr(id, m, time(0)))));
+    forceAddRemoteID(m, id);
   }
   return true;
 }

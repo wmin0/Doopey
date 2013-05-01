@@ -3,27 +3,41 @@
 
 #include "common/Doopey.h"
 
+#include "block/Block.h"
+
 #include <ctime>
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 namespace Doopey {
 
+  enum BlockState {
+    BS_Available,
+    BS_Invalid,
+    BS_Deleting,
+  }; // enum BlockState
+
   class BlockLocationAttr {
     public:
-      BlockLocationAttr(): block(0), machine(0), ts(0) {}
-      BlockLocationAttr(BlockID b, MachineID m, time_t t):
-        block(b), machine(m), ts(t) {}
-      void set(BlockID b, MachineID m, time_t t) {
-        block = b; machine = m; ts = t;
+      BlockLocationAttr(): block(0), ts(0), state(BS_Invalid) {}
+      BlockLocationAttr(BlockID b, time_t t, BlockState st):
+        block(b), ts(t), state(st) {}
+      void set(BlockID b, time_t t, BlockState st) {
+        block = b; ts = t; state = st;
       }
-
+      bool addMachine(MachineID m);
+      void removeMachine(MachineID m);
+      // replace m1 to m2
+      bool replaceMachine(MachineID m1, MachineID m2);
     public:
       BlockID block;
-      MachineID machine;
+      vector<MachineID> machine;
       // for replacement alg
       time_t ts;
+      BlockState state;
   }; // class BlockLocationAttr
 
 };  // namespace Doopey

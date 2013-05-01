@@ -37,6 +37,7 @@ bool Dispatcher::start() {
   log->debug("Dispatcher Thread start!!\n");
   if (!_socket->bind(DoopeyPort) || !_socket->listen()) {
     log->error("Dispatcher Socket bind Err!!\n");
+    return false;
   }
   return _thread->start(this);
 }

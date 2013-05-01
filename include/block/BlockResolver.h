@@ -33,6 +33,8 @@ namespace Doopey {
     private:
       void loadLocalIDs();
       void cleanCache();
+      void forceAddLocalID(BlockID id);
+      void forceAddRemoteID(MachineID m, BlockID id);
       BlockLocationAttrSPtr askRemoteBlock(BlockID id);
 
     private:
@@ -41,7 +43,7 @@ namespace Doopey {
       string _localDir;
       size_t _cacheRemoteSize;
 
-      set<BlockID> _localIDs;
+      BlockMap _localIDs;
       BlockMap _remoteIDs;
       LocalBlockID _localMax;
 
