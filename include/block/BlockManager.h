@@ -32,6 +32,15 @@ namespace Doopey {
       const MachineID& getMachineID() const;
 
       bool isHealth() const;
+
+      bool start();
+      bool stop();
+    private:
+      static void threadFunc(void* obj);
+      static void threadStop(void* obj);
+      void mainLoop();
+
+      const static uint32_t checkReplicaInterval;
     private:
 
       const Server* _server;
@@ -40,6 +49,9 @@ namespace Doopey {
       BlockResolverSPtr _resolver;
       BlockSaverSPtr _saver;
       BlockUpdaterSPtr _updater;
+
+      ThreadSPtr _thread;
+      bool _run;
 
   }; // class BlockManager
 

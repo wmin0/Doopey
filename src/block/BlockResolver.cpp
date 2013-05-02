@@ -26,7 +26,7 @@ using std::ifstream;
 using std::string;
 using std::stringstream;
 
-const int BlockResolver::waitRemote = 30;
+const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
 
 BlockResolver::BlockResolver(
@@ -145,7 +145,7 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
   _manager->getRouter()->broadcast(msg);
-  sleep(30);
+  sleep(waitRemote);
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
@@ -161,10 +161,15 @@ bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
   memcpy(&m, msg->getData().data(), sizeof(MachineID));
   memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
   MessageSPtr ack(new Message(MT_Block, MC_RequestBlockLocationACK));
-  if (_localIDs.end() != _localIDs.find(id)) {
-     MachineID local = _manager->getMachineID();
-     ack->addData((unsigned char*)&local, 0, sizeof(MachineID));
-     ack->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
+  BlockMap::iterator it = _localIDs.find(id);
+  if (_localIDs.end() != it) {
+    ack->addData((unsigned char*)&id, 0, sizeof(BlockID));
+    size_t off = sizeof(BlockID);
+    for (size_t i = 0; i < it->second->machine.size(); ++i) {
+      MachineID mid = it->second->machine[i];
+      ack->addData((unsigned char*)&mid, off, sizeof(MachineID));
+      off += sizeof(MachineID);
+    }
   }
   _manager->getRouter()->sendTo(m, msg);
   return true;
@@ -176,18 +181,26 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
   }
   MachineID m;
   BlockID id;
-  memcpy(&m, msg->getData().data(), sizeof(MachineID));
-  memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
+  memcpy(&id, msg->getData().data(), sizeof(BlockID));
+  memcpy(&m, msg->getData().data() + sizeof(BlockID), sizeof(MachineID));
+  size_t off = sizeof(BlockID) + sizeof(MachineID);
   // check
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
+    // TODO: check repeated
     it->second->addMachine(m);
   } else {
     if (_remoteIDs.size() >= remoteSizeMax) {
       cleanCache();
     }
     forceAddRemoteID(m, id);
+    it = _remoteIDs.find(id);
+  }
+  while (off < msg->getData().size()) {
+    memcpy(&m, msg->getData().data() + off, sizeof(MachineID));
+    off += sizeof(MachineID);
+    it->second->addMachine(m);
   }
   return true;
 }

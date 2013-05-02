@@ -281,22 +281,22 @@ void Router::broadcast(const MessageSPtr& msg) const {
   }
 }
 
-bool Router::sendTo(MachineID id, const MessageSPtr& msg) const {
+SocketSPtr Router::sendTo(MachineID id, const MessageSPtr& msg) const {
   RoutingMap::const_iterator it = _routingTable.find(id);
   if (_routingTable.end() == it) {
-    return false;
+    return NULL;
   }
   msg->setSrc(_server->getMachineID());
   msg->setDest(id);
-  Socket sock(ST_TCP);
-  if (!sock.connect(it->second.ip, DoopeyPort)) {
+  SocketSPtr sock(new Socket(ST_TCP));
+  if (!sock->connect(it->second.ip, DoopeyPort)) {
     // TODO: clear record
-    return false;
+    return NULL;
   }
-  if (!sock.send(msg)) {
-    return false;
+  if (!sock->send(msg)) {
+    return NULL;
   }
-  return true;
+  return sock;
 }
 
 // routing operation functions
