@@ -48,10 +48,14 @@ namespace Doopey {
     MC_CheckRepeatMachineID,
     // -------------------------------------------------------------------------
     // Command used by Block ---------------------------------------------------
+    // Common Block ACK
+    MC_BlockACK,
     // Ask for block location
     MC_RequestBlockLocation,
     // ACK for MC_RequestBlockLocation
     MC_RequestBlockLocationACK,
+    // Request remote block data
+    MC_RequestBlockData,
   }; // enum MessageCmd
 
   class Message {

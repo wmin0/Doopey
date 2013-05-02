@@ -1,10 +1,7 @@
 #ifndef _DOOPEY_BLOCK_LOADER_H_
 #define _DOOPEY_BLOCK_LOADER_H_
 
-#include <memory>
 #include "common/Doopey.h"
-
-using std::shared_ptr;
 
 namespace Doopey {
 
@@ -18,10 +15,15 @@ namespace Doopey {
       DataBlockSPtr newData() const;
       MetaBlockSPtr newMeta() const;
 
+      bool handleRequestBlockData(
+        const SocketSPtr& sock, const MessageSPtr& msg);
+
     private:
       unsigned char* getData(const BlockLocationAttrSPtr& attr) const;
       unsigned char* allocateMem() const;
       const BlockManager* _manager;
+
+
 
   }; // class BlockLoader
 

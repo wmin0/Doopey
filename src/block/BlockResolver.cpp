@@ -31,18 +31,8 @@ const size_t BlockResolver::remoteSizeMax = 1000;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
-  _manager(manager), _localDir("."), _cacheRemoteSize(0),
+  _manager(manager), _cacheRemoteSize(0),
   _localMax(0), _health(true) {
-  if (NULL != config) {
-    string tmp = config->getValue("BlockDir");
-    if ("" != tmp) {
-      _localDir = DoopeyRoot + tmp;
-    } else {
-      log->warning("Use Default BlockDir .\n");
-    }
-  } else {
-    log->warning("Use Default BlockResolver .\n");
-  }
   // some setup
   loadLocalIDs();
 }
@@ -58,9 +48,10 @@ BlockID BlockResolver::newLocalID() {
 void BlockResolver::loadLocalIDs() {
   DIR* dir;
   struct dirent* file;
-  dir = opendir(_localDir.data());
+  const char* localDir = _manager->getLocalDir().data();
+  dir = opendir(localDir);
   if (NULL == dir) {
-    log->error("Open BlockDir fail: %s\n", _localDir.data());
+    log->error("Open BlockDir fail: %s\n", localDir);
     _health = false;
     return;
   }
@@ -98,7 +89,7 @@ void BlockResolver::loadLocalIDs() {
 void BlockResolver::addLocalID(BlockID id) {
   // TODO: check local file exist
   stringstream ss("");
-  ss << _localDir << "/" << id;
+  ss << _manager->getLocalDir() << "/" << id;
   ifstream file(ss.str(), ifstream::in);
   if (file.good()) {
     forceAddLocalID(id);

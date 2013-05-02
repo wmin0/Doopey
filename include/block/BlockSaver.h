@@ -3,10 +3,6 @@
 
 #include "common/Doopey.h"
 
-#include <string>
-
-using std::string;
-
 namespace Doopey {
 
   class Block;
@@ -22,7 +18,6 @@ namespace Doopey {
 
     private:
       const BlockManager* _manager;
-      string _localDir;
 
   }; // class BlockSaver
 

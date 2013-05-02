@@ -15,7 +15,7 @@ using namespace Doopey;
 using namespace std;
 
 BlockSaver::BlockSaver(const BlockManager* manager, const ConfigSPtr& config):
-  _manager(manager), _localDir(".") {
+  _manager(manager) {
 }
 
 BlockSaver::~BlockSaver() {
@@ -26,12 +26,8 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   BlockID newLocalBID = resolver->newLocalID();
   // get a new ID for file name
 
-  stringstream ss("");
-  ss << _localDir << "/" 
-     << internal << setfill('0') << uppercase
-     << hex << setw(16) << newLocalBID;
-
-  fstream file(ss.str(), fstream::out | fstream::binary);
+  string path = _manager->convertBlockIDToPath(newLocalBID);
+  fstream file(path, fstream::out | fstream::binary);
   //create new file, filename is "locatDir+newLocalBID"
 
   if (!file.good()){

@@ -7,11 +7,18 @@
 //#include "block/BlockUpdater.h"
 #include "block/DataBlock.h"
 #include "block/MetaBlock.h"
+#include "common/Config.h"
 #include "common/Message.h"
 #include "common/Thread.h"
 #include "machine/Server.h"
 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <iomanip>
+
 using namespace Doopey;
+using namespace std;
 
 const uint32_t BlockManager::checkReplicaInterval = 3600;
 
@@ -23,7 +30,18 @@ const RouterSPtr& BlockManager::getRouter() const {
   return _server->getRouter();
 }
 
-BlockManager::BlockManager(const Server* server, const ConfigSPtr& config): _server(server), _run(0) {
+BlockManager::BlockManager(const Server* server, const ConfigSPtr& config):
+  _server(server), _run(false), _localDir(".") {
+  if (NULL != config) {
+    string tmp = config->getValue("BlockDir");
+    if ("" != tmp) {
+      _localDir = DoopeyRoot + tmp;
+    } else {
+      log->warning("Use Default BlockDir .\n");
+    }
+  } else {
+    log->warning("Use Default BlockResolver .\n");
+  }
   _resolver.reset(new BlockResolver(this, config));
   _loader.reset(new BlockLoader(this, config));
   _saver.reset(new BlockSaver(this, config));
@@ -90,7 +108,17 @@ void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     case MC_RequestBlockLocationACK:
       _resolver->handleRequestBlockLocationACK(msg);
       break;
+    case MC_RequestBlockData:
+      _loader->handleRequestBlockData(sock, msg);
     default:
       break;
   }
+}
+
+string BlockManager::convertBlockIDToPath(const BlockID& id) const {
+  stringstream ss("");
+  ss << _localDir << "/"
+     << internal << setfill('0') << uppercase
+     << hex << setw(16) << id;
+  return ss.str();
 }

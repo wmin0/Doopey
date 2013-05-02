@@ -4,6 +4,9 @@
 #include "common/Doopey.h"
 
 #include <cstdint>
+#include <string>
+
+using std::string;
 
 namespace Doopey {
 
@@ -30,11 +33,17 @@ namespace Doopey {
       const RouterSPtr& getRouter() const;
 
       const MachineID& getMachineID() const;
+      const string& getLocalDir() const { return _localDir; }
 
       bool isHealth() const;
 
       bool start();
       bool stop();
+
+    // util
+    public:
+      string convertBlockIDToPath(const BlockID& id) const;
+
     private:
       static void threadFunc(void* obj);
       static void threadStop(void* obj);
@@ -52,6 +61,8 @@ namespace Doopey {
 
       ThreadSPtr _thread;
       bool _run;
+
+      string _localDir;
 
   }; // class BlockManager
 

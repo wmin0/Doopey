@@ -40,7 +40,6 @@ namespace Doopey {
     private:
       const BlockManager* _manager;
 
-      string _localDir;
       size_t _cacheRemoteSize;
 
       BlockMap _localIDs;
