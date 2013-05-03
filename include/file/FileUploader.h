@@ -8,6 +8,7 @@
 #include "common/Doopey.h"
 #include "common/Socket.h"
 #include "block/BlockManager.h"
+#include "file/FileManager.h"
 
 using std::shared_ptr;
 using std::string;
@@ -29,6 +30,7 @@ namespace Doopey{
     private:
       FileUploader();
       bool setupMeta(MetaBlockSPtr meta, const MessageSPtr msg);
+      bool setupData(MetaBlockSPtr meta, const MessageSPtr msg);
 
       BlockManagerSPtr _blockManager;
   };//class FileUploader
