@@ -3,6 +3,7 @@
 
 #include "block/Block.h"
 #include "common/Doopey.h"
+#include "common/Message.h"
 
 namespace Doopey {
 
@@ -11,6 +12,7 @@ namespace Doopey {
       DataBlock(unsigned char* data, BlockID id): Block(data, id) {}
       virtual ~DataBlock() {}
 
+      void copyData(const vector<unsigned char> msgData, size_t size, size_t off);
   }; // class Block
 
 };  // namespace Doopey

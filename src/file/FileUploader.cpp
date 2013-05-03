@@ -1,5 +1,10 @@
 #include "file/FileUploader.h"
 #include "common/Message.h"
+#include "block/MetaBlock.h"
+#include "block/DataBlock.h"
+#include "block/BlockManager.h"
+
+#include <cstring>
 
 #define stringiz(arg) #arg //enum to string
 
@@ -23,8 +28,9 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     return false;
   }
 
-  MetaBlockSPtr meta = _blockManager->newMeta(); 
+  MetaBlockSPtr meta = _blockManager->newMeta();
 
+  BlockID blockID;
   MessageSPtr msg;
   while(1)
   {
@@ -42,15 +48,20 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     {
       //the msg is about the file meta, like filenam, creat time, etc.
       case MC_UpFileMeta:
-        setupMeta(meta, msg);
+        if(setupMeta(meta, msg) == false)
+          log->error("Set up meta block error!\n");
         break;
       //the msg is the file data, just receive and split it into different data block and 
       //add the datablock ID into metablock
       case MC_UpFileData:
+        if (setupData(meta, msg) == false)
+          log->error("Set up data block error!\n");
         break;
       //this msg means file has been transmitted successfully just check the meta ID 
       //and add it into file directory structure
       case MC_UpFileEnd:
+        blockID = _blockManager->saveBlock(meta);
+       // _fileTable.insert(pair<string, uint64_t>(meta->getFileName(), blockID));
         return true;
         break;
       default:
@@ -69,8 +80,51 @@ void FileUploader::setBlockManager(const BlockManagerSPtr blockManager)
 
 bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 {
-  
+  unsigned int nameLength;
+  vector<unsigned char> data;
+  string nameStr;
+  time_t ctime;
+
+  data = msg->getData();
+  memcpy(&nameLength, data.data(), sizeof(unsigned int));
+
+  memcpy(&nameStr, data.data()+sizeof(unsigned int), nameLength);
+  if( meta->setFileName(nameStr) == false){
+    //log->error("Meta Block: set file name failed by %s\n", nameStr.c_str());
+    return false;
+  }
+
+  memcpy(&ctime, data.data()+sizeof(unsigned int)+nameLength, sizeof(time_t));
+  if( meta->setCreateTime(ctime) == false ){
+    //log->error("Meta Block: set ctime failed by %s\n", nameStr.c_str());
+    return false;
+  }
 
   return true;
 }
 
+
+bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
+  vector<unsigned char> msgData = msg->getData();
+  size_t off = 0;
+  BlockID blockID;
+
+  while(sizeof(msgData) - off >0){
+    DataBlockSPtr dataBlock = _blockManager->newData();
+    if(sizeof(msgData) < DataBlock::blockSize){
+      dataBlock->copyData(msgData, off, sizeof(msgData)); //memcpy(_data, msgData.data()+off, sizeof(msgData));
+      off = sizeof(msgData);
+      blockID = _blockManager->saveBlock(dataBlock);
+      if(meta->addDataID(blockID) == false)
+        return false;
+    }
+    else{
+      dataBlock->copyData(msgData, off, DataBlock::blockSize);//memcpy(_data, msgData.data()+off, DataBlock::blockSize);
+      off+=DataBlock::blockSize;
+      blockID = _blockManager->saveBlock(dataBlock);
+      if(meta->addDataID(blockID) == false)
+        return false;
+    }
+  }
+  return true;
+}
