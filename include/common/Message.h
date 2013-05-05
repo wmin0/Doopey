@@ -11,10 +11,11 @@ using std::vector;
 namespace Doopey {
 
   enum MessageType {
-    MT_None   = 0,
-    MT_File   = 1,
-    MT_Router = 2,
-    MT_Block  = 3,
+    MT_None    = 0,
+    MT_File    = 1,
+    MT_Router  = 2,
+    MT_Block   = 3,
+    MT_Machine = 4,
   }; // enum MessageType
 
   enum MessageCmd {
@@ -56,6 +57,14 @@ namespace Doopey {
     MC_RequestBlockLocationACK,
     // Request remote block data
     MC_RequestBlockData,
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    // ACK for RequestSysInfo
+    MC_SysInfoACK,
+    // Request MEM of system info
+    MC_RequestSysInfoMem,
+    // Request Free Space of System info
+    MC_RequestSysInfoDisk,
   }; // enum MessageCmd
 
   class Message {

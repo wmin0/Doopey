@@ -11,7 +11,7 @@ namespace Doopey {
 
   class Dispatcher {
     public:
-      Dispatcher(const Server* server, const ConfigSPtr& config);
+      Dispatcher(Server* server, const ConfigSPtr& config);
       ~Dispatcher();
 
       bool start();
@@ -26,7 +26,7 @@ namespace Doopey {
 
     private:
       // do not delete it!!
-      const Server* _server;
+      Server* _server;
 
       ThreadSPtr _thread;
 

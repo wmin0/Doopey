@@ -3,7 +3,9 @@
 #include "block/BlockManager.h"
 #include "common/Doopey.h"
 #include "common/Config.h"
+#include "common/Message.h"
 #include "common/SectionCollection.h"
+#include "common/Socket.h"
 #include "machine/ServerSnapshot.h"
 #include "network/Dispatcher.h"
 #include "network/Router.h"
@@ -15,6 +17,9 @@
 #include <arpa/inet.h>
 #include <csignal>
 #include <pthread.h>
+#include <sys/statfs.h>
+#include <stdio.h>
+#include <iostream>
 
 using namespace Doopey;
 
@@ -128,3 +133,56 @@ void Server::loadSnapshot() {
   }
   _machineID = snapshot.getMachineID();
 }
+
+
+void Server::request(const MessageSPtr& msg, const SocketSPtr& sock) {
+  if (MT_Machine != msg->getType()) {
+    return;
+  }
+  switch (msg->getCmd()) {
+   // case MC_RequestSysInfoMem:
+   //   getSysInfoFreeMemInKB(sock);
+    case MC_RequestSysInfoDisk:
+      getSysInfoAvailDisk(sock);
+      break;
+    default:
+      break;
+  }
+}
+
+/*
+int Server::getSysInfoFreeMemInKB()
+{
+  FILE *meminfo = fopen("/proc/meminfo", "r");
+  if(meminfo == NULL) {
+    log->waring("file opening error:");
+  }
+  while(fgets(line, sixeof(line), meminfo))
+  {
+    int ram;
+    if(sscanf(line, "MemFree: $d kB", &ram) == 1)
+    {
+      fclose(meminfo);
+      return ram;
+    }
+  }
+  fclose(meminfo);
+  return -1;
+
+}
+
+*/
+bool Server::getSysInfoAvailDisk(const SocketSPtr& sock)
+{
+  MessageSPtr ack(new Message(MT_Machine, MC_SysInfoACK));
+  string test = "hello world.";
+  uint64_t len = test.size();
+  ack->addData((unsigned char*)&len, 0, sizeof(uint64_t));
+  ack->addData((unsigned char*)test.data(), sizeof(uint64_t), len);
+  if (!sock->send(ack)) {
+    log->warning("send SysInfo ack fail\n");
+    return false;
+  }
+  return true;
+}
+

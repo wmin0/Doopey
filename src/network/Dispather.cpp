@@ -17,7 +17,7 @@ using namespace Doopey;
 
 typedef shared_ptr<Message> MessageSPtr;
 
-Dispatcher::Dispatcher(const Server* server, const ConfigSPtr& config):
+Dispatcher::Dispatcher(Server* server, const ConfigSPtr& config):
   _server(server), _run(false) {
   _socket.reset(new Socket(ST_TCP));
   _thread.reset(new Thread(threadFunc, threadStop));
@@ -100,6 +100,8 @@ void Dispatcher::dispatch(void* dispatch, void* sock) {
         break;
       case MT_Block:
         dispatcher->_server->getBlockManager()->request(msg, *socket);
+      case MT_Machine:
+        dispatcher->_server->request(msg, *socket);
       default:
         break;
     }

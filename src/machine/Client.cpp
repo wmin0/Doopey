@@ -6,6 +6,9 @@
 
 #include <iostream>
 #include <memory>
+#include <memory.h>
+#include <string>
+#include <cstdint>
 
 #include <getopt.h>
 
@@ -71,6 +74,14 @@ void Client::go() {
     cerr << "connect server error" << endl;
     return;
   }
-  MessageSPtr msg(new Message(MT_None, MC_None));
+  MessageSPtr msg(new Message(MT_Machine, MC_RequestSysInfoDisk));
   socket.send(msg);
+  MessageSPtr ack = socket.receive();
+  string test;
+  uint64_t len;
+  memcpy(&len, ack->getData().data(), sizeof(uint64_t));
+  cout << "len: " << len << endl;
+  test.resize(len);
+  memcpy(&(test[0]), ack->getData().data() + sizeof(uint64_t), len);
+  cout << "test: " << test << endl;
 }

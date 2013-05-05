@@ -26,6 +26,10 @@ namespace Doopey {
       void setMachineIDMax(const MachineID& id) { _machineIDMax = id; }
       const string& getLocalIP() const { return _ip; }
       void serve();
+
+      void request(const MessageSPtr& msg, const SocketSPtr& sock);
+      //int getSysInfoFreeMemInKB(void);
+      bool getSysInfoAvailDisk(const SocketSPtr&);
     private:
       static void handleTERM(int sig);
       static void handleINT(int sig);
@@ -54,6 +58,9 @@ namespace Doopey {
 
       // wait lock
       pthread_mutex_t _mutex;
+
+      //char line [256];
+
   }; // class Server
 
 };  // namespace Doopey
