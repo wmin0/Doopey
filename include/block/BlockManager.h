@@ -52,6 +52,9 @@ namespace Doopey {
 
       string _localDir;
 
+    private:
+      bool handleDoReplica(const MessageSPtr& msg);
+
   }; // class BlockManager
 
 };  // namespace Doopey

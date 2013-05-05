@@ -56,6 +56,12 @@ namespace Doopey {
     MC_RequestBlockLocationACK,
     // Request remote block data
     MC_RequestBlockData,
+    // Check Remote Block Alive
+    MC_CheckBlockAlive,
+    // Request Do Replica,
+    MC_DoReplica,
+    // Update Replica
+    MC_UpdateReplica,
   }; // enum MessageCmd
 
   class Message {
