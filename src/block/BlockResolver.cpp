@@ -28,6 +28,7 @@ using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
+const time_t BlockResolver::checkReplicaInterval = 3600;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
@@ -43,7 +44,6 @@ BlockResolver::~BlockResolver() {
 BlockID BlockResolver::newLocalID() {
   return buildBlockID(_manager->getMachineID(), ++_localMax);
 }
-
 
 void BlockResolver::loadLocalIDs() {
   DIR* dir;
@@ -115,18 +115,38 @@ void BlockResolver::cleanCache() {
   // TODO: maybe use LRU?
 }
 
+void BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
+  // TODO: check remote replica
+}
+
+MachineID BlockResolver::chooseReplica(const BlockLocationAttrSPtr& attr) {
+  // TODO: load balance
+  return attr->machine[0];
+}
+
 BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   if (_localIDs.end() != _localIDs.find(id)) {
-    // machineID = 0 is local
-    return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, BS_Available));
+    return BlockLocationAttrSPtr(
+      new BlockLocationAttr(id, _manager->getMachineID(), BS_Available));
   }
   BlockMap::iterator it = _remoteIDs.find(id);
+  time_t now = time(0);
+  BlockLocationAttrSPtr tmp;
   if (_remoteIDs.end() != it) {
-    it->second->ts = time(0);
-    return it->second;
+    if (checkReplicaInterval <= now - it->second->ts) {
+      checkReplica(it->second);
+    }
+    it->second->ts = now;
+    tmp = it->second;
+  } else {
+    tmp = askRemoteBlock(id);
   }
-  BlockLocationAttrSPtr tmp = askRemoteBlock(id);
-  return tmp;
+  if (NULL != tmp) {
+   MachineID mid = chooseReplica(tmp);
+    return BlockLocationAttrSPtr(
+      new BlockLocationAttr(id, mid, BS_Available));
+  }
+  return NULL;
 }
 
 BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {

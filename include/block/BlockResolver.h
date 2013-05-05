@@ -36,7 +36,8 @@ namespace Doopey {
       void forceAddLocalID(BlockID id);
       void forceAddRemoteID(MachineID m, BlockID id);
       BlockLocationAttrSPtr askRemoteBlock(BlockID id);
-
+      void checkReplica(BlockLocationAttrSPtr& attr);
+      MachineID chooseReplica(const BlockLocationAttrSPtr& attr);
     private:
       const BlockManager* _manager;
 
@@ -50,6 +51,7 @@ namespace Doopey {
 
       static const int waitRemote;
       static const size_t remoteSizeMax;
+      static const time_t checkReplicaInterval;
   }; // class BlockResolver
 
 };  // namespace Doopey
