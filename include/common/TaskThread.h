@@ -10,12 +10,12 @@ namespace Doopey {
   class TaskThread: public Thread {
     public:
       TaskThread();
-      TaskThread(void (*task)(void* input, void* output));
+      TaskThread(void (*task)(void* obj, void* input, void* output));
       virtual ~TaskThread();
 
-      bool setTask(void (*task)(void* input, void* output));
+      bool setTask(void (*task)(void* obj, void* input, void* output));
       bool isFree() const { return _free; }
-      bool runTask(void* input, void* output);
+      bool runTask(void* obj, void* input, void* output);
 
     private:
       static void threadFunc(void* obj);
@@ -24,11 +24,12 @@ namespace Doopey {
 
       void init();
 
-      void (*_task)(void*, void*);
+      void (*_task)(void*, void*, void*);
 
       bool _run;
       bool _free;
 
+      void* _task_obj;
       void* _task_input;
       void* _task_output;
       pthread_mutex_t _task_lock;
