@@ -74,7 +74,8 @@ unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
       RouterSPtr router = _manager->getRouter();
       MessageSPtr msg(new Message(MT_Block, MC_RequestBlockData));
       msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
-      // TODO: load balance
+      // NOTE: load balance do in Resolver, just use machine[0] here
+      // NOTE: remote load use when doing replica
       log->debug("try to load remote %d->%d\n", attr->machine[0], attr->block);
       SocketSPtr sock = router->sendTo(attr->machine[0], msg);
       if (NULL == sock) {

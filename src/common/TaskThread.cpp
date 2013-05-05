@@ -11,7 +11,7 @@ TaskThread::TaskThread():
   init();
 }
 
-TaskThread::TaskThread(void (*task)(void* input, void* output)):
+TaskThread::TaskThread(void (*task)(void* obj, void* input, void* output)):
   Thread(TaskThread::threadFunc, TaskThread::threadStop),
   _task(task), _run(false), _free(true) {
   init();
@@ -49,14 +49,15 @@ void TaskThread::mainLoop() {
     if (!_run) {
       break;
     }
-    _task(_task_input, _task_output);
+    _task(_task_obj, _task_input, _task_output);
     _free = true;
+    _task_obj = NULL;
     _task_input = NULL;
     _task_output = NULL;
   }
 }
 
-bool TaskThread::setTask(void (*task)(void* input, void* output)) {
+bool TaskThread::setTask(void (*task)(void* obj, void* input, void* output)) {
   if (_free) {
     _task = task;
     return true;
@@ -64,10 +65,11 @@ bool TaskThread::setTask(void (*task)(void* input, void* output)) {
   return false;
 }
 
-bool TaskThread::runTask(void* input, void* output) {
+bool TaskThread::runTask(void* obj, void* input, void* output) {
   if (_free && _run && NULL != _task) {
     // TODO: lock
     _free = false;
+    _task_obj = obj;
     _task_input = input;
     _task_output = output;
     pthread_mutex_unlock(&_task_lock);

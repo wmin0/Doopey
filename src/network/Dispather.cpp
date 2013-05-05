@@ -69,8 +69,7 @@ void Dispatcher::mainLoop() {
         if (_threadPool[i]->isFree()) {
           // Note: Hack Orz
           SocketSPtr* ptr = new SocketSPtr(conn);
-          // and abuse Orz
-          if (!_threadPool[i]->runTask(this, ptr)) {
+          if (!_threadPool[i]->runTask(this, ptr, NULL)) {
             delete ptr;
             log->warning("start task thread err\n");
           } else {
@@ -87,7 +86,7 @@ void Dispatcher::mainLoop() {
   }
 }
 
-void Dispatcher::dispatch(void* dispatch, void* sock) {
+void Dispatcher::dispatch(void* dispatch, void* sock, void* output) {
   Dispatcher* dispatcher = (Dispatcher*)dispatch;
   SocketSPtr* socket = (SocketSPtr*)sock;
   MessageSPtr msg = (*socket)->receive();

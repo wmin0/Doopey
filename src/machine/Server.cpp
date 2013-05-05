@@ -77,8 +77,7 @@ void Server::setupLocalIP() {
 bool Server::start() {
   return _blockManager->isHealth() &&
          _dispatcher->start() &&
-         _router->start() &&
-         _blockManager->start();
+         _router->start();
 }
 
 void Server::serve() {

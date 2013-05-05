@@ -20,8 +20,6 @@
 using namespace Doopey;
 using namespace std;
 
-const uint32_t BlockManager::checkReplicaInterval = 3600;
-
 const MachineID& BlockManager::getMachineID() const {
   return _server->getMachineID();
 }
@@ -31,7 +29,7 @@ const RouterSPtr& BlockManager::getRouter() const {
 }
 
 BlockManager::BlockManager(const Server* server, const ConfigSPtr& config):
-  _server(server), _run(false), _localDir(".") {
+  _server(server), _localDir(".") {
   if (NULL != config) {
     string tmp = config->getValue("BlockDir");
     if ("" != tmp) {
@@ -45,38 +43,9 @@ BlockManager::BlockManager(const Server* server, const ConfigSPtr& config):
   _resolver.reset(new BlockResolver(this, config));
   _loader.reset(new BlockLoader(this, config));
   _saver.reset(new BlockSaver(this, config));
-  _thread.reset(new Thread(threadFunc, threadStop));
 }
 
 BlockManager::~BlockManager() {
-  stop();
-}
-
-bool BlockManager::start() {
-  log->debug("BlockManager Thread start!!\n");
-  return _thread->start(this);
-}
-
-bool BlockManager::stop() {
-  log->debug("BlockManager Thread stop!!\n");
-  return _thread->stop(this);
-}
-
-void BlockManager::threadFunc(void* obj) {
-  BlockManager* manager = (BlockManager*)obj;
-  manager->_run = true;
-  manager->mainLoop();
-}
-
-void BlockManager::threadStop(void* obj) {
-  BlockManager* manager = (BlockManager*)obj;
-  manager->_run = false;
-}
-
-void BlockManager::mainLoop() {
-  while (_run) {
-    sleep(BlockManager::checkReplicaInterval);
-  }
 }
 
 MetaBlockSPtr BlockManager::newMeta() {
@@ -96,6 +65,14 @@ BlockID BlockManager::saveBlock(const BlockSPtr& block) {
   return newID;
 }
 
+string BlockManager::convertBlockIDToPath(const BlockID& id) const {
+  stringstream ss("");
+  ss << _localDir << "/"
+     << internal << setfill('0') << uppercase
+     << hex << setw(16) << id;
+  return ss.str();
+}
+
 bool BlockManager::isHealth() const {
   return _resolver->isHealth();
 }
@@ -110,15 +87,22 @@ void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
       break;
     case MC_RequestBlockData:
       _loader->handleRequestBlockData(sock, msg);
+      break;
+    case MC_CheckBlockAlive:
+      _resolver->handleCheckBlockAlive(sock, msg);
+      break;
+    case MC_DoReplica:
+      handleDoReplica(msg);
+      break;
+    case MC_UpdateReplica:
+      _resolver->handleUpdateReplica(msg);
     default:
       break;
   }
 }
 
-string BlockManager::convertBlockIDToPath(const BlockID& id) const {
-  stringstream ss("");
-  ss << _localDir << "/"
-     << internal << setfill('0') << uppercase
-     << hex << setw(16) << id;
-  return ss.str();
+bool BlockManager::handleDoReplica(const MessageSPtr& msg) {
+  // TODO:
+  return true;
 }
+

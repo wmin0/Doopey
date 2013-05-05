@@ -30,13 +30,16 @@ namespace Doopey {
 
       bool handleRequestBlockLocation(const MessageSPtr& msg);
       bool handleRequestBlockLocationACK(const MessageSPtr& msg);
+      bool handleCheckBlockAlive(const SocketSPtr& sock, const MessageSPtr& msg);
+      bool handleUpdateReplica(const MessageSPtr& msg);
     private:
       void loadLocalIDs();
       void cleanCache();
       void forceAddLocalID(BlockID id);
       void forceAddRemoteID(MachineID m, BlockID id);
       BlockLocationAttrSPtr askRemoteBlock(BlockID id);
-
+      bool checkReplica(BlockLocationAttrSPtr& attr);
+      MachineID chooseReplica(const BlockLocationAttrSPtr& attr);
     private:
       const BlockManager* _manager;
 
@@ -50,6 +53,7 @@ namespace Doopey {
 
       static const int waitRemote;
       static const size_t remoteSizeMax;
+      static const time_t checkReplicaInterval;
   }; // class BlockResolver
 
 };  // namespace Doopey

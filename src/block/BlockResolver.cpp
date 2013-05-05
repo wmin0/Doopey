@@ -5,6 +5,7 @@
 #include "common/Doopey.h"
 #include "common/Config.h"
 #include "common/Message.h"
+#include "common/Socket.h"
 #include "network/Router.h"
 
 #include <cstdio>
@@ -28,6 +29,7 @@ using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
+const time_t BlockResolver::checkReplicaInterval = 3600;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
@@ -43,7 +45,6 @@ BlockResolver::~BlockResolver() {
 BlockID BlockResolver::newLocalID() {
   return buildBlockID(_manager->getMachineID(), ++_localMax);
 }
-
 
 void BlockResolver::loadLocalIDs() {
   DIR* dir;
@@ -115,22 +116,71 @@ void BlockResolver::cleanCache() {
   // TODO: maybe use LRU?
 }
 
+bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
+  bool requestReplica = Block::blockReplica != attr->machine.size();
+
+  for (size_t i = attr->machine.size() - 1; i >= 0; --i) {
+    // TODO: send all replica ?
+    MessageSPtr msg(new Message(MT_Block, MC_CheckBlockAlive));
+    msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
+    MessageSPtr ack = sock->receive();
+    if (NULL == ack) {
+      requestReplica = true;
+      attr->machine.erase(attr->machine.begin() + i);
+    }
+    bool result = false;
+    memcpy(&result, ack->getData().data(), sizeof(bool));
+    if (!result) {
+      requestReplica = true;
+      attr->machine.erase(attr->machine.begin() + i);
+    }
+  }
+  if (0 == attr->machine.size()) {
+    return false;
+  }
+  if (requestReplica) {
+    MessageSPtr msg(new Message(MT_Block, MC_DoReplica));
+    msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    _manager->getRouter()->sendTo(attr->machine[0], msg);
+  }
+  return true;
+}
+
+MachineID BlockResolver::chooseReplica(const BlockLocationAttrSPtr& attr) {
+  // TODO: load balance
+  return attr->machine[0];
+}
+
 BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   if (_localIDs.end() != _localIDs.find(id)) {
-    // machineID = 0 is local
-    return BlockLocationAttrSPtr(new BlockLocationAttr(id, 0, BS_Available));
+    return BlockLocationAttrSPtr(
+      new BlockLocationAttr(id, _manager->getMachineID(), BS_Available));
   }
   BlockMap::iterator it = _remoteIDs.find(id);
+  time_t now = time(0);
+  BlockLocationAttrSPtr tmp;
   if (_remoteIDs.end() != it) {
-    it->second->ts = time(0);
-    return it->second;
+    if (checkReplicaInterval <= now - it->second->ts) {
+      if (checkReplica(it->second)) {
+        it->second->ts = now;
+        tmp = it->second;
+      } else {
+        tmp = askRemoteBlock(id);
+      }
+    }
+  } else {
+    tmp = it->second;
   }
-  BlockLocationAttrSPtr tmp = askRemoteBlock(id);
-  return tmp;
+  if (NULL != tmp) {
+   MachineID mid = chooseReplica(tmp);
+    return BlockLocationAttrSPtr(
+      new BlockLocationAttr(id, mid, BS_Available));
+  }
+  return NULL;
 }
 
 BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
-  // TODO: check protocol
   MessageSPtr msg(new Message(MT_Block, MC_RequestBlockLocation));
   MachineID m = _manager->getMachineID();
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
@@ -193,5 +243,23 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
     off += sizeof(MachineID);
     it->second->addMachine(m);
   }
+  return true;
+}
+
+bool BlockResolver::handleCheckBlockAlive(
+  const SocketSPtr& sock, const MessageSPtr& msg) {
+  BlockID id;
+  memcpy(&id, msg->getData().data(), sizeof(BlockID));
+  bool alive = false;
+  if (_localIDs.end() != _localIDs.find(id)) {
+    alive = true;
+  }
+  MessageSPtr ack(new Message(MT_Block, MC_BlockACK));
+  ack->addData((unsigned char*)&alive, 0, sizeof(bool));
+  return sock->send(ack);
+}
+
+bool BlockResolver::handleUpdateReplica(const MessageSPtr& msg) {
+  // TODO:
   return true;
 }

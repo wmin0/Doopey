@@ -20,7 +20,7 @@ namespace Doopey {
     private:
       static void threadFunc(void* obj);
       static void threadStop(void* obj);
-      static void dispatch(void* dispatch, void* sock);
+      static void dispatch(void* dispatch, void* sock, void* output);
 
       void mainLoop();
 
