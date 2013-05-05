@@ -37,19 +37,10 @@ namespace Doopey {
 
       bool isHealth() const;
 
-      bool start();
-      bool stop();
-
     // util
     public:
       string convertBlockIDToPath(const BlockID& id) const;
 
-    private:
-      static void threadFunc(void* obj);
-      static void threadStop(void* obj);
-      void mainLoop();
-
-      const static uint32_t checkReplicaInterval;
     private:
 
       const Server* _server;
@@ -58,9 +49,6 @@ namespace Doopey {
       BlockResolverSPtr _resolver;
       BlockSaverSPtr _saver;
       BlockUpdaterSPtr _updater;
-
-      ThreadSPtr _thread;
-      bool _run;
 
       string _localDir;
 
