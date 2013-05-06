@@ -4,6 +4,7 @@
 #include "block/BlockLoader.h"
 #include "block/BlockResolver.h"
 #include "block/BlockSaver.h"
+#include "block/BlockLocationAttr.h"
 //#include "block/BlockUpdater.h"
 #include "block/DataBlock.h"
 #include "block/MetaBlock.h"
@@ -54,6 +55,25 @@ MetaBlockSPtr BlockManager::newMeta() {
 
 DataBlockSPtr BlockManager::newData() {
   return _loader->newData();
+}
+
+MetaBlockSPtr BlockManager::getMeta(BlockID id) {
+  BlockLocationAttrSPtr attr = _resolver->askBlock(id);
+  if (NULL == attr) {
+    log->warning("no found meta block: %lld\n", id);
+    return NULL;
+  }
+  return _loader->loadMeta(attr);
+}
+
+DataBlockSPtr BlockManager::getData(BlockID id) {
+  BlockLocationAttrSPtr attr = _resolver->askBlock(id);
+  if (NULL == attr) {
+    log->warning("no found data block: %lld\n", id);
+    return NULL;
+  }
+
+  return _loader->loadData(attr);
 }
 
 BlockID BlockManager::saveBlock(const BlockSPtr& block) {

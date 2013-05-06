@@ -10,6 +10,10 @@
 #include "network/Dispatcher.h"
 #include "network/Router.h"
 
+// test include
+#include "block/Block.h"
+#include "block/DataBlock.h"
+
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <netinet/in.h>
@@ -33,10 +37,11 @@ Server::Server(const SectionCollectionSPtr& section):
   pthread_mutex_init(&_mutex, NULL);
   // TODO: snapshot
   loadSnapshot();
-  _blockManager.reset(
-    new BlockManager(this, _sectionCollection->getConfig("block")));
+  // NOTE: notice initial dependent
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
+  _blockManager.reset(
+    new BlockManager(this, _sectionCollection->getConfig("block")));
 }
 
 Server::~Server() {
@@ -92,7 +97,7 @@ void Server::attachSignal() {
   signal(SIGTERM, Server::handleTERM);
   signal(SIGINT, Server::handleINT);
   signal(SIGPIPE, SIG_IGN);
-  signal(SIGUSR1, server::handleUSR1);
+  signal(SIGUSR1, Server::handleUSR1);
 }
 
 void Server::detachSignal() {
@@ -118,8 +123,15 @@ void Server::signalStop() {
 }
 
 void Server::handleUSR1(int sig) {
-  log->info("Server Receive USR1"\n);
+  log->info("Server Receive USR1\n");
   // do testing you want
+/*
+  DataBlockSPtr block = _this->_blockManager->newData();
+  log->debug("new block\n");
+  BlockID id = _this->_blockManager->saveBlock((BlockSPtr)block);
+  log->debug("save new block %d\n", id);
+*/
+  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(1, 100));
 }
 
 

@@ -24,6 +24,7 @@ BlockSaver::~BlockSaver() {
 BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   const BlockResolverSPtr resolver = _manager->getBlockResolver();
   BlockID newLocalBID = resolver->newLocalID();
+  log->debug("saveBlock request newLocalID: %d\n", newLocalBID);
   // get a new ID for file name
 
   string path = _manager->convertBlockIDToPath(newLocalBID);
@@ -35,6 +36,7 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
     return 0;
   } else {
     file << block->_data;
+    //log->debug("write data: %s\n", block->_data);
     file.close();
     resolver->addLocalID(newLocalBID);
     return newLocalBID;

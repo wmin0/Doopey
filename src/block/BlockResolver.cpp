@@ -16,7 +16,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -25,7 +24,6 @@ using namespace Doopey;
 using std::pair;
 using std::ifstream;
 using std::string;
-using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
@@ -43,7 +41,7 @@ BlockResolver::~BlockResolver() {
 }
 
 BlockID BlockResolver::newLocalID() {
-  return buildBlockID(_manager->getMachineID(), ++_localMax);
+  return Doopey::buildBlockID(_manager->getMachineID(), ++_localMax);
 }
 
 void BlockResolver::loadLocalIDs() {
@@ -76,11 +74,13 @@ void BlockResolver::loadLocalIDs() {
     log->info("found local block: %s\n", file->d_name);
     forceAddLocalID(tmp);
     // TODO: if change to new Machine ID...
-    MachineID mid = getMachineIDFromBlockID(tmp);
+    MachineID mid = Doopey::getMachineIDFromBlockID(tmp);
     if (machine == mid) {
-      LocalBlockID bid = getLocalIDFromBlockID(tmp);
+      LocalBlockID bid = Doopey::getLocalIDFromBlockID(tmp);
+      //log->debug("split id %d\n", bid);
       if (bid > _localMax) {
         _localMax = bid;
+        log->debug("set _localMax: %d\n", _localMax);
       }
     }
   }
@@ -89,13 +89,12 @@ void BlockResolver::loadLocalIDs() {
 
 void BlockResolver::addLocalID(BlockID id) {
   // TODO: check local file exist
-  stringstream ss("");
-  ss << _manager->getLocalDir() << "/" << id;
-  ifstream file(ss.str(), ifstream::in);
+  string path = _manager->convertBlockIDToPath(id);
+  ifstream file(path, ifstream::in);
   if (file.good()) {
     forceAddLocalID(id);
   } else {
-    log->error("add invalid id\n");
+    log->error("add invalid id %lld\n", id);
   }
   file.close();
 }
@@ -103,6 +102,7 @@ void BlockResolver::addLocalID(BlockID id) {
 void BlockResolver::forceAddLocalID(BlockID id) {
   BlockLocationAttrSPtr attr(new BlockLocationAttr(id, 0, BS_Available));
   attr->addMachine(_manager->getMachineID());
+  log->debug("add local ID: %lld\n", id);
   _localIDs[id] = attr;
 }
 
@@ -153,7 +153,9 @@ MachineID BlockResolver::chooseReplica(const BlockLocationAttrSPtr& attr) {
 }
 
 BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
+  log->debug("askBlock %lld\n", id);
   if (_localIDs.end() != _localIDs.find(id)) {
+    log->debug("find at local\n");
     return BlockLocationAttrSPtr(
       new BlockLocationAttr(id, _manager->getMachineID(), BS_Available));
   }
@@ -161,22 +163,26 @@ BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   time_t now = time(0);
   BlockLocationAttrSPtr tmp;
   if (_remoteIDs.end() != it) {
+    log->debug("find cache\n");
     if (checkReplicaInterval <= now - it->second->ts) {
       if (checkReplica(it->second)) {
         it->second->ts = now;
         tmp = it->second;
       } else {
+        log->debug("checkReplica fail remote ask\n");
         tmp = askRemoteBlock(id);
       }
     }
   } else {
-    tmp = it->second;
+    log->debug("remote ask\n");
+    tmp = askRemoteBlock(id);
   }
   if (NULL != tmp) {
    MachineID mid = chooseReplica(tmp);
     return BlockLocationAttrSPtr(
       new BlockLocationAttr(id, mid, BS_Available));
   }
+  log->debug("no found\n");
   return NULL;
 }
 

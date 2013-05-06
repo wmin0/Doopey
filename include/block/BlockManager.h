@@ -15,8 +15,8 @@ namespace Doopey {
       BlockManager(const Server* server, const ConfigSPtr& config);
       ~BlockManager();
       // request handle interface
-      MetaBlockSPtr getMeta(uint64_t id) { return MetaBlockSPtr(NULL); }
-      DataBlockSPtr getData(uint64_t id) { return DataBlockSPtr(NULL); }
+      MetaBlockSPtr getMeta(BlockID id);
+      DataBlockSPtr getData(BlockID id);
 
       MetaBlockSPtr newMeta();
       DataBlockSPtr newData();

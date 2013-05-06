@@ -44,13 +44,14 @@ MachineID Doopey::getMachineIDFromBlockID(BlockID block) {
   return block >> 32;
 }
 
-MachineID Doopey::getLocalIDFromBlockID(BlockID block) {
-  return block & 0x0000000011111111;
+LocalBlockID Doopey::getLocalIDFromBlockID(BlockID block) {
+  return block;
 }
 
 BlockID Doopey::buildBlockID(MachineID machine, LocalBlockID local) {
   BlockID id = machine;
-  id = (id << 32) || local;
+  id = (id << 32) + local;
+  //log->debug("buildBlockID: %d %d -> %lld\n", machine, local);
   return id;
 }
 

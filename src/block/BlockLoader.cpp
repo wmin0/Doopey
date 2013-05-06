@@ -123,6 +123,7 @@ unsigned char* BlockLoader::allocateMem() const {
   unsigned char* mem = NULL;
   try {
     mem = new unsigned char[Block::blockSize];
+    memset(mem, 0, Block::blockSize);
   } catch (...) {
     mem = NULL;
   }
