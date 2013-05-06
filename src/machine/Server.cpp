@@ -92,28 +92,36 @@ void Server::attachSignal() {
   signal(SIGTERM, Server::handleTERM);
   signal(SIGINT, Server::handleINT);
   signal(SIGPIPE, SIG_IGN);
+  signal(SIGUSR1, server::handleUSR1);
 }
 
 void Server::detachSignal() {
   signal(SIGTERM, NULL);
   signal(SIGINT, NULL);
   signal(SIGPIPE, SIG_DFL);
+  signal(SIGUSR1, NULL);
   Server::_this = NULL;
 }
 
 void Server::handleTERM(int sig) {
-  log->info("Server Recieve TERM\n");
+  log->info("Server Receive TERM\n");
   signalStop();
 }
 
 void Server::handleINT(int sig) {
-  log->info("Server Recieve INT\n");
+  log->info("Server Receive INT\n");
   signalStop();
 }
 
 void Server::signalStop() {
   pthread_mutex_unlock(&(Server::_this->_mutex));
 }
+
+void Server::handleUSR1(int sig) {
+  log->info("Server Receive USR1"\n);
+  // do testing you want
+}
+
 
 // snapshot
 void Server::saveSnapshot() {

@@ -33,6 +33,8 @@ namespace Doopey {
     private:
       static void handleTERM(int sig);
       static void handleINT(int sig);
+      // runtime testing function
+      static void handleUSR1(int sig);
       static void signalStop();
 
       void attachSignal();
