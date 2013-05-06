@@ -88,7 +88,8 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
   data = msg->getData();
   memcpy(&nameLength, data.data(), sizeof(unsigned int));
 
-  memcpy(&nameStr, data.data()+sizeof(unsigned int), nameLength);
+  nameStr.resize(nameLength);
+  memcpy(&(nameStr[0]), data.data()+sizeof(unsigned int), nameLength);
   if( meta->setFileName(nameStr) == false){
     //log->error("Meta Block: set file name failed by %s\n", nameStr.c_str());
     return false;
