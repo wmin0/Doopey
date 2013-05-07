@@ -48,14 +48,18 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     {
       //the msg is about the file meta, like filenam, creat time, etc.
       case MC_UpFileMeta:
-        if(setupMeta(meta, msg) == false)
-          log->error("Set up meta block error!\n");
+        if(setupMeta(meta, msg) == false){
+          log->error("Set up meta block error! Msg from %u\n", msg->getSrc());
+          return false;//one failure should terminate whole file?
+        }
         break;
       //the msg is the file data, just receive and split it into different data block and 
       //add the datablock ID into metablock
       case MC_UpFileData:
-        if (setupData(meta, msg) == false)
-          log->error("Set up data block error!\n");
+        if (setupData(meta, msg) == false){
+          log->error("Set up data block error! Msg from %u\n", msg->getSrc());
+          return false;//one failure should terminate whole file?
+        }
         break;
       //this msg means file has been transmitted successfully just check the meta ID 
       //and add it into file directory structure
@@ -104,28 +108,17 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
   return true;
 }
 
-
+//data of a msg is equal or less than one block size
 bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
   vector<unsigned char> msgData = msg->getData();
-  size_t off = 0;
-  BlockID blockID;
-
-  while(sizeof(msgData) - off >0){
-    DataBlockSPtr dataBlock = _blockManager->newData();
-    if(sizeof(msgData) < DataBlock::blockSize){
-      dataBlock->copyData(msgData, off, sizeof(msgData)); //memcpy(_data, msgData.data()+off, sizeof(msgData));
-      off = sizeof(msgData);
-      blockID = _blockManager->saveBlock(dataBlock);
-      if(meta->addDataID(blockID) == false)
-        return false;
-    }
-    else{
-      dataBlock->copyData(msgData, off, DataBlock::blockSize);//memcpy(_data, msgData.data()+off, DataBlock::blockSize);
-      off+=DataBlock::blockSize;
-      blockID = _blockManager->saveBlock(dataBlock);
-      if(meta->addDataID(blockID) == false)
-        return false;
-    }
+  if(sizeof(msgData) > DataBlock::blockSize){
+    log->error("data exceed block size! Msg from %u\n", msg->getSrc());
+    return false;
   }
+  DataBlockSPtr dataBlock = _blockManager->newData();
+  dataBlock->copyData(msgData);
+  BlockID blockID = _blockManager->saveBlock(dataBlock);
+  if(meta->addDataID(blockID) == false)
+    return false;
   return true;
 }

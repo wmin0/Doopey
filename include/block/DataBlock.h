@@ -11,11 +11,14 @@ using std::vector;
 namespace Doopey {
 
   class DataBlock: public Block {
+    friend class FileUploader;
+
     public:
       DataBlock(unsigned char* data, BlockID id): Block(data, id) {}
       virtual ~DataBlock() {}
 
-      void copyData(const vector<unsigned char>& msgData, size_t size, size_t off);
+    private:
+      void copyData(const vector<unsigned char>& msgData);
   }; // class Block
 
 };  // namespace Doopey
