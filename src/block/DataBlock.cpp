@@ -6,7 +6,11 @@
 using namespace std;
 using namespace Doopey;
 
-void DataBlock::copyData(const vector<unsigned char>& msgData){
-  memcpy(_data, msgData.data(),msgData.size());
+bool DataBlock::copyData(const vector<unsigned char>& msgData){
+  if(msgData.size() > DataBlock::blockSize)
+    return false;
+  else
+    memcpy(_data, msgData.data(), msgData.size());
+  return true;
 }
 

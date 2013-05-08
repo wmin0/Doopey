@@ -18,7 +18,7 @@ namespace Doopey {
       virtual ~DataBlock() {}
 
     private:
-      void copyData(const vector<unsigned char>& msgData);
+      bool copyData(const vector<unsigned char>& msgData);
   }; // class Block
 
 };  // namespace Doopey
