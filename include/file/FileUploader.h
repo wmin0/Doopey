@@ -25,7 +25,7 @@ namespace Doopey{
 
     public:
       ~FileUploader();
-      bool receiveFile(SocketSPtr socket);
+      BlockID receiveFile(SocketSPtr socket);
       void setBlockManager(const BlockManagerSPtr blockManager);
     private:
       FileUploader();

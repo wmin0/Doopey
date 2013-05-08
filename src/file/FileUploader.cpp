@@ -19,7 +19,7 @@ FileUploader::~FileUploader()
 {
 }
 
-bool FileUploader::receiveFile(SocketSPtr socket)
+BlockID FileUploader::receiveFile(SocketSPtr socket)
 {
   //for sure that blockManager has been set up
   if(_blockManager == NULL)
@@ -74,7 +74,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     }
   }
 
-  return true;
+  return blockID;
 }
 
 void FileUploader::setBlockManager(const BlockManagerSPtr blockManager)
