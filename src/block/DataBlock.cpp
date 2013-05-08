@@ -7,6 +7,6 @@ using namespace std;
 using namespace Doopey;
 
 void DataBlock::copyData(const vector<unsigned char>& msgData){
-  memcpy(_data, msgData.data(), sizeof(msgData));
+  memcpy(_data, msgData.data(),msgData.size());
 }
 
