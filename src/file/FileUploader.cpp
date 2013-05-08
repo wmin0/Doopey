@@ -111,7 +111,7 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 //data of a msg is equal or less than one block size
 bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
   vector<unsigned char> msgData = msg->getData();
-  if(sizeof(msgData) > DataBlock::blockSize){
+  if(msgData.size() > DataBlock::blockSize){
     log->error("data exceed block size! Msg from %u\n", msg->getSrc());
     return false;
   }
