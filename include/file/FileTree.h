@@ -2,11 +2,13 @@
 #define _DOOPEY_FILE_TREE_H_
 
 #include <string>
+#include <vector>
 #include <functional>
 #include <common/Doopey.h>
 
 
 using std::string;
+using std::vector;
 using std::hash;
 
 namespace Doopey{
@@ -62,6 +64,7 @@ namespace Doopey{
       bool removeFile(const string& path);
       bool removeDir(const string& path);
       BlockID getMetaID(const string& filePath);
+      vector<string> getChildren(const string& filePath);
     private:
       string getFileName(const string& path) const;
       string getFirst(string& s);

@@ -1,10 +1,12 @@
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "file/FileTree.h"
 
 using namespace Doopey;
 using std::string;
+using std::vector;
 
 TreeNode::TreeNode()
 {
@@ -188,4 +190,17 @@ BlockID FileTree::getMetaID(const string& filePath)
     return 0;
   else
     return tn->getID();
+}
+vector<string> FileTree::getChildren(const string& filePath)
+{
+  TreeNode* tn = _fileMap->getValue(filePath);
+  vector<string> result;
+  if(tn != NULL){
+    TreeNode* working = tn->_children;
+    while(working!=NULL){
+      result.insert(result.begin(), working->_name);
+      working = working->_next;
+    }
+  }
+  return result;
 }
