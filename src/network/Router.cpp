@@ -135,8 +135,12 @@ void Router::initMachineID() {
   }
   RoutingMap::iterator it = _routingTable.begin();
   MachineID max = 0;
+  string localIP = _server->getLocalIP();
   while (_routingTable.end() != it) {
     do {
+      if (localIP == it->second.ip) {
+        continue;
+      }
       Socket sock(ST_TCP);
       if (!sock.connect(it->second.ip, DoopeyPort)) {
         log->warning("connect to %s fail\n", it->second.ip.data());
