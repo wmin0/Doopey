@@ -218,7 +218,7 @@ bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
       off += sizeof(MachineID);
     }
   }
-  _manager->getRouter()->sendTo(m, msg);
+  _manager->getRouter()->sendTo(m, ack);
   return true;
 }
 
