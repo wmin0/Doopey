@@ -14,9 +14,12 @@ namespace Doopey {
       void setMachineID(const MachineID& id) { _machineID = id; }
       const MachineID& getMachineID() const { return _machineID; }
     private:
+      static const char* _dirpath;
       static const char* _filepath;
     private:
       MachineID _machineID;
+
+      void checkDirExist();
 
   }; // class ServerSnapshot
 
