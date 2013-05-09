@@ -20,6 +20,7 @@ namespace Doopey{
   class FileUploader;
   class Config;
   class BlockManager;
+  class FileTree;
 
   class FileManager{
 
@@ -42,9 +43,9 @@ namespace Doopey{
 
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;
+      FileTreeSPtr _fileMap;
 
       const Server* _server;
-      map<string, uint64_t> _fileTable;
   };//class FileManager
 
 } //namespace Doopey

@@ -42,13 +42,14 @@ bool FileManager::uploadFile(SocketSPtr socket)
 {
   //let uploader to create meta, receive file and create data block
   _uploader->setBlockManager(_server->getBlockManager());
-  BlockID metaID = _uploader->receiveFile(socket);
+  _uploader->setFileTree(_fileMap);
+  bool result = _uploader->receiveFile(socket);
 
   //add file into map
 
   //broadcast that here have a new file
 
-  return metaID>0;
+  return result;
 }
 
 bool FileManager::searchList(SocketSPtr socket)

@@ -25,14 +25,16 @@ namespace Doopey{
 
     public:
       ~FileUploader();
-      BlockID receiveFile(SocketSPtr socket);
+      bool receiveFile(SocketSPtr socket);
       void setBlockManager(const BlockManagerSPtr blockManager);
+      void setFileTree(FileTreeSPtr tree);
     private:
       FileUploader();
       bool setupMeta(MetaBlockSPtr meta, const MessageSPtr msg);
       bool setupData(MetaBlockSPtr meta, const MessageSPtr msg);
 
       BlockManagerSPtr _blockManager;
+      FileTreeSPtr _fileTree;
   };//class FileUploader
 
 }//namespace Doopey
