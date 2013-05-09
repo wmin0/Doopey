@@ -108,7 +108,7 @@ void BlockResolver::forceAddLocalID(BlockID id) {
 
 void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
   BlockLocationAttrSPtr attr(new BlockLocationAttr(id, 0, BS_Available));
-  attr->addMachine(id);
+  attr->addMachine(m);
   _remoteIDs[id] = attr;
 }
 
