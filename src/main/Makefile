@@ -12,4 +12,5 @@ target: $(TARGET)
 
 %: %Main.o $(DEPLIBS)
 	@echo "> building $@"
+	@mkdir -p $(BINDIR)
 	@$(CXX) $(CFLAGS) -I$(EXTINCLUDE) $< -L$(LIBDIR) $(INCLIB) -o $(BINDIR)/$@

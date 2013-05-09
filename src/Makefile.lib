@@ -5,4 +5,5 @@ target: $(TARGET)
 
 $(TARGET): $(OBJS)
 	@echo "Building $(LIBNAME)"
+	@mkdir -p $(LIBDIR)
 	@$(AR) $@ $(OBJS)
