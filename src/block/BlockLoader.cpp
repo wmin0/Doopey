@@ -41,13 +41,13 @@ MetaBlockSPtr BlockLoader::loadMeta(const BlockLocationAttrSPtr& attr) const {
 
 unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
   if (BS_Available != attr->state) {
-    log->warn("remote block not available\n")
+    log->warn("remote block not available\n");
     return NULL;
   }
   MachineID local = _manager->getMachineID();
   bool atLocal = false;
   if (0 == attr->machine.size()) {
-    log->warn("remote block no machine\n")
+    log->warn("remote block no machine\n");
     return NULL;
   }
   for (size_t i = 0; i < attr->machine.size(); ++i) {
