@@ -178,9 +178,10 @@ BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
     tmp = askRemoteBlock(id);
   }
   if (NULL != tmp) {
-   MachineID mid = chooseReplica(tmp);
-    return BlockLocationAttrSPtr(
-      new BlockLocationAttr(id, mid, BS_Available));
+    MachineID mid = chooseReplica(tmp);
+    BlockLocationAttrSPtr ans(new BlockLocationAttrSPtr(id, 0, BS_Available));
+    ans->addMachine(mid);
+    return ans;
   }
   log->debug("no found\n");
   return NULL;
