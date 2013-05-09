@@ -229,12 +229,12 @@ void Router::initTable() {
         off += sizeof(uint64_t);
         ip.resize(len);
         memcpy(&(ip[0]), ack->getData().data() + off, len);
-        if (_server->getLocalIP() == ip) {
-          continue;
-        }
         off += len;
         memcpy(&d, ack->getData().data() + off, sizeof(uint16_t));
         off += sizeof(uint16_t);
+        if (_server->getLocalIP() == ip) {
+          continue;
+        }
         // TODO: len
         addRoutingPath(id, ip, d + 1);
         done = true;
