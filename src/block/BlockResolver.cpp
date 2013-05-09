@@ -179,7 +179,7 @@ BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   }
   if (NULL != tmp) {
     MachineID mid = chooseReplica(tmp);
-    BlockLocationAttrSPtr ans(new BlockLocationAttrSPtr(id, 0, BS_Available));
+    BlockLocationAttrSPtr ans(new BlockLocationAttr(id, 0, BS_Available));
     ans->addMachine(mid);
     return ans;
   }
