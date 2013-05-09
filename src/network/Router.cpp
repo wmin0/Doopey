@@ -100,6 +100,12 @@ void Router::initMachineID() {
       }
       MessageSPtr msg(new Message(MT_Router, MC_CheckRepeatMachineID));
       msg->addData((unsigned char*)&oldID, 0, sizeof(MachineID));
+      string localIP = _server->getLocalIP();
+      uint64_t len = localIP.size();
+      msg->addData((unsigned char*)&len, sizeof(MachineID), sizeof(uint64_t));
+      msg->addData((unsigned char*)localIP.data(),
+                   sizeof(MachineID) + sizeof(uint64_t),
+                   len);
       if (!sock.send(msg)) {
         log->warning("send CheckRepeatMachineID msg to %s fail\n", it->second.ip.data());
         break;
@@ -410,9 +416,18 @@ bool Router::handleCheckRepeatMachineID(
   const SocketSPtr& sock, const MessageSPtr& msg) {
   MachineID req;
   memcpy(&req, msg->getData().data(), sizeof(MachineID));
+  string IP;
+  uint64_t len = 0;
+  memcpy(&len, msg->getData().data() + sizeof(MachineID), sizeof(uint64_t));
+  IP.resize(len);
+  memcpy(&(IP[0]),
+         msg->getData().data() + sizeof(MachineID) + sizeof(uint64_t),
+         len);
+  // true means available
   bool ans = true;
+  RoutingMap::iterator it = _routingTable.find(req);
   if (_server->getMachineID() == req ||
-      _routingTable.end() != _routingTable.find(req)) {
+      (_routingTable.end() != it && IP != it->second->ip)) {
     ans = false;
   }
   MessageSPtr ack(new Message(MT_Router, MC_RouterACK));
