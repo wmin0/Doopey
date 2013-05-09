@@ -427,7 +427,7 @@ bool Router::handleCheckRepeatMachineID(
   bool ans = true;
   RoutingMap::iterator it = _routingTable.find(req);
   if (_server->getMachineID() == req ||
-      (_routingTable.end() != it && IP != it->second->ip)) {
+      (_routingTable.end() != it && IP != it->second.ip)) {
     ans = false;
   }
   MessageSPtr ack(new Message(MT_Router, MC_RouterACK));
