@@ -123,6 +123,9 @@ void Router::initMachineID() {
       MachineID max;
       memcpy(&ans, ack->getData().data(), sizeof(bool));
       memcpy(&max, ack->getData().data() + sizeof(bool), sizeof(MachineID));
+      if (max < oldID) {
+        max = oldID;
+      }
       if (ans) {
         _server->setMachineIDMax(max);
         log->info("set MachineID(%d)\n", oldID);
@@ -226,6 +229,9 @@ void Router::initTable() {
         off += sizeof(uint64_t);
         ip.resize(len);
         memcpy(&(ip[0]), ack->getData().data() + off, len);
+        if (_server->getLocalIP() == ip) {
+          continue;
+        }
         off += len;
         memcpy(&d, ack->getData().data() + off, sizeof(uint16_t));
         off += sizeof(uint16_t);
