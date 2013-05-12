@@ -1,17 +1,22 @@
 #include "file/FileManager.h"
 #include "file/MetaDecoder.h"
 #include "file/FileUploader.h"
+#include "file/FileTree.h"
 #include "block/BlockManager.h"
 #include "block/Block.h"
 #include "block/MetaBlock.h"
 #include "machine/Server.h"
 #include "common/Message.h"
 
+#include <stdio.h>
+#include <string.h>
+
 using namespace Doopey;
 
 FileManager::FileManager(const Server* server, const ConfigSPtr& config):_server(server){
   _decoder.reset(new MetaDecoder());
   _uploader.reset(new FileUploader());
+  _fileMap.reset(new FileTree());
 }
 
 FileManager::~FileManager()
@@ -54,6 +59,23 @@ bool FileManager::uploadFile(SocketSPtr socket)
 
 bool FileManager::searchList(SocketSPtr socket)
 {
+  //receive the name of dir which is requested
+  uint64_t nameLength;
+  MessageSPtr msg = socket->receive();
+  memcpy(&nameLength, msg->getData().data(), sizeof(uint64_t));
+  string dirName;
+  dirName.resize(nameLength);
+  memcpy(&(dirName[0]), msg->getData().data() + sizeof(uint64_t), nameLength);
+
+  //get result by _fileMap
+  //vector<string> result = _fileMap->getChildren(dirName);
+  vector<string> result = _fileMap->getExChildren();
+
+  MessageSPtr reply(new Message(MT_File, MC_RequestList));
+  reply->addData((unsigned char*)&result, 0, sizeof(result));
+  socket->send(reply);
+
+  //return result to the client which request
   return true;
 }
 

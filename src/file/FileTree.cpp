@@ -204,3 +204,12 @@ vector<string> FileTree::getChildren(const string& filePath)
   }
   return result;
 }
+
+vector<string> FileTree::getExChildren()
+{
+  vector<string> result;
+  result.insert(result.begin(), "a");
+  result.insert(result.begin(), "b");
+  result.insert(result.begin(), "c");
+  return result;
+}

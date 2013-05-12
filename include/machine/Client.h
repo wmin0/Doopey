@@ -1,6 +1,10 @@
 #ifndef _DOOPEY_CLIENT_H_
 #define _DOOPEY_CLIENT_H_
 
+#include <string>
+
+using std::string;
+
 namespace Doopey {
 
   class Client {
@@ -13,6 +17,7 @@ namespace Doopey {
     private:
       // TODO: change name XD
       void go();
+      bool getFileList(const char* name);
   }; // class Client
 
 };  // namespace Doopey

@@ -65,6 +65,9 @@ namespace Doopey{
       bool removeDir(const string& path);
       BlockID getMetaID(const string& filePath);
       vector<string> getChildren(const string& filePath);
+
+      //used to debug only return a,b,c
+      vector<string> getExChildren();
     private:
       string getFileName(const string& path) const;
       string getFirst(string& s);

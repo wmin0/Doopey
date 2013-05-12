@@ -9,6 +9,7 @@
 #include <memory.h>
 #include <string>
 #include <cstdint>
+#include <vector>
 
 #include <getopt.h>
 
@@ -65,7 +66,7 @@ void Client::run(int argc, char** argv) {
     cout << endl;
   }
 
-  go();
+  //go();
 }
 
 void Client::go() {
@@ -85,3 +86,25 @@ void Client::go() {
   memcpy(&(test[0]), ack->getData().data() + sizeof(uint64_t), len);
   cout << "test: " << test << endl;
 }
+
+bool Client::getFileList(const char* name)
+{
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    cerr << "connect server error" << endl;
+    return 0;
+  }
+  MessageSPtr msg(new Message(MT_File, MC_RequestList));
+  socket.send(msg);
+  uint64_t l = strlen(name);
+  msg->addData((unsigned char*)&l, 0, sizeof(l));
+  msg->addData((unsigned char*)name, 0, l);
+  socket.send(msg);
+  MessageSPtr reply = socket.receive();
+  vector<string>* list = (vector<string>*)msg->getData().data();
+  for(vector<string>::iterator it=list->begin(); it<list->end(); it++)
+  {
+    cout << *it << endl;
+  }
+  return true;
+} 
