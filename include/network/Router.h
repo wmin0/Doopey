@@ -7,11 +7,13 @@
 #include <map>
 #include <string>
 #include <set>
+#include <vector>
 
 using std::pair;
 using std::map;
 using std::set;
 using std::string;
+using std::vector;
 
 namespace Doopey {
 
@@ -39,6 +41,9 @@ namespace Doopey {
       SocketSPtr sendTo(MachineID id, const MessageSPtr& msg) const;
 
       void request(const MessageSPtr& msg, const SocketSPtr& sock);
+
+      vector<MachineID> pickMachineBesideList(
+        const vector<MachineID>& list, size_t num) const;
 
     private:
       // routing operation functions

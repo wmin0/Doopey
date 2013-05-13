@@ -23,10 +23,12 @@ BlockSaver::~BlockSaver() {
 
 BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   const BlockResolverSPtr resolver = _manager->getBlockResolver();
-  BlockID newLocalBID = resolver->newLocalID();
-  log->debug("saveBlock request newLocalID: %d\n", newLocalBID);
+  BlockID newLocalBID = block->getID();
+  if (0 == newLocalBID) {
+    newLocalBID = resolver->newLocalID();
+    log->debug("saveBlock request newLocalID: %d\n", newLocalBID);
+  }
   // get a new ID for file name
-
   string path = _manager->convertBlockIDToPath(newLocalBID);
   fstream file(path, fstream::out | fstream::binary);
   //create new file, filename is "locatDir+newLocalBID"

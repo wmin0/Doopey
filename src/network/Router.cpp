@@ -1,5 +1,6 @@
 #include "network/Router.h"
 
+#include "block/Block.h"
 #include "common/Config.h"
 #include "common/Doopey.h"
 #include "common/Thread.h"
@@ -287,6 +288,29 @@ void Router::mainLoop() {
 void Router::threadStop(void* obj) {
   Router* router = (Router*)obj;
   router->_run = false;
+}
+
+vector<MachineID> Router::pickMachineBesideList(
+  const vector<MachineID>& list, size_t num) const {
+  vector<MachineID> ret;
+  RoutingMap::const_iterator it = _routingTable.begin();
+  while (_routingTable.end() != it) {
+    if (num == 0 || num > Block::blockReplica) {
+      break;
+    }
+    bool in = false;
+    for (size_t i = 0; i < list.size(); ++i) {
+      if (list[i] == it->first) {
+        in = true;
+      }
+    }
+    if (in) {
+      continue;
+    }
+    ret.push_back(it->first);
+    --num;
+  }
+  return ret;
 }
 
 void Router::broadcast(const MessageSPtr& msg) const {

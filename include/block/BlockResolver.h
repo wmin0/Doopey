@@ -21,7 +21,10 @@ namespace Doopey {
       BlockResolver(const BlockManager* manager, const ConfigSPtr& config);
       ~BlockResolver();
 
+      // only return 1 machine
       BlockLocationAttrSPtr askBlock(BlockID id);
+      // return all machine list
+      BlockLocationAttrSPtr askLocalBlockDetail(BlockID id);
       BlockID newLocalID();
       void addLocalID(BlockID id);
       //void removeID(BlockID id);

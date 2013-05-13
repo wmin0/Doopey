@@ -54,7 +54,7 @@ namespace Doopey {
 
     private:
       bool handleDoReplica(const MessageSPtr& msg);
-
+      bool handleCopyBlockFromRemote(const SocketSPtr& sock, const MessageSPtr& msg);
   }; // class BlockManager
 
 };  // namespace Doopey

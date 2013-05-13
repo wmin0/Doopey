@@ -114,6 +114,11 @@ void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
 
 void BlockResolver::cleanCache() {
   // TODO: maybe use LRU?
+
+  // flush five
+  for (int i = 0; i < 5; ++i) {
+    _remoteIDs.erase(_remoteIDs.begin());
+  }
 }
 
 bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
@@ -142,6 +147,11 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
   if (requestReplica) {
     MessageSPtr msg(new Message(MT_Block, MC_DoReplica));
     msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    size_t off = sizeof(BlockID);
+    for (size_t i = 0; i < attr->machine.size(); ++i) {
+      msg->addData((unsigned char*)&(attr->machine[i]), off, sizeof(MachineID));
+      off += sizeof(MachineID);
+    }
     _manager->getRouter()->sendTo(attr->machine[0], msg);
   }
   return true;
@@ -200,6 +210,14 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
     return it->second;
   }
   return BlockLocationAttrSPtr(NULL);
+}
+
+BlockLocationAttrSPtr BlockResolver::askLocalBlockDetail(BlockID id) {
+  BlockMap::iterator it = _localIDs.find(id);
+  if (_localIDs.end() == it) {
+    return NULL;
+  }
+  return it->second;
 }
 
 bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
@@ -267,6 +285,26 @@ bool BlockResolver::handleCheckBlockAlive(
 }
 
 bool BlockResolver::handleUpdateReplica(const MessageSPtr& msg) {
-  // TODO:
+  BlockID id;
+  MachineID mid;
+  memcpy(&id, msg->getData().data(), sizeof(BlockID));
+  size_t off = sizeof(BlockID);
+  vector<MachineID> mids;
+  while (off < msg->getData().size()) {
+    memcpy(&mid, msg->getData().data() + off, sizeof(MachineID));
+    off += sizeof(MachineID);
+    mids.push_back(mid);
+  }
+  // update local
+  BlockMap::iterator it = _localIDs.find(id);
+  if (_localIDs.end() != it) {
+    it->second->machine = mids;
+  }
+  // update remote
+  it = _remoteIDs.find(id);
+  if (_remoteIDs.end() != it) {
+    it->second->machine = mids;
+    it->second->ts = time(0);
+  }
   return true;
 }
