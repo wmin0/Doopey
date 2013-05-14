@@ -9,6 +9,7 @@
 #include "common/Socket.h"
 #include "common/Message.h"
 #include "network/Router.h"
+#include "file/FileManager.h"
 
 #include <pthread.h>
 #include <memory>
@@ -99,8 +100,13 @@ void Dispatcher::dispatch(void* dispatch, void* sock, void* output) {
         break;
       case MT_Block:
         dispatcher->_server->getBlockManager()->request(msg, *socket);
+        break;
       case MT_Machine:
         dispatcher->_server->request(msg, *socket);
+        break;
+      case MT_File:
+        dispatcher->_server->getFileManager()->receiveQuest(msg, *socket);
+        break;
       default:
         break;
     }

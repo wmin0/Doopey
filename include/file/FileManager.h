@@ -29,7 +29,7 @@ namespace Doopey{
       ~FileManager();
 
       //this function is used to tell which work is requested in msg 
-      void receiveQuest(SocketSPtr socket);
+      void receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket);
 
     private:
       //three function belonging is used to handle different msg

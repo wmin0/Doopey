@@ -43,6 +43,8 @@ void Client::run(int argc, char** argv) {
       // TODO: build option and check one option only
       case 'l':
         cout << "ls request" << endl;
+        cout << "arg=" << argv[optind] << endl;
+        getFileList(argv[option_index]);
         break;
       case 'p':
         cout << "put request" << endl;
@@ -96,15 +98,23 @@ bool Client::getFileList(const char* name)
   }
   MessageSPtr msg(new Message(MT_File, MC_RequestList));
   socket.send(msg);
+  cout << "first msg to let dispatcher transfer socket to FileManager" << endl;
+
   uint64_t l = strlen(name);
+  msg.reset(new Message(MT_File, MC_RequestList));
   msg->addData((unsigned char*)&l, 0, sizeof(l));
   msg->addData((unsigned char*)name, 0, l);
   socket.send(msg);
+  cout << "second msg to let FileManager know which dir is requested" << endl;
+
   MessageSPtr reply = socket.receive();
+  cout << "receive the reply" << endl;
+
   vector<string>* list = (vector<string>*)msg->getData().data();
   for(vector<string>::iterator it=list->begin(); it<list->end(); it++)
   {
     cout << *it << endl;
   }
+  cout << "finished show all data" << endl;
   return true;
 } 

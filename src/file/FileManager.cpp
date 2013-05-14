@@ -24,8 +24,7 @@ FileManager::~FileManager()
 
 }
 
-void FileManager::receiveQuest(SocketSPtr socket){
-  MessageSPtr msg = socket->receive();
+void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket){
   if(!checkMsg(msg))
     return;
   switch(msg->getCmd())
@@ -36,6 +35,7 @@ void FileManager::receiveQuest(SocketSPtr socket){
     case MC_RequestFile:
       break;
     case MC_RequestList:
+      searchList(socket);
       break;
     default:
       log->warning("FileManager: error message command!\n");
