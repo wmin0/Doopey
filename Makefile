@@ -1,5 +1,5 @@
 EXTPKGS=
-SRCPKGS=machine file block network common logger
+SRCPKGS=machine network file block common logger
 TESTPKGS=file
 LIBPKGS=$(EXTPKGS) $(SRCPKGS)
 
