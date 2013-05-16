@@ -71,11 +71,10 @@ bool FileManager::searchList(SocketSPtr socket)
   vector<string> result = _fileMap->getExChildren();
 
   MessageSPtr reply(new Message(MT_File, MC_RequestList));
-  int offset = 0;
   for(unsigned int i=0; i<result.size(); i++)
   {
-    reply->addData((unsigned char*)result[i].data(), offset, result[i].length());
-    offset += result[i].length();
+    reply->addData((unsigned char*)result[i].data(), result[i].length());
+    reply->addData((const unsigned char*)"\n", 1);
   }
   socket->send(reply);
 
