@@ -1,4 +1,5 @@
 #include "common/Doopey.h"
+#include "file/FileTree.h"
 #include "file/FileUploader.h"
 #include "common/Message.h"
 #include "block/MetaBlock.h"
@@ -34,12 +35,14 @@ bool FileUploader::receiveFile(SocketSPtr socket)
   while(1)
   {
     msg = socket->receive();
-    //if msg==NULL means client has disconnected so just aboadon the file and return false
+    //if msg==NULL means client has disconnected
+    //just aboadon the file and return false
     if( NULL==msg){
       //TODO: release the thing has received
       return false;
     }else if( MT_File != msg->getType()){
-      log->error("FileUploader Error: error message type of %s in FileUploader\n", enum2String(msg->getType()));
+      log->error("FileUploader Error: error message type of %s in FileUploader\n"
+        , enum2String(msg->getType()));
     }
 
     //decide what to do depend on the command
@@ -52,19 +55,19 @@ bool FileUploader::receiveFile(SocketSPtr socket)
           return false;//one failure should terminate whole file?
         }
         break;
-      //the msg is the file data, just receive and split it into different data block and 
-      //add the datablock ID into metablock
+      //the msg is the file data, just receive and split it into different data 
+      //block and add the datablock ID into metablock
       case MC_UpFileData:
         if (setupData(meta, msg) == false){
           log->error("Set up data block error! Msg from %u\n", msg->getSrc());
           return false;//one failure should terminate whole file?
         }
         break;
-      //this msg means file has been transmitted successfully just check the meta ID 
-      //and add it into file directory structure
+      //this msg means file has been transmitted successfully just check the 
+      //meta ID and add it into file directory structure
       case MC_UpFileEnd:
         blockID = _blockManager->saveBlock(meta);
-       // _fileTable.insert(pair<string, uint64_t>(meta->getFileName(), blockID));
+        _fileTree->addFile(meta->getFileName(), blockID);
         return true;
         break;
       default:
@@ -88,22 +91,22 @@ void FileUploader::setFileTree(FileTreeSPtr tree)
 
 bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 {
-  unsigned int nameLength;
+  uint64_t nameLength;
   vector<unsigned char> data;
   string nameStr;
   time_t ctime;
 
   data = msg->getData();
-  memcpy(&nameLength, data.data(), sizeof(unsigned int));
+  memcpy(&nameLength, data.data(), sizeof(nameLength));
 
   nameStr.resize(nameLength);
-  memcpy(&(nameStr[0]), data.data()+sizeof(unsigned int), nameLength);
+  memcpy(&(nameStr[0]), data.data()+sizeof(nameLength), nameLength);
   if( meta->setFileName(nameStr) == false){
     //log->error("Meta Block: set file name failed by %s\n", nameStr.c_str());
     return false;
   }
 
-  memcpy(&ctime, data.data()+sizeof(unsigned int)+nameLength, sizeof(time_t));
+  memcpy(&ctime, data.data()+sizeof(nameLength)+nameLength, sizeof(time_t));
   if( meta->setCreateTime(ctime) == false ){
     //log->error("Meta Block: set ctime failed by %s\n", nameStr.c_str());
     return false;
