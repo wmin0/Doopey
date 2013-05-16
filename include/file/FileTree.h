@@ -39,8 +39,8 @@ namespace Doopey{
 
   class TreeNode{
     public:
-      ~TreeNode();
       BlockID getID() const;
+      ~TreeNode();
     private:
       TreeNode();
       bool _isFile;
