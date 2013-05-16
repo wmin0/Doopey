@@ -30,12 +30,12 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
   switch(msg->getCmd())
   {
     case MC_UpFileStart:
-      uploadFile(socket);
+      handleUpload(socket);
       break;
     case MC_RequestFile:
       break;
     case MC_RequestList:
-      searchList(socket);
+      handleList(socket);
       break;
     default:
       log->warning("FileManager: error message command!\n");
@@ -43,7 +43,7 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
   }
 }
 
-bool FileManager::uploadFile(SocketSPtr socket)
+bool FileManager::handleUpload(SocketSPtr socket)
 {
   //let uploader to create meta, receive file and create data block
   _uploader->setBlockManager(_server->getBlockManager());
@@ -57,7 +57,7 @@ bool FileManager::uploadFile(SocketSPtr socket)
   return result;
 }
 
-bool FileManager::searchList(SocketSPtr socket)
+bool FileManager::handleList(SocketSPtr socket)
 {
   //receive the name of dir which is requested
   MessageSPtr msg = socket->receive();
@@ -82,7 +82,7 @@ bool FileManager::searchList(SocketSPtr socket)
   return true;
 }
 
-bool FileManager::getFile(SocketSPtr socket)
+bool FileManager::handleGetFile(SocketSPtr socket)
 {
   return true;
 }

@@ -34,9 +34,9 @@ namespace Doopey{
     private:
       //three function belonging is used to handle different msg
       //which will be catch by receiveQuest()
-      bool uploadFile(SocketSPtr socket); 
-      bool getFile(SocketSPtr socket);
-      bool searchList(SocketSPtr socket);
+      bool handleUpload(SocketSPtr socket); 
+      bool handleGetFile(SocketSPtr socket);
+      bool handleList(SocketSPtr socket);
 
       //check the msg type is for FileManager 
       bool checkMsg(const MessageSPtr& msg) const;
