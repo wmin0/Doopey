@@ -60,12 +60,11 @@ bool FileManager::uploadFile(SocketSPtr socket)
 bool FileManager::searchList(SocketSPtr socket)
 {
   //receive the name of dir which is requested
-  uint64_t nameLength;
   MessageSPtr msg = socket->receive();
-  memcpy(&nameLength, msg->getData().data(), sizeof(uint64_t));
   string dirName;
-  dirName.resize(nameLength);
-  memcpy(&(dirName[0]), msg->getData().data() + sizeof(uint64_t), nameLength);
+  unsigned int size = msg->getData().size();
+  dirName.resize(size);
+  memcpy(&(dirName[0]), msg->getData().data(), size);
 
   //get result by _fileMap
   //vector<string> result = _fileMap->getChildren(dirName);
@@ -73,7 +72,7 @@ bool FileManager::searchList(SocketSPtr socket)
 
   MessageSPtr reply(new Message(MT_File, MC_RequestList));
   int offset = 0;
-  for(int i=0; i<result.size(); i++)
+  for(unsigned int i=0; i<result.size(); i++)
   {
     reply->addData((unsigned char*)result[i].data(), offset, result[i].length());
     offset += result[i].length();

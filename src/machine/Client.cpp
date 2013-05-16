@@ -35,7 +35,7 @@ void Client::run(int argc, char** argv) {
   };
   while (1) {
     int option_index = 0;
-    c = getopt_long(argc, argv, "lp:g:h", long_options, &option_index);
+    c = getopt_long(argc, argv, "l:p:g:h", long_options, &option_index);
     if (-1 == c) {
       break;
     }
@@ -43,8 +43,8 @@ void Client::run(int argc, char** argv) {
       // TODO: build option and check one option only
       case 'l':
         cout << "ls request" << endl;
-        cout << "arg=" << argv[optind] << endl;
-        getFileList(argv[option_index]);
+        cout << "arg=" << optarg << endl;
+        getFileList(optarg);
         break;
       case 'p':
         cout << "put request" << endl;
@@ -101,13 +101,12 @@ bool Client::getFileList(const char* name)
 
   uint64_t l = strlen(name);
   msg.reset(new Message(MT_File, MC_RequestList));
-  msg->addData((unsigned char*)&l, 0, sizeof(l));
   msg->addData((unsigned char*)name, 0, l);
   socket.send(msg);
 
   MessageSPtr reply = socket.receive();
 
-  for(int i=0; i<reply->getData().size(); i++)
+  for(unsigned int i=0; i<reply->getData().size(); i++)
     cout << reply->getData()[i];
   return true;
 } 
