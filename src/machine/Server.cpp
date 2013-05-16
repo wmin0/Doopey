@@ -1,5 +1,6 @@
 #include "machine/Server.h"
 
+#include "file/FileManager.h"
 #include "block/BlockManager.h"
 #include "common/Doopey.h"
 #include "common/Config.h"
@@ -42,6 +43,8 @@ Server::Server(const SectionCollectionSPtr& section):
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
+  _fileManager.reset(
+    new FileManager(this, _sectionCollection->getConfig("file")));
 }
 
 Server::~Server() {
@@ -131,7 +134,7 @@ void Server::handleUSR1(int sig) {
   BlockID id = _this->_blockManager->saveBlock((BlockSPtr)block);
   log->debug("save new block %d\n", id);
 */
-  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(1, 100));
+  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(4, 1));
 }
 
 

@@ -72,7 +72,12 @@ bool FileManager::searchList(SocketSPtr socket)
   vector<string> result = _fileMap->getExChildren();
 
   MessageSPtr reply(new Message(MT_File, MC_RequestList));
-  reply->addData((unsigned char*)&result, 0, sizeof(result));
+  int offset = 0;
+  for(int i=0; i<result.size(); i++)
+  {
+    reply->addData((unsigned char*)result[i].data(), offset, result[i].length());
+    offset += result[i].length();
+  }
   socket->send(reply);
 
   //return result to the client which request

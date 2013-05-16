@@ -13,6 +13,7 @@ using std::string;
 
 namespace Doopey {
 
+  #define enum2String(arg) #arg 
   #define registerClass(T) \
     class T; \
     typedef shared_ptr<T> T##SPtr

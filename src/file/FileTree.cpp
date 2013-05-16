@@ -208,8 +208,8 @@ vector<string> FileTree::getChildren(const string& filePath)
 vector<string> FileTree::getExChildren()
 {
   vector<string> result;
-  result.insert(result.begin(), "a");
-  result.insert(result.begin(), "b");
-  result.insert(result.begin(), "c");
+  result.insert(result.begin(), "a\n");
+  result.insert(result.begin(), "b\n");
+  result.insert(result.begin(), "c\n");
   return result;
 }
