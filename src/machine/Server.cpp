@@ -45,7 +45,9 @@ Server::Server(const SectionCollectionSPtr& section):
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
-<<<<<<< HEAD
+  _fileManager.reset(
+    new FileManager(this, _sectionCollection->getConfig("file")));
+
   ConfigSPtr config = _sectionCollection->getConfig("global");
   string tmp = config->getValue("UseSpaceMax");
   // TODO: validataion
@@ -56,10 +58,6 @@ Server::Server(const SectionCollectionSPtr& section):
   } else {
     log->info("Server UseSpaceMax: %lld\n", _useSpaceMax);
   }
-=======
-  _fileManager.reset(
-    new FileManager(this, _sectionCollection->getConfig("file")));
->>>>>>> ee7c859662e5d83122a83dd4074b254a123930d3
 }
 
 Server::~Server() {
