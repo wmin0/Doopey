@@ -15,6 +15,7 @@
 #include <dirent.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
@@ -24,6 +25,7 @@ using namespace Doopey;
 using std::pair;
 using std::ifstream;
 using std::string;
+using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
@@ -145,6 +147,7 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
     return false;
   }
   if (requestReplica) {
+    log->debug("request replica: %d->%lld\n", attr->machine[0], attr->block);
     MessageSPtr msg(new Message(MT_Block, MC_DoReplica));
     msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
     size_t off = sizeof(BlockID);
@@ -295,6 +298,12 @@ bool BlockResolver::handleUpdateReplica(const MessageSPtr& msg) {
     off += sizeof(MachineID);
     mids.push_back(mid);
   }
+  // TODO: delete
+  stringstream tmp("");
+  for (size_t i = 0; i < mids.size(); ++i) {
+    tmp << i << " ";
+  }
+  log->debug("update replica: %lld->%s\n", id, tmp.str().data());
   // update local
   BlockMap::iterator it = _localIDs.find(id);
   if (_localIDs.end() != it) {
