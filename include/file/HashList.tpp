@@ -16,11 +16,11 @@ HashList<KEY, VALUE>::~HashList()
     while(release!=NULL)
     {
       next = release->next;
-      free(release);
+      delete release;
       release = next;
     }
   }
-  free(_list);
+  delete[] _list;
 }
 
 template<typename KEY, typename VALUE>

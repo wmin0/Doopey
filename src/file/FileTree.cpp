@@ -25,7 +25,7 @@ TreeNode::~TreeNode()
   while(work!=NULL)
   {
     next = work->_next;
-    free(work);
+    delete work;
     work = next;
   }
 }
@@ -37,7 +37,6 @@ BlockID TreeNode::getID() const
 
 FileTree::FileTree()
 {
-  log->info("Start release FileTree\n");
   _root = new TreeNode();
   _root->_name = "/";
   _fileMap = new HashList<string, TreeNode*>();
@@ -45,8 +44,9 @@ FileTree::FileTree()
 
 FileTree::~FileTree()
 {
-  free(_fileMap);
-  free(_root);
+  log->info("Start release FileTree\n");
+  delete _fileMap;
+  delete _root;
 }
 
 string FileTree::getFirst(string& s)
