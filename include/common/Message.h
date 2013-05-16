@@ -83,6 +83,7 @@ namespace Doopey {
       ~Message();
 
       bool addData(const unsigned char* data, size_t s, size_t len);
+      bool addData(const unsigned char* data, size_t len);
 
       bool serilize(vector<unsigned char>& output) const;
 
