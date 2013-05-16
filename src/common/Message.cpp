@@ -35,6 +35,10 @@ bool Message::addData(const unsigned char* data, size_t s, size_t len) {
   return true;
 }
 
+bool Message::addData(const unsigned char* data, size_t len) {
+  return addData(data, _data.size(), len);
+}
+
 bool Message::serilize(vector<unsigned char>& output) const {
   output.clear();
   output.resize(

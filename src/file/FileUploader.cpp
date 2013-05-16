@@ -1,3 +1,4 @@
+#include "common/Doopey.h"
 #include "file/FileUploader.h"
 #include "common/Message.h"
 #include "block/MetaBlock.h"
@@ -5,8 +6,6 @@
 #include "block/BlockManager.h"
 
 #include <cstring>
-
-#define stringiz(arg) #arg //enum to string
 
 using namespace Doopey;
 
@@ -40,7 +39,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
       //TODO: release the thing has received
       return false;
     }else if( MT_File != msg->getType()){
-      log->error("FileUploader Error: error message type of %s in FileUploader\n", stringiz(msg->getType()));
+      log->error("FileUploader Error: error message type of %s in FileUploader\n", enum2String(msg->getType()));
     }
 
     //decide what to do depend on the command

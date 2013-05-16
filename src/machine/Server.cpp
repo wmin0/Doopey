@@ -1,5 +1,6 @@
 #include "machine/Server.h"
 
+#include "file/FileManager.h"
 #include "block/BlockManager.h"
 #include "common/Doopey.h"
 #include "common/Config.h"
@@ -44,6 +45,7 @@ Server::Server(const SectionCollectionSPtr& section):
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
+<<<<<<< HEAD
   ConfigSPtr config = _sectionCollection->getConfig("global");
   string tmp = config->getValue("UseSpaceMax");
   // TODO: validataion
@@ -54,6 +56,10 @@ Server::Server(const SectionCollectionSPtr& section):
   } else {
     log->info("Server UseSpaceMax: %lld\n", _useSpaceMax);
   }
+=======
+  _fileManager.reset(
+    new FileManager(this, _sectionCollection->getConfig("file")));
+>>>>>>> ee7c859662e5d83122a83dd4074b254a123930d3
 }
 
 Server::~Server() {
@@ -144,7 +150,7 @@ void Server::handleUSR1(int sig) {
   BlockID id = _this->_blockManager->saveBlock((BlockSPtr)block);
   log->debug("save new block %d\n", id);
 */
-  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(1, 100));
+  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(4, 1));
 }
 
 

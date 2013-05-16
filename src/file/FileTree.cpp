@@ -18,6 +18,18 @@ TreeNode::TreeNode()
   _metaID = 0;
 }
 
+TreeNode::~TreeNode()
+{
+  TreeNode* work = _children;
+  TreeNode* next;
+  while(work!=NULL)
+  {
+    next = work->_next;
+    delete work;
+    work = next;
+  }
+}
+
 BlockID TreeNode::getID() const
 {
   return _metaID;
@@ -32,6 +44,9 @@ FileTree::FileTree()
 
 FileTree::~FileTree()
 {
+  log->info("Start release FileTree\n");
+  delete _fileMap;
+  delete _root;
 }
 
 string FileTree::getFirst(string& s)
