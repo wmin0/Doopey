@@ -28,17 +28,17 @@ namespace Doopey{
       FileManager(const Server* server, const ConfigSPtr& config);
       ~FileManager();
 
-      //this function is used to tell which work is requested in msg 
+      //this function is used to tell which work is requested in msg
       void receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket);
 
     private:
       //three function belonging is used to handle different msg
       //which will be catch by receiveQuest()
-      bool handleUpload(SocketSPtr socket); 
+      bool handleUpload(SocketSPtr socket);
       bool handleGetFile(SocketSPtr socket);
       bool handleList(SocketSPtr socket);
 
-      //check the msg type is for FileManager 
+      //check the msg type is for FileManager
       bool checkMsg(const MessageSPtr& msg) const;
 
       MetaDecoderSPtr _decoder;

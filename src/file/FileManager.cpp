@@ -48,9 +48,8 @@ bool FileManager::handleUpload(SocketSPtr socket)
   //let uploader to create meta, receive file and create data block
   _uploader->setBlockManager(_server->getBlockManager());
   _uploader->setFileTree(_fileMap);
+  log->info("FileManager: Start receiving file\n");
   bool result = _uploader->receiveFile(socket);
-
-  //add file into map
 
   //broadcast that here have a new file
 

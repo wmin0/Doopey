@@ -3,6 +3,7 @@
 #include "common/Doopey.h"
 #include "common/Socket.h"
 #include "common/Message.h"
+#include "block/DataBlock.h"
 
 #include <iostream>
 #include <memory>
@@ -10,6 +11,9 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <getopt.h>
 
@@ -27,7 +31,7 @@ Client::~Client() {
 void Client::run(int argc, char** argv) {
   int c = 0;
   struct option long_options[] = {
-    {"ls",   no_argument,       0, 'l'},
+    {"ls",   required_argument, 0, 'l'},
     {"put",  required_argument, 0, 'p'},
     {"get",  required_argument, 0, 'g'},
     {"help", no_argument,       0, 'h'},
@@ -48,6 +52,14 @@ void Client::run(int argc, char** argv) {
         break;
       case 'p':
         cout << "put request" << endl;
+        cout << "filename=" << optarg << endl;
+        if(argv[optind][0] == '-'){
+          cout << "missing the location on remote" << endl;
+          return;
+        }
+        cout << "remove dir=" << argv[optind] << endl;
+        putFile(optarg, argv[optind]);
+        optind++;
         break;
       case 'g':
         cout << "get request" << endl;
@@ -97,7 +109,7 @@ bool Client::getFileList(const char* name)
   Socket socket(ST_TCP);
   if(!socket.connect("localhost", DoopeyPort)){
     cerr << "connect server error" << endl;
-    return 0;
+    return false;
   }
   MessageSPtr msg(new Message(MT_File, MC_RequestList));
   socket.send(msg);
@@ -111,5 +123,91 @@ bool Client::getFileList(const char* name)
 
   for(unsigned int i=0; i<reply->getData().size(); i++)
     cout << reply->getData()[i];
+  socket.close();
   return true;
-} 
+}
+
+bool Client::putFile(const char* filename, const char* dir)
+{
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    cerr << "connet server error" << endl;
+    return false;
+  }
+
+  //read file
+  FILE* pFile;
+  pFile = fopen(filename, "rb");
+  if(pFile == NULL){
+    cerr << "File error\n" << endl;
+    socket.close();
+    return false;
+  }
+
+  //get ctime
+  struct stat* stat_buf = (struct stat*)malloc(sizeof(struct stat));
+  if(0 != lstat(filename, stat_buf)){
+    cerr << "open " << filename << " error" << endl;
+    free(stat_buf);
+    return false;
+  }
+
+  //check the upload filename is really a file
+  if( S_ISDIR( stat_buf->st_mode)){
+    cerr << filename << " is a dir" << endl;
+    free(stat_buf);
+    return false;
+  }
+
+  time_t ctime = stat_buf->st_ctime;
+  uint64_t nameLength = strlen(filename);
+  uint64_t dirLength = strlen(dir);
+  uint64_t totalLength = nameLength + dirLength + 1;
+
+  //clean the stat_buf
+  free(stat_buf);
+
+  log->info("FileName:%s\nRemote Dir:%s\nctime:%d\n", filename, dir, ctime);
+
+  //first message to let dispatcher transfer socket to fileManager
+  MessageSPtr msg(new Message(MT_File, MC_UpFileStart));
+  socket.send(msg);
+
+  //second message to set up the Meta block
+  msg.reset(new Message(MT_File, MC_UpFileMeta));
+  msg->addData((unsigned char*)&totalLength, sizeof(nameLength));
+  msg->addData((unsigned char*)filename, nameLength);
+  msg->addData((unsigned char*)"/", 1);
+  msg->addData((unsigned char*)dir, dirLength);
+  msg->addData((unsigned char*)&ctime, sizeof(ctime));
+  socket.send(msg);
+
+  //start to send the file content
+  log->info("Start transfer data\n");
+  char* buf = (char*)malloc(DataBlock::blockSize);
+  size_t cread;
+  do{
+    cread = fread(buf, 1, DataBlock::blockSize, pFile);
+    if(cread == 0){ //the byte of read is 0
+      if(feof(pFile)) //have read to end of file
+        break;
+      else{ //there is a error
+        cerr << "error while reading file" << endl;
+        return false;
+      }
+    }
+
+    log->info("Read %d bytes and trasmit it\n", cread);
+
+    //prepare the msg of data
+    msg.reset(new Message(MT_File, MC_UpFileData));
+    msg->addData((unsigned char*)buf, cread);
+    socket.send(msg);
+  }while(1);
+
+  //last msg to end the transfer
+  log->info("Finish send the file\n");
+  msg.reset(new Message(MT_File, MC_UpFileEnd));
+
+  return true;
+}
