@@ -28,7 +28,7 @@ namespace Doopey {
       void serve();
 
       void request(const MessageSPtr& msg, const SocketSPtr& sock);
-      //int getSysInfoFreeMemInKB(void);
+      bool getSysInfoFreeMemInKB(const SocketSPtr&);
       bool getSysInfoAvailDisk(const SocketSPtr&);
     private:
       static void handleTERM(int sig);
@@ -58,6 +58,8 @@ namespace Doopey {
       RouterSPtr _router;
       FileManagerSPtr _fileManager;
 
+      uint64_t _useSpaceMax;
+      bool _health;
       // wait lock
       pthread_mutex_t _mutex;
 

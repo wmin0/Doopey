@@ -24,13 +24,15 @@
 #include <sys/statfs.h>
 #include <stdio.h>
 #include <iostream>
+#include <cstring>
 
 using namespace Doopey;
 
 Server* Server::_this = NULL;
 
 Server::Server(const SectionCollectionSPtr& section):
-  _sectionCollection(section), _machineID(0), _machineIDMax(0), _ip("") {
+  _sectionCollection(section), _machineID(0), _machineIDMax(0), _ip(""),
+  _useSpaceMax(0), _health(true) {
   attachSignal();
   setupLocalIP();
 
@@ -42,6 +44,16 @@ Server::Server(const SectionCollectionSPtr& section):
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
+  ConfigSPtr config = _sectionCollection->getConfig("global");
+  string tmp = config->getValue("UseSpaceMax");
+  // TODO: validataion
+  _useSpaceMax = strtoull(tmp.data(), NULL, 10);
+  if (0 == _useSpaceMax) {
+    log->error("Server UseSpaceMax == 0\n");
+    _health = false;
+  } else {
+    log->info("Server UseSpaceMax: %lld\n", _useSpaceMax);
+  }
 }
 
 Server::~Server() {
@@ -80,7 +92,8 @@ void Server::setupLocalIP() {
 }
 
 bool Server::start() {
-  return _blockManager->isHealth() &&
+  return _health &&
+         _blockManager->isHealth() &&
          _dispatcher->start() &&
          _router->start();
 }
@@ -159,8 +172,9 @@ void Server::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     return;
   }
   switch (msg->getCmd()) {
-   // case MC_RequestSysInfoMem:
-   //   getSysInfoFreeMemInKB(sock);
+    case MC_RequestSysInfoMem:
+      getSysInfoFreeMemInKB(sock);
+      break;
     case MC_RequestSysInfoDisk:
       getSysInfoAvailDisk(sock);
       break;
@@ -169,35 +183,54 @@ void Server::request(const MessageSPtr& msg, const SocketSPtr& sock) {
   }
 }
 
-/*
-int Server::getSysInfoFreeMemInKB()
-{
-  FILE *meminfo = fopen("/proc/meminfo", "r");
-  if(meminfo == NULL) {
-    log->waring("file opening error:");
-  }
-  while(fgets(line, sixeof(line), meminfo))
-  {
-    int ram;
-    if(sscanf(line, "MemFree: $d kB", &ram) == 1)
-    {
-      fclose(meminfo);
-      return ram;
-    }
-  }
-  fclose(meminfo);
-  return -1;
 
+bool Server::getSysInfoFreeMemInKB( const SocketSPtr& sock)
+{
+  MessageSPtr ack(new Message(MT_Machine, MC_SysInfoACK));
+
+  FILE *meminfo = popen("grep MemFree /proc/meminfo", "r");
+  char line[256];
+  fgets(line, sizeof(line), meminfo);
+  int ram;
+  log->debug("get line:%s\n", line);
+  sscanf(line, "MemFree: %d kB", &ram);
+  pclose(meminfo);
+
+  ack->addData((unsigned char*)&ram, 0, sizeof(uint64_t));
+  log->info("Server Free Mem: %d\n", ram);
+
+  if (!sock->send(ack)) {
+    log->warning("send SysInfo ack fail\n");
+    return false;
+  }
+
+  return true;
 }
 
-*/
+
 bool Server::getSysInfoAvailDisk(const SocketSPtr& sock)
 {
   MessageSPtr ack(new Message(MT_Machine, MC_SysInfoACK));
+
+  FILE *fp;
+  // TODO: fix block dir
+  fp = popen( "du -s |awk '{print $1}'", "r");
+  char line[256];
+  fgets(line, sizeof(line), fp);
+  pclose(fp);
+
+  uint64_t sizenow = strtoull(line, NULL, 10);
+  uint64_t usage = (_useSpaceMax - sizenow);
+  ack->addData((unsigned char*)&usage, 0, sizeof(uint64_t));
+  log->info("Server Free Space: %d\n", usage);
+
+/*
   string test = "hello world.";
   uint64_t len = test.size();
   ack->addData((unsigned char*)&len, 0, sizeof(uint64_t));
   ack->addData((unsigned char*)test.data(), sizeof(uint64_t), len);
+*/
+
   if (!sock->send(ack)) {
     log->warning("send SysInfo ack fail\n");
     return false;

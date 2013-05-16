@@ -77,16 +77,19 @@ void Client::go() {
     cerr << "connect server error" << endl;
     return;
   }
-  MessageSPtr msg(new Message(MT_Machine, MC_RequestSysInfoDisk));
+  MessageSPtr msg(new Message(MT_Machine, MC_RequestSysInfoMem));
   socket.send(msg);
   MessageSPtr ack = socket.receive();
-  string test;
-  uint64_t len;
-  memcpy(&len, ack->getData().data(), sizeof(uint64_t));
-  cout << "len: " << len << endl;
-  test.resize(len);
-  memcpy(&(test[0]), ack->getData().data() + sizeof(uint64_t), len);
-  cout << "test: " << test << endl;
+  //string test;
+  //uint64_t len;
+  //memcpy(&len, ack->getData().data(), sizeof(uint64_t));
+  //cout << "len: " << len << endl;
+  //test.resize(len);
+  //memcpy(&(test[0]), ack->getData().data() + sizeof(uint64_t), len);
+  //cout << "test: " << test << endl;
+  int mem;
+  memcpy(&mem, ack->getData().data(), sizeof(int));
+  cout << "mem: " << mem << endl;
 }
 
 bool Client::getFileList(const char* name)
