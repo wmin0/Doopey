@@ -127,19 +127,31 @@ void BlockResolver::cleanCache() {
 bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
   bool requestReplica = Block::blockReplica > attr->machine.size();
 
+  MessageSPtr msg(new Message(MT_Block, MC_CheckBlockAlive));
+  msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
   for (size_t i = attr->machine.size() - 1; i >= 0; --i) {
     // TODO: send all replica ?
-    MessageSPtr msg(new Message(MT_Block, MC_CheckBlockAlive));
-    msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
-    SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
-    MessageSPtr ack = sock->receive();
-    if (NULL == ack) {
-      requestReplica = true;
-      attr->machine.erase(attr->machine.begin() + i);
-    }
-    bool result = false;
-    memcpy(&result, ack->getData().data(), sizeof(bool));
-    if (!result) {
+    bool succ = true;
+    do {
+      SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
+      if (NULL == sock) {
+        succ = false;
+        break;
+      }
+      MessageSPtr ack = sock->receive();
+      if (NULL == ack) {
+        succ = false;
+        break;
+      }
+      bool result = false;
+      memcpy(&result, ack->getData().data(), sizeof(bool));
+      if (!result) {
+        succ = false;
+        break;
+      }
+    } while (0);
+    if (!succ) {
+      log->warning("check replica fail: %lld->%d\n", attr->block, attr->machine[i]);
       requestReplica = true;
       attr->machine.erase(attr->machine.begin() + i);
     }
@@ -149,14 +161,14 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
   }
   if (requestReplica) {
     log->debug("request replica: %d->%lld\n", attr->machine[0], attr->block);
-    MessageSPtr msg(new Message(MT_Block, MC_DoReplica));
-    msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    MessageSPtr req(new Message(MT_Block, MC_DoReplica));
+    req->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
     size_t off = sizeof(BlockID);
     for (size_t i = 0; i < attr->machine.size(); ++i) {
-      msg->addData((unsigned char*)&(attr->machine[i]), off, sizeof(MachineID));
+      req->addData((unsigned char*)&(attr->machine[i]), off, sizeof(MachineID));
       off += sizeof(MachineID);
     }
-    _manager->getRouter()->sendTo(attr->machine[0], msg);
+    _manager->getRouter()->sendTo(attr->machine[0], req);
   }
   return true;
 }
