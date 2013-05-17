@@ -29,7 +29,8 @@ using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
-const time_t BlockResolver::checkReplicaInterval = 3600;
+// TODO: test
+const time_t BlockResolver::checkReplicaInterval = 0;
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
@@ -124,7 +125,7 @@ void BlockResolver::cleanCache() {
 }
 
 bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
-  bool requestReplica = Block::blockReplica != attr->machine.size();
+  bool requestReplica = Block::blockReplica > attr->machine.size();
 
   for (size_t i = attr->machine.size() - 1; i >= 0; --i) {
     // TODO: send all replica ?
