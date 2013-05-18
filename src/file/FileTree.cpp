@@ -49,19 +49,6 @@ FileTree::~FileTree()
   delete _root;
 }
 
-string FileTree::getFirst(string& s)
-{
-  size_t idx = s.find_first_of("/");
-  while (idx == 0){
-    s.erase(0, 1);
-    idx = s.find_first_of("/");
-  }
-    
-  string get = s.substr(0, idx);
-  s.erase(0, idx+1);
-  return get;
-}
-
 string FileTree::getFileName(const string& path) const
 {
   return path.substr(path.find_last_of("/")+1);
@@ -84,34 +71,34 @@ TreeNode* FileTree::searchChild(TreeNode* node, const string& name) const
 
 TreeNode* FileTree::searchDir(const string& dirPath)
 {
-  if(dirPath=="")
-    return _root;
-  string path = dirPath;
-  string name = getFileName(dirPath);
-  TreeNode* idx = _root;
-  while(1)
-  {
-    string searchStr = getFirst(path);
-    if(name == searchStr)
-      return searchChild(idx, searchStr);
-    idx = searchChild(idx, searchStr);
-    if(idx==NULL)
-      return NULL;
-  }
+  return _fileMap->getValue(dirPath);
 }
 
 bool FileTree::addFile(const string& path, const BlockID metaID)
 {
-  string dir = path.substr(0, path.find_last_of("/"));
+  //check the file if exist or not
+  if(_fileMap->getValue(path) != NULL)
+    return false;
+
+  //path should be definite path
+  //aplit the path to dirPath and filename
+  string dir;
+  if(path.find_last_of("/")==string::npos)
+    return false;
+  else
+    dir = path.substr(0, path.find_last_of("/"));
   string name = getFileName(path);
   TreeNode* insert = searchDir(dir);
 
+  //check the dir if exist or not
   if(insert == NULL)
     return false;
 
+  //check the dirName is really a dir
   if(insert->_isFile == true)
     return false;
 
+  //used when called by addDir
   if(insert->_children != NULL)
   {
     insert = insert->_children;
@@ -121,6 +108,7 @@ bool FileTree::addFile(const string& path, const BlockID metaID)
     (insert->_next)->_last = insert;
     insert = insert->_next;
   }else{
+  //add file
     insert->_children = new TreeNode();
     (insert->_children)->_parent = insert;
     insert = insert->_children;
@@ -198,15 +186,15 @@ bool FileTree::removeDir(const string& path)
   return true;
 }
 
-BlockID FileTree::getMetaID(const string& filePath)
-{ 
+BlockID FileTree::getMetaID(const string& filePath) const
+{
   TreeNode* tn = _fileMap->getValue(filePath);
   if(tn == NULL)
     return 0;
   else
     return tn->getID();
 }
-vector<string> FileTree::getChildren(const string& filePath)
+vector<string> FileTree::getChildren(const string& filePath) const
 {
   TreeNode* tn = _fileMap->getValue(filePath);
   vector<string> result;
