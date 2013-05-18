@@ -30,6 +30,7 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
   switch(msg->getCmd())
   {
     case MC_UpFileStart:
+      log->info("FileManager: Start to upload file\n");
       handleUpload(socket);
       break;
     case MC_RequestFile:

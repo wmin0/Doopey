@@ -50,22 +50,25 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     {
       //the msg is about the file meta, like filenam, creat time, etc.
       case MC_UpFileMeta:
+        log->info("FileUploader: Set up meta block of file\n");
         if(setupMeta(meta, msg) == false){
-          log->error("Set up meta block error! Msg from %u\n", msg->getSrc());
+          log->error("FileUploader: Set up meta block error! Msg from %u\n", msg->getSrc());
           return false;//one failure should terminate whole file?
         }
         break;
       //the msg is the file data, just receive and split it into different data 
       //block and add the datablock ID into metablock
       case MC_UpFileData:
+        log->info("FileUploader: Receive a data block\n");
         if (setupData(meta, msg) == false){
-          log->error("Set up data block error! Msg from %u\n", msg->getSrc());
+          log->error("FileUploader: Set up data block error! Msg from %u\n", msg->getSrc());
           return false;//one failure should terminate whole file?
         }
         break;
       //this msg means file has been transmitted successfully just check the 
       //meta ID and add it into file directory structure
       case MC_UpFileEnd:
+        log->info("FileUploader: Finish receiving file successfully\n");
         blockID = _blockManager->saveBlock(meta);
         _fileTree->addFile(meta->getFileName(), blockID);
         return true;
@@ -101,6 +104,9 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 
   nameStr.resize(nameLength);
   memcpy(&(nameStr[0]), data.data()+sizeof(nameLength), nameLength);
+
+  log->info("FileUploader: Receive meta:%s, %d\n", nameStr.data(), nameLength);
+
   if( meta->setFileName(nameStr) == false){
     //log->error("Meta Block: set file name failed by %s\n", nameStr.c_str());
     return false;
@@ -117,6 +123,7 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
 
 //data of a msg is equal or less than one block size
 bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
+  log->info("FileUploader: Receiving data of %s\n", meta->getFileName().data());
   vector<unsigned char> msgData = msg->getData();
   if(msgData.size() > DataBlock::blockSize){
     log->error("data exceed block size! Msg from %u\n", msg->getSrc());
