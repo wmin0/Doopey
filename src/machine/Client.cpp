@@ -53,6 +53,7 @@ void Client::run(int argc, char** argv) {
       case 'p':
         cout << "put request" << endl;
         cout << "filename=" << optarg << endl;
+        cout << "optind=" << optind << endl;
         if(argv[optind][0] == '-'){
           cout << "missing the location on remote" << endl;
           return;
