@@ -185,8 +185,9 @@ BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
   log->debug("askBlock %lld\n", id);
   if (_localIDs.end() != _localIDs.find(id)) {
     log->debug("find at local\n");
-    return BlockLocationAttrSPtr(
-      new BlockLocationAttr(id, _manager->getMachineID(), BS_Available));
+    BlockLocationAttrSPtr ans(new BlockLocationAttr(id, 0, BS_Available));
+    ans->addMachine(_manager->getMachineID());
+    return ans;
   }
   BlockMap::iterator it = _remoteIDs.find(id);
   time_t now = time(0);
