@@ -105,8 +105,6 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
   nameStr.resize(nameLength);
   memcpy(&(nameStr[0]), data.data()+sizeof(nameLength), nameLength);
 
-  log->info("FileUploader: Receive meta:%s, %d\n", nameStr.data(), nameLength);
-
   if( meta->setFileName(nameStr) == false){
     //log->error("Meta Block: set file name failed by %s\n", nameStr.c_str());
     return false;
@@ -117,6 +115,8 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
     //log->error("Meta Block: set ctime failed by %s\n", nameStr.c_str());
     return false;
   }
+
+  log->info("FileUploader: Receive meta:%s, ctime=%d\n", nameStr.data(), ctime);
 
   return true;
 }

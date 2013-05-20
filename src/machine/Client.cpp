@@ -163,7 +163,9 @@ bool Client::putFile(const char* filename, const char* dir)
   time_t ctime = stat_buf->st_ctime;
   uint64_t nameLength = strlen(filename);
   uint64_t dirLength = strlen(dir);
-  uint64_t totalLength = nameLength + dirLength + 1;
+  uint64_t totalLength = nameLength + dirLength;
+  if(dir[dirLength-1]!='/')
+    totalLength += 1;
 
   //clean the stat_buf
   free(stat_buf);
@@ -177,9 +179,10 @@ bool Client::putFile(const char* filename, const char* dir)
   //second message to set up the Meta block
   msg.reset(new Message(MT_File, MC_UpFileMeta));
   msg->addData((unsigned char*)&totalLength, sizeof(nameLength));
-  msg->addData((unsigned char*)filename, nameLength);
-  msg->addData((unsigned char*)"/", 1);
   msg->addData((unsigned char*)dir, dirLength);
+  if(dir[dirLength-1]!='/')
+    msg->addData((unsigned char*)"/", 1);
+  msg->addData((unsigned char*)filename, nameLength);
   msg->addData((unsigned char*)&ctime, sizeof(ctime));
   socket.send(msg);
 
@@ -209,6 +212,7 @@ bool Client::putFile(const char* filename, const char* dir)
   //last msg to end the transfer
   log->info("Finish send the file\n");
   msg.reset(new Message(MT_File, MC_UpFileEnd));
+  socket.send(msg);
 
   return true;
 }
