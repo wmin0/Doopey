@@ -39,6 +39,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     //just aboadon the file and return false
     if( NULL==msg){
       //TODO: release the thing has received
+      cleanData(meta);
       return false;
     }else if( MT_File != msg->getType()){
       log->error("FileUploader Error: error message type of %s in FileUploader\n"
@@ -53,8 +54,10 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         log->info("FileUploader: Set up meta block of file\n");
         if(setupMeta(meta, msg) == false){
           log->error("FileUploader: Set up meta block error! Msg from %u\n", msg->getSrc());
+          returnError(socket);        
           return false;//one failure should terminate whole file?
         }
+        returnACK(socket);
         break;
       //the msg is the file data, just receive and split it into different data 
       //block and add the datablock ID into metablock
@@ -62,15 +65,22 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         log->info("FileUploader: Receive a data block\n");
         if (setupData(meta, msg) == false){
           log->error("FileUploader: Set up data block error! Msg from %u\n", msg->getSrc());
+          returnError(socket);
           return false;//one failure should terminate whole file?
         }
+        returnACK(socket);
         break;
       //this msg means file has been transmitted successfully just check the 
       //meta ID and add it into file directory structure
       case MC_UpFileEnd:
         log->info("FileUploader: Finish receiving file successfully\n");
         blockID = _blockManager->saveBlock(meta);
-        _fileTree->addFile(meta->getFileName(), blockID);
+        if(false == _fileTree->addFile(meta->getFileName(), blockID)){
+          log->info("FileUploader: add file into fileTree fail\n");
+          returnError(socket);
+          return false;
+        }
+        returnACK(socket);
         return true;
         break;
       default:
@@ -135,4 +145,20 @@ bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
   if(meta->addDataID(blockID) == false)
     return false;
   return true;
+}
+
+void FileUploader::cleanData(MetaBlockSPtr meta)
+{
+}
+
+void FileUploader::returnACK(SocketSPtr socket)
+{
+  MessageSPtr msg(new Message(MT_File, MC_FileACK));
+  socket->send(msg);
+}
+
+void FileUploader::returnError(SocketSPtr socket)
+{
+  MessageSPtr msg(new Message(MT_File, MC_FileError));
+  socket->send(msg);
 }

@@ -36,6 +36,7 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
     case MC_RequestFile:
       break;
     case MC_RequestList:
+      log->info("FileManager: Receive a request of file list\n");
       handleList(socket);
       break;
     default:
@@ -67,8 +68,8 @@ bool FileManager::handleList(SocketSPtr socket)
   memcpy(&(dirName[0]), msg->getData().data(), size);
 
   //get result by _fileMap
-  //vector<string> result = _fileMap->getChildren(dirName);
-  vector<string> result = _fileMap->getExChildren();
+  vector<string> result = _fileMap->getChildren(dirName);
+  //vector<string> result = _fileMap->getExChildren();
 
   MessageSPtr reply(new Message(MT_File, MC_RequestList));
   for(unsigned int i=0; i<result.size(); i++)

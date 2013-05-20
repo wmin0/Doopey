@@ -185,6 +185,11 @@ bool Client::putFile(const char* filename, const char* dir)
   msg->addData((unsigned char*)filename, nameLength);
   msg->addData((unsigned char*)&ctime, sizeof(ctime));
   socket.send(msg);
+  msg = socket.receive();
+  if(msg->getCmd() != MC_FileACK){
+    log->info("Error when uploading meta\n");
+    return false;
+  }
 
   //start to send the file content
   log->info("Start transfer data\n");
@@ -196,7 +201,7 @@ bool Client::putFile(const char* filename, const char* dir)
       if(feof(pFile)) //have read to end of file
         break;
       else{ //there is a error
-        cerr << "error while reading file" << endl;
+        log->info("error while reading file\n");
         return false;
       }
     }
@@ -207,12 +212,22 @@ bool Client::putFile(const char* filename, const char* dir)
     msg.reset(new Message(MT_File, MC_UpFileData));
     msg->addData((unsigned char*)buf, cread);
     socket.send(msg);
+    msg = socket.receive();
+    if(msg->getCmd() != MC_FileACK){
+      log->info("Error when uploading data\n");
+      return false;
+    }
   }while(1);
 
   //last msg to end the transfer
   log->info("Finish send the file\n");
   msg.reset(new Message(MT_File, MC_UpFileEnd));
   socket.send(msg);
+  msg = socket.receive();
+  if(msg->getCmd() != MC_FileACK){
+    log->info("Error when adding file into fileTree\n");
+    return false;
+  }
 
   return true;
 }

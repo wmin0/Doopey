@@ -33,6 +33,11 @@ namespace Doopey{
       bool setupMeta(MetaBlockSPtr meta, const MessageSPtr msg);
       bool setupData(MetaBlockSPtr meta, const MessageSPtr msg);
 
+      //used when tranmition failed
+      void cleanData(MetaBlockSPtr meta);
+      void returnACK(SocketSPtr socket);
+      void returnError(SocketSPtr socket);
+
       BlockManagerSPtr _blockManager;
       FileTreeSPtr _fileTree;
   };//class FileUploader
