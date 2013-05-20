@@ -35,6 +35,7 @@ namespace Doopey{
       //three function belonging is used to handle different msg
       //which will be catch by receiveQuest()
       bool handleUpload(SocketSPtr socket);
+      bool handleAddDir(SocketSPtr socket);
       bool handleGetFile(SocketSPtr socket);
       bool handleList(SocketSPtr socket);
 

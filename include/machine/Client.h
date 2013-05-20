@@ -17,8 +17,9 @@ namespace Doopey {
     private:
       // TODO: change name XD
       void go();
-      bool getFileList(const char* name);
-      bool putFile(const char* filename, const char* dir);
+      bool getFileList(const char* name) const;
+      bool putFile(const char* filename, const char* dir) const;
+      bool addDir(const char* dirName, const char* dir) const;
   }; // class Client
 
 };  // namespace Doopey

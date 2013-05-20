@@ -33,6 +33,8 @@ void Client::run(int argc, char** argv) {
   struct option long_options[] = {
     {"ls",   required_argument, 0, 'l'},
     {"put",  required_argument, 0, 'p'},
+    {"adDir",required_argument, 0, 'd'},
+    {"rm",   required_argument, 0, 'r'},
     {"get",  required_argument, 0, 'g'},
     {"help", no_argument,       0, 'h'},
     {0,      0,                 0,  0}
@@ -67,6 +69,12 @@ void Client::run(int argc, char** argv) {
         break;
       case 'h':
         cout << "help request" << endl;
+        break;
+      case 'd':
+        cout << "add Dir request" << endl;
+        break;
+      case 'r':
+        cout << "remove file/dir request" << endl;
       case '?':
         break;
       default:
@@ -105,7 +113,7 @@ void Client::go() {
   cout << "mem: " << mem << endl;
 }
 
-bool Client::getFileList(const char* name)
+bool Client::getFileList(const char* name) const
 {
   Socket socket(ST_TCP);
   if(!socket.connect("localhost", DoopeyPort)){
@@ -128,7 +136,7 @@ bool Client::getFileList(const char* name)
   return true;
 }
 
-bool Client::putFile(const char* filename, const char* dir)
+bool Client::putFile(const char* filename, const char* dir) const
 {
   Socket socket(ST_TCP);
   if(!socket.connect("localhost", DoopeyPort)){
@@ -229,5 +237,10 @@ bool Client::putFile(const char* filename, const char* dir)
     return false;
   }
 
+  return true;
+}
+
+bool Client::addDir(const char* dirName, const char* dir) const
+{
   return true;
 }

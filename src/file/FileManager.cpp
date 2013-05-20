@@ -83,6 +83,20 @@ bool FileManager::handleList(SocketSPtr socket)
   return true;
 }
 
+bool FileManager::handleAddDir(SocketSPtr socket)
+{
+  MessageSPtr msg = socket->receive();
+  string dir;
+  unsigned int size = msg->getData().size();
+  dir.resize(size);
+  memcpy(&(dir[0]), msg->getData().data(), size);
+
+  bool result = _fileMap->addDir(dir);
+  msg.reset(new Message(MT_File, result?MC_FileACK:MC_FileError));
+  socket->send(msg);
+  return result;
+}
+
 bool FileManager::handleGetFile(SocketSPtr socket)
 {
   return true;
