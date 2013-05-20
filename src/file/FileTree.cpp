@@ -40,6 +40,7 @@ FileTree::FileTree()
   _root = new TreeNode();
   _root->_name = "/";
   _fileMap = new HashList<string, TreeNode*>();
+  _fileMap->add("/", _root);
 }
 
 FileTree::~FileTree()
@@ -77,26 +78,37 @@ TreeNode* FileTree::searchDir(const string& dirPath)
 bool FileTree::addFile(const string& path, const BlockID metaID)
 {
   //check the file if exist or not
-  if(_fileMap->getValue(path) != NULL)
+  if(_fileMap->getValue(path) != NULL){
+    log->info("FileTree: File %s exists\n", path.data());
     return false;
+  }
 
   //path should be definite path
   //aplit the path to dirPath and filename
   string dir;
-  if(path.find_last_of("/")==string::npos)
+  if(path.find_last_of("/")==string::npos){
+    log->info("FileTree: path %s error\n", path.data());
     return false;
-  else
+  }else if(path.find_last_of("/")==0){
+    dir = "/";
+  }else{
     dir = path.substr(0, path.find_last_of("/"));
+  }
   string name = getFileName(path);
   TreeNode* insert = searchDir(dir);
 
   //check the dir if exist or not
-  if(insert == NULL)
+  if(insert == NULL){
+    log->info("FileTree: dir %s does not exist, please add dir first\n", dir.data());
     return false;
+  }
 
   //check the dirName is really a dir
   if(insert->_isFile == true)
+  {
+    log->info("FileTree: dir name is a file actually\n");
     return false;
+  }
 
   //used when called by addDir
   if(insert->_children != NULL)
@@ -196,6 +208,7 @@ BlockID FileTree::getMetaID(const string& filePath) const
 }
 vector<string> FileTree::getChildren(const string& filePath) const
 {
+  log->info("FileTree: Request file list\n");
   TreeNode* tn = _fileMap->getValue(filePath);
   vector<string> result;
   if(tn != NULL){
