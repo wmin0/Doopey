@@ -45,7 +45,7 @@ string BlockLocationAttr::toString() const {
   stringstream ss("");
   ss << "BlockID: " << block << endl
      << "Status: " << state << endl
-     << "time: " << time(0) - t << endl
+     << "time: " << time(0) - ts << endl
      << "machines: ";
   for (size_t i = 0; i < machine.size(); ++i) {
     ss << machine[i] << " ";
