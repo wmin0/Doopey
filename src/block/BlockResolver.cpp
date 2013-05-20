@@ -130,7 +130,9 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
 
   MessageSPtr msg(new Message(MT_Block, MC_CheckBlockAlive));
   msg->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
-  for (size_t i = attr->machine.size() - 1; i >= 0; --i) {
+  for (size_t i = attr->machine.size() - 1;
+       i >= 0 && i < attr->machine.size();
+       --i) {
     // TODO: send all replica ?
     bool succ = true;
     do {
