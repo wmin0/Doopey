@@ -32,6 +32,7 @@ namespace Doopey {
       void removeMachine(MachineID m);
       // replace m1 to m2
       bool replaceMachine(MachineID m1, MachineID m2);
+      string toString() const;
     public:
       BlockID block;
       vector<MachineID> machine;

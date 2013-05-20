@@ -1,6 +1,8 @@
 #include "block/BlockLocationAttr.h"
 
 #include <algorithm>
+#include <sstream>
+#include <ctime>
 
 using namespace Doopey;
 using namespace std;
@@ -37,4 +39,17 @@ bool BlockLocationAttr::replaceMachine(MachineID m1, MachineID m2) {
   }
   sort(machine.begin(), machine.end());
   return succ;
+}
+
+string BlockLocationAttr::toString() const {
+  stringstream ss("");
+  ss << "BlockID: " << block << endl
+     << "Status: " << state << endl
+     << "time: " << time(0) - t << endl
+     << "machines: ";
+  for (size_t i = 0; i < machine.size(); ++i) {
+    ss << machine[i] << " ";
+  }
+  ss << endl;
+  return ss.str();
 }

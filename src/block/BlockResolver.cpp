@@ -125,6 +125,7 @@ void BlockResolver::cleanCache() {
 }
 
 bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
+  log->debug("CheckReplica: %s\n", attr->toString().data());
   bool requestReplica = Block::blockReplica > attr->machine.size();
 
   MessageSPtr msg(new Message(MT_Block, MC_CheckBlockAlive));
