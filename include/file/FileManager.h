@@ -46,6 +46,7 @@ namespace Doopey{
 
       void returnACK(SocketSPtr socket);
       void returnError(SocketSPtr socket);
+      string getString(const MessageSPtr& msg) const;
 
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;

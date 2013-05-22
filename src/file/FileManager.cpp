@@ -7,6 +7,7 @@
 #include "block/MetaBlock.h"
 #include "machine/Server.h"
 #include "common/Message.h"
+#include "network/Router.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -64,11 +65,23 @@ bool FileManager::handleUpload(SocketSPtr socket)
   _uploader->setBlockManager(_server->getBlockManager());
   _uploader->setFileTree(_fileMap);
   log->info("FileManager: Start receiving file\n");
-  bool result = _uploader->receiveFile(socket);
+  MetaBlockSPtr meta = _uploader->receiveFile(socket);
+
+  if(meta==NULL)
+    return false;
 
   //broadcast that here have a new file
+  //broadcast format: length of name, name, ID of metablock
+  string filename = meta->getFileName();
+  size_t l=filename.length();
+  BlockID id = meta->getID();
+  MessageSPtr msg(new Message(MT_File, MC_BroadcastNewFile));
+  msg->addData((unsigned char*)&l, sizeof(l));
+  msg->addData((unsigned char*)filename.data(), l);
+  msg->addData((unsigned char*)&id, sizeof(id));
+  (_server->getRouter())->broadcast(msg);
 
-  return result;
+  return true;
 }
 
 bool FileManager::handleList(SocketSPtr socket)
@@ -114,21 +127,33 @@ bool FileManager::handleAddDir(SocketSPtr socket)
 
 bool FileManager::handleBroadcast(const MessageSPtr& msg)
 {
+  bool success;
+  string name;
   switch(msg->getCmd())
   {
     case MC_BroadcastNewFile:
+      size_t l;
+      memcpy(&l, msg->getData().data(), sizeof(l));
+      name.resize(l);
+      memcpy(&(name[0]), msg->getData().data()+sizeof(l), l);
+      BlockID meta;
+      memcpy(&meta, msg->getData().data()+sizeof(l)+l, sizeof(meta));
+      success = _fileMap->addFile(name, meta);
       break;
     case MC_BroadcastNewDir:
+      success = _fileMap->addDir(getString(msg));
       break;
     case MC_BroadcastRmFile:
+      success = _fileMap->removeFile(getString(msg));
       break;
     case MC_BroadcastRmDir:
+      success = _fileMap->removeDir(getString(msg));
       break;
     default:
       log->error("FileManager: Error msg cmd\n");
       return false;
   }
-  return true;
+  return success;
 }
 
 bool FileManager::handleGetFile(SocketSPtr socket)
@@ -166,4 +191,13 @@ void FileManager::returnError(SocketSPtr socket)
 {
   MessageSPtr msg(new Message(MT_File, MC_FileError));
   socket->send(msg);
+}
+
+string FileManager::getString(const MessageSPtr& msg) const
+{
+  string name;
+  size_t l=msg->getData().size();
+  name.resize(l);
+  memcpy(&(name[0]), msg->getData().data(), l);
+  return name;
 }

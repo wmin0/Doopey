@@ -19,13 +19,13 @@ FileUploader::~FileUploader()
 {
 }
 
-bool FileUploader::receiveFile(SocketSPtr socket)
+MetaBlockSPtr FileUploader::receiveFile(SocketSPtr socket)
 {
   //for sure that blockManager has been set up
   if(_blockManager == NULL)
   {
     log->error("FileUploader Error: haven't initialize block manager");
-    return false;
+    return NULL;
   }
 
   MetaBlockSPtr meta = _blockManager->newMeta();
@@ -40,7 +40,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     if( NULL==msg){
       //TODO: release the thing has received
       cleanData(meta);
-      return false;
+      return NULL;
     }else if( MT_File != msg->getType()){
       log->error("FileUploader Error: error message type of %s in FileUploader\n"
         , enum2String(msg->getType()));
@@ -55,7 +55,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         if(setupMeta(meta, msg) == false){
           log->error("FileUploader: Set up meta block error! Msg from %u\n", msg->getSrc());
           returnError(socket);        
-          return false;//one failure should terminate whole file?
+          return NULL;//one failure should terminate whole file?
         }
         returnACK(socket);
         break;
@@ -66,7 +66,7 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         if (setupData(meta, msg) == false){
           log->error("FileUploader: Set up data block error! Msg from %u\n", msg->getSrc());
           returnError(socket);
-          return false;//one failure should terminate whole file?
+          return NULL;//one failure should terminate whole file?
         }
         returnACK(socket);
         break;
@@ -78,10 +78,10 @@ bool FileUploader::receiveFile(SocketSPtr socket)
         if(false == _fileTree->addFile(meta->getFileName(), blockID)){
           log->info("FileUploader: add file into fileTree fail\n");
           returnError(socket);
-          return false;
+          return NULL;
         }
         returnACK(socket);
-        return true;
+        return meta;
         break;
       default:
         log->error("FileUploader Error: Unknown command!\n");
@@ -89,7 +89,6 @@ bool FileUploader::receiveFile(SocketSPtr socket)
     }
   }
 
-  return true;;
 }
 
 void FileUploader::setBlockManager(const BlockManagerSPtr blockManager)

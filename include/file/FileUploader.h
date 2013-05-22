@@ -9,6 +9,7 @@
 #include "common/Socket.h"
 #include "block/BlockManager.h"
 #include "file/FileManager.h"
+#include "network/Router.h"
 
 using std::shared_ptr;
 using std::string;
@@ -25,7 +26,7 @@ namespace Doopey{
 
     public:
       ~FileUploader();
-      bool receiveFile(SocketSPtr socket);
+      MetaBlockSPtr receiveFile(SocketSPtr socket);
       void setBlockManager(const BlockManagerSPtr blockManager);
       void setFileTree(FileTreeSPtr tree);
     private:
