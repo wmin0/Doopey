@@ -32,7 +32,7 @@ void Client::run(int argc, char** argv) {
   int c = 0;
   struct option long_options[] = {
     {"ls",   required_argument, 0, 'l'},
-    {"put",  required_argument, 0, 'p'},
+    {"put",  required_argument, 0, 'p'},//use two parameter
     {"adDir",required_argument, 0, 'd'},
     {"rm",   required_argument, 0, 'r'},
     {"get",  required_argument, 0, 'g'},
@@ -60,7 +60,7 @@ void Client::run(int argc, char** argv) {
           cout << "missing the location on remote" << endl;
           return;
         }
-        cout << "remove dir=" << argv[optind] << endl;
+        cout << "remote dir=" << argv[optind] << endl;
         putFile(optarg, argv[optind]);
         optind++;
         break;
@@ -72,6 +72,7 @@ void Client::run(int argc, char** argv) {
         break;
       case 'd':
         cout << "add Dir request" << endl;
+        addDir(optarg);
         break;
       case 'r':
         cout << "remove file/dir request" << endl;
@@ -240,7 +241,26 @@ bool Client::putFile(const char* filename, const char* dir) const
   return true;
 }
 
-bool Client::addDir(const char* dirName, const char* dir) const
+bool Client::addDir(const char* dirName) const
 {
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    log->info("Error when connect to server\n");
+    return false;
+  }
+
+  MessageSPtr msg(new Message(MT_File, MC_NewDir));
+  socket.send(msg);
+
+  msg.reset(new Message(MT_File, MC_NewDir));
+  msg->addData((unsigned char*)dirName, strlen(dirName));
+  socket.send(msg);
+
+  msg=socket.receive();
+  if(msg->getCmd() != MC_FileACK){
+    log->info("Error when add new directory\n");
+    return false;
+  }
+
   return true;
 }

@@ -39,6 +39,19 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
       log->info("FileManager: Receive a request of file list\n");
       handleList(socket);
       break;
+    case MC_NewDir:
+      handleAddDir(socket);
+      break;
+    case MC_RmDir:
+    case MC_RmFile:
+      handleRemove(socket);
+      break;
+    case MC_BroadcastNewFile:
+    case MC_BroadcastNewDir:
+    case MC_BroadcastRmFile:
+    case MC_BroadcastRmDir:
+      handleBroadcast(msg);
+      break;
     default:
       log->warning("FileManager: error message command!\n");
       break;
@@ -77,7 +90,7 @@ bool FileManager::handleList(SocketSPtr socket)
     reply->addData((unsigned char*)result[i].data(), result[i].length());
     reply->addData((const unsigned char*)"\n", 1);
   }
-  socket->send(reply);
+   socket->send(reply);
 
   //return result to the client which request
   return true;
@@ -91,10 +104,31 @@ bool FileManager::handleAddDir(SocketSPtr socket)
   dir.resize(size);
   memcpy(&(dir[0]), msg->getData().data(), size);
 
-  bool result = _fileMap->addDir(dir);
-  msg.reset(new Message(MT_File, result?MC_FileACK:MC_FileError));
-  socket->send(msg);
-  return result;
+  bool success = _fileMap->addDir(dir);
+  if(success)
+    returnACK(socket);
+  else
+    returnError(socket);
+  return success;
+}
+
+bool FileManager::handleBroadcast(const MessageSPtr& msg)
+{
+  switch(msg->getCmd())
+  {
+    case MC_BroadcastNewFile:
+      break;
+    case MC_BroadcastNewDir:
+      break;
+    case MC_BroadcastRmFile:
+      break;
+    case MC_BroadcastRmDir:
+      break;
+    default:
+      log->error("FileManager: Error msg cmd\n");
+      return false;
+  }
+  return true;
 }
 
 bool FileManager::handleGetFile(SocketSPtr socket)
@@ -115,4 +149,21 @@ bool FileManager::checkMsg(const MessageSPtr& msg) const
     return false;
   }
   return true;
+}
+
+bool FileManager::handleRemove(SocketSPtr socket)
+{
+  return true;
+}
+
+void FileManager::returnACK(SocketSPtr socket)
+{
+  MessageSPtr msg(new Message(MT_File, MC_FileACK));
+  socket->send(msg);
+}
+
+void FileManager::returnError(SocketSPtr socket)
+{
+  MessageSPtr msg(new Message(MT_File, MC_FileError));
+  socket->send(msg);
 }

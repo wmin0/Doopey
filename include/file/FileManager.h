@@ -38,9 +38,14 @@ namespace Doopey{
       bool handleAddDir(SocketSPtr socket);
       bool handleGetFile(SocketSPtr socket);
       bool handleList(SocketSPtr socket);
+      bool handleRemove(SocketSPtr socket);
+      bool handleBroadcast(const MessageSPtr& msg);
 
       //check the msg type is for FileManager
       bool checkMsg(const MessageSPtr& msg) const;
+
+      void returnACK(SocketSPtr socket);
+      void returnError(SocketSPtr socket);
 
       MetaDecoderSPtr _decoder;
       FileUploaderSPtr _uploader;

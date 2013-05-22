@@ -33,10 +33,21 @@ namespace Doopey {
     MC_RequestFile,
     // means client want to see the list in the path he requst
     MC_RequestList,
+    // Add directory
+    MC_NewDir,
+    // Remove directory
+    MC_RmDir,
+    // Remove file
+    MC_RmFile,
     // common File ACK
     MC_FileACK,
     // File Error
     MC_FileError,
+    // broadcast
+    MC_BroadcastNewFile,
+    MC_BroadcastNewDir,
+    MC_BroadcastRmFile,
+    MC_BroadcastRmDir,
     // -------------------------------------------------------------------------
     // Command used by Router --------------------------------------------------
     // Common Router ACK

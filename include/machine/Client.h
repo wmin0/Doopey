@@ -19,7 +19,7 @@ namespace Doopey {
       void go();
       bool getFileList(const char* name) const;
       bool putFile(const char* filename, const char* dir) const;
-      bool addDir(const char* dirName, const char* dir) const;
+      bool addDir(const char* dirName) const;
   }; // class Client
 
 };  // namespace Doopey
