@@ -177,8 +177,36 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
 }
 
 MachineID BlockResolver::chooseReplica(const BlockLocationAttrSPtr& attr) {
-  // TODO: load balance
-  return attr->machine[0];
+  //wait for test : load balance
+
+  int maxmem = 0;
+  int mem = 0;
+  size_t a = 0;
+  MessageSPtr req(new Message(MT_Machine, MC_RequestSysInfoMem));
+
+  for (size_t i = 0; i < attr->machine.size(); ++i) {
+    SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], req);
+    if (sock == NULL) {
+      log->error("connet machine %d error\n", attr->machine[i]);
+      continue;
+    }
+
+    MessageSPtr ack = sock->receive();
+    if (ack == NULL) {
+      log->error("lose machine %d 's ack\n", attr->machine[i]);
+      continue;
+    }
+
+    memcpy(&mem, ack->getData().data(), sizeof(int));
+    //cout << "mem: " << mem << endl;
+
+    if (mem > maxmem) {
+      maxmem = mem;
+      a = i;
+    }
+  }
+
+  return attr->machine[a];
 }
 
 BlockLocationAttrSPtr BlockResolver::askBlock(BlockID id) {
