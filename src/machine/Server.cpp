@@ -75,7 +75,7 @@ void Server::setupLocalIP() {
   getifaddrs(&ifAddrStruct);
 
   for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-      if (AF_INET == ifa->ifa_addr->sa_family) { // check it is IP4
+      if (ifa->ifa_addr!=NULL && AF_INET == ifa->ifa_addr->sa_family) { // check it is IP4
         // is a valid IP4 Address
         tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
         char addressBuffer[INET_ADDRSTRLEN];
