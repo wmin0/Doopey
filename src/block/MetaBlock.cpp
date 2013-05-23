@@ -22,7 +22,7 @@ bool MetaBlock::setFileName(string& name)
 
   //setup pointer of filename
   if(_filename == NULL)
-    _filename = (char*)(_nameLength + sizeof(uint64_t));
+    _filename = (char*)(_data + sizeof(uint64_t));
   else{
     log->warning("MetaBlock: \
                   change filename means reuse this MetaBlock\n");
@@ -72,12 +72,15 @@ bool MetaBlock::addDataID(BlockID id)
     return false;
   }
   if(_blockNumber == NULL){
-    _blockNumber = (uint64_t*)(_ctime + sizeof(time_t));
-    _firstBlockID = (BlockID*)( _blockNumber + sizeof(uint64_t));
+    char* op = (char*)_ctime;
+    op += sizeof(time_t);
+    _blockNumber = (uint64_t*)op;
+    op += sizeof(uint64_t);
+    _firstBlockID = (BlockID*)op;
     *_blockNumber = 0;
   }
-  
-  BlockID* save = _firstBlockID + (*_blockNumber)*sizeof(BlockID);
+ 
+  BlockID* save = _firstBlockID + (*_blockNumber);
   *_blockNumber = *_blockNumber + 1;
   *save = id;
 
