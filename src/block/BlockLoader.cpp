@@ -9,9 +9,11 @@
 #include "common/Socket.h"
 #include "common/Message.h"
 
-#include <fstream>
-#include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <memory.h>
+#include <unistd.h>
 
 using namespace Doopey;
 using namespace std;
@@ -63,14 +65,14 @@ unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
   do {
     if (atLocal) {
       string path = _manager->convertBlockIDToPath(attr->block);
-      fstream file(path, fstream::in | fstream::binary);
-      if (!file.good()) {
+      int file = open(path.data(), O_RDONLY);
+      if (file <= 0) {
         log->warning("load %s fail\n", path.data());
         break;
       }
       log->debug("load %s\n", path.data());
-      file >> mem;
-      file.close();
+      read(file, mem, Block::blockSize);
+      close(file);
       succ = true;
     } else {
       RouterSPtr router = _manager->getRouter();
@@ -140,12 +142,12 @@ bool BlockLoader::handleRequestBlockData(const SocketSPtr& sock, const MessageSP
     return false;
   }
   string path = _manager->convertBlockIDToPath(id);
-  fstream file(path, fstream::in | fstream::binary);
-  if (!file.good()) {
+  int file = open(path.data(), O_RDONLY);
+  if (file <= 0) {
     return false;
   }
-  file >> mem;
-  file.close();
+  read(file, mem, Block::blockSize);
+  close(file);
   MessageSPtr ack(new Message(MT_Block, MC_BlockACK));
   ack->addData(mem, 0, Block::blockSize);
   sock->send(ack);
