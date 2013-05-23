@@ -7,6 +7,7 @@
 using namespace Doopey;
 using std::string;
 using std::vector;
+using std::to_string;
 
 TreeNode::TreeNode()
 {
@@ -231,5 +232,28 @@ vector<string> FileTree::getExChildren()
   result.insert(result.begin(), "a");
   result.insert(result.begin(), "b");
   result.insert(result.begin(), "c");
+  return result;
+}
+
+string FileTree::getTotalTree()
+{
+  return getTotalNode(_root);
+}
+
+string FileTree::getTotalNode(const TreeNode* tn)
+{
+  string result = tn->_name;
+  result = result + ',';
+  if(tn->_isFile)
+    result +=to_string(tn->getID());
+  else
+    result += to_string(0);
+  result = result + ":";
+  TreeNode* working = tn->_children;
+  while(working!=NULL)
+  {
+    result = result + getTotalNode(working);
+    working = working->_next;
+  }
   return result;
 }

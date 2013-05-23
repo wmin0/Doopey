@@ -66,6 +66,8 @@ namespace Doopey{
       BlockID getMetaID(const string& filePath) const;
       vector<string> getChildren(const string& filePath) const;
 
+      string getTotalTree();
+
       //used to debug only return a,b,c
       vector<string> getExChildren();
     private:
@@ -76,6 +78,8 @@ namespace Doopey{
 
       TreeNode* _root;
       HashList<string, TreeNode*>* _fileMap;
+
+      string getTotalNode(const TreeNode* tn);
 
     friend class FileTreeTest;
   };//class FileTree
