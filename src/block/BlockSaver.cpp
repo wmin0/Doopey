@@ -6,10 +6,12 @@
 
 #include "common/Doopey.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <iostream>
-#include <iomanip>
-#include <fstream>
 #include <sstream>
+#include <unistd.h>
 
 using namespace Doopey;
 using namespace std;
@@ -30,16 +32,18 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
   }
   // get a new ID for file name
   string path = _manager->convertBlockIDToPath(newLocalBID);
-  fstream file(path, fstream::out | fstream::binary);
-  //create new file, filename is "locatDir+newLocalBID"
 
-  if (!file.good()){
-    log->error("create file failed.");
+  //create new file, filename is "locatDir+newLocalBID"
+  int file = open(
+    path.data(),
+    O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+  if (file <= 0){
+    log->error("create file failed: %s\n", path.data());
     return 0;
   } else {
-    file << block->_data;
+    write(file, block->_data, Block::blockSize);
     //log->debug("write data: %s\n", block->_data);
-    file.close();
+    close(file);
     resolver->addLocalID(newLocalBID);
     return newLocalBID;
   }

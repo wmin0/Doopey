@@ -177,10 +177,10 @@ void Server::request(const MessageSPtr& msg, const SocketSPtr& sock) {
   }
   switch (msg->getCmd()) {
     case MC_RequestSysInfoMem:
-      getSysInfoFreeMemInKB(sock);
+      handleRequestSysInfoMem(sock);
       break;
     case MC_RequestSysInfoDisk:
-      getSysInfoAvailDisk(sock);
+      handleRequestSysInfoDisk(sock);
       break;
     default:
       break;
@@ -188,7 +188,7 @@ void Server::request(const MessageSPtr& msg, const SocketSPtr& sock) {
 }
 
 
-bool Server::getSysInfoFreeMemInKB( const SocketSPtr& sock)
+bool Server::handleRequestSysInfoMem( const SocketSPtr& sock)
 {
   MessageSPtr ack(new Message(MT_Machine, MC_SysInfoACK));
 
@@ -212,12 +212,15 @@ bool Server::getSysInfoFreeMemInKB( const SocketSPtr& sock)
 }
 
 
-bool Server::getSysInfoAvailDisk(const SocketSPtr& sock)
+bool Server::handleRequestSysInfoDisk(const SocketSPtr& sock)
 {
   MessageSPtr ack(new Message(MT_Machine, MC_SysInfoACK));
 
   FILE *fp;
-  // TODO: fix block dir
+  ConfigSPtr config=_sectionCollection->getConfig("block");
+  string dir = config->getValue("BlockDir");
+  log->info("%s\n", dir.data());
+  chdir(dir.data());
   fp = popen( "du -s |awk '{print $1}'", "r");
   char line[256];
   fgets(line, sizeof(line), fp);
