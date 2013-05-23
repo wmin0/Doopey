@@ -208,13 +208,17 @@ BlockID FileTree::getMetaID(const string& filePath) const
 }
 vector<string> FileTree::getChildren(const string& filePath) const
 {
-  log->info("FileTree: Request file list\n");
+  log->info("FileTree: Request file list of %s\n", filePath.data());
   TreeNode* tn = _fileMap->getValue(filePath);
   vector<string> result;
+  string addString;
   if(tn != NULL){
     TreeNode* working = tn->_children;
     while(working!=NULL){
-      result.insert(result.begin(), working->_name);
+      addString = working->_name;
+      if(!working->_isFile)
+        addString = addString + "/";
+      result.insert(result.begin(), addString);
       working = working->_next;
     }
   }
