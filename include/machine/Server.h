@@ -28,8 +28,8 @@ namespace Doopey {
       void serve();
 
       void request(const MessageSPtr& msg, const SocketSPtr& sock);
-      bool getSysInfoFreeMemInKB(const SocketSPtr&);
-      bool getSysInfoAvailDisk(const SocketSPtr&);
+      bool handleRequestSysInfoMem(const SocketSPtr&);
+      bool handleRequestSysInfoDisk(const SocketSPtr&);
     private:
       static void handleTERM(int sig);
       static void handleINT(int sig);

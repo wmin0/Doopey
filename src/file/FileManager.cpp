@@ -147,6 +147,8 @@ bool FileManager::handleBroadcast(const MessageSPtr& msg)
       memcpy(&(name[0]), msg->getData().data()+sizeof(l), l);
       BlockID meta;
       memcpy(&meta, msg->getData().data()+sizeof(l)+l, sizeof(meta));
+      log->info("FileManager: receive a broadcast of adding new file %s, %d\n"
+        , name.data(), meta);
       success = _fileMap->addFile(name, meta);
       break;
     case MC_BroadcastNewDir:
