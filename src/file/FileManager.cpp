@@ -124,6 +124,9 @@ bool FileManager::handleAddDir(SocketSPtr socket)
   if(success){
     returnACK(socket);
     log->info("FileManager: Add dir successfully\n");
+    msg.reset(new Message(MT_File, MC_BroadcastNewDir));
+    msg->addData((unsigned char*)dir.data(), size);
+    (_server->getRouter())->broadcast(msg);
   }else{
     log->info("FileManager: Add dir fail\n");
     returnError(socket);
