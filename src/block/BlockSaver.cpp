@@ -45,6 +45,7 @@ BlockID BlockSaver::saveBlock(const BlockSPtr& block) {
     //log->debug("write data: %s\n", block->_data);
     close(file);
     resolver->addLocalID(newLocalBID);
+    block->setID(newLocalBID);
     return newLocalBID;
   }
 }
