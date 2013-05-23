@@ -41,7 +41,7 @@ void Client::run(int argc, char** argv) {
   };
   while (1) {
     int option_index = 0;
-    c = getopt_long(argc, argv, "l:p:g:h", long_options, &option_index);
+    c = getopt_long(argc, argv, "d:r:l:p:g:h", long_options, &option_index);
     if (-1 == c) {
       break;
     }

@@ -41,6 +41,7 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
       handleList(socket);
       break;
     case MC_NewDir:
+      log->info("FileManager: Receive a request of adding dir\n");
       handleAddDir(socket);
       break;
     case MC_RmDir:
@@ -117,11 +118,16 @@ bool FileManager::handleAddDir(SocketSPtr socket)
   dir.resize(size);
   memcpy(&(dir[0]), msg->getData().data(), size);
 
+  log->info("FileManager: Add dir %s\n", dir.data());
+
   bool success = _fileMap->addDir(dir);
-  if(success)
+  if(success){
     returnACK(socket);
-  else
+    log->info("FileManager: Add dir successfully\n");
+  }else{
+    log->info("FileManager: Add dir fail\n");
     returnError(socket);
+  }
   return success;
 }
 
