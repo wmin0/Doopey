@@ -170,6 +170,7 @@ bool Client::putFile(const char* filename, const char* dir) const
   }
 
   time_t ctime = stat_buf->st_ctime;
+  size_t size = stat_buf->st_size;
   uint64_t nameLength = strlen(filename);
   uint64_t dirLength = strlen(dir);
   uint64_t totalLength = nameLength + dirLength;
@@ -193,6 +194,7 @@ bool Client::putFile(const char* filename, const char* dir) const
     msg->addData((unsigned char*)"/", 1);
   msg->addData((unsigned char*)filename, nameLength);
   msg->addData((unsigned char*)&ctime, sizeof(ctime));
+  msg->addData((unsigned char*)&size, sizeof(size));
   socket.send(msg);
   msg = socket.receive();
   if(msg->getCmd() != MC_FileACK){

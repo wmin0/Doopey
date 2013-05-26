@@ -54,7 +54,7 @@ MetaBlockSPtr FileUploader::receiveFile(SocketSPtr socket)
         log->info("FileUploader: Set up meta block of file\n");
         if(setupMeta(meta, msg) == false){
           log->error("FileUploader: Set up meta block error! Msg from %u\n", msg->getSrc());
-          returnError(socket);        
+          returnError(socket);
           return NULL;//one failure should terminate whole file?
         }
         returnACK(socket);
@@ -107,6 +107,7 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
   vector<unsigned char> data;
   string nameStr;
   time_t ctime;
+  size_t size;
 
   data = msg->getData();
   memcpy(&nameLength, data.data(), sizeof(nameLength));
@@ -125,7 +126,14 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
     return false;
   }
 
-  log->info("FileUploader: Receive meta:%s, ctime=%d\n", nameStr.data(), ctime);
+  memcpy(&size, data.data()+sizeof(nameLength)+nameLength+sizeof(time_t), sizeof(size_t));
+  if( meta->setFileSize(size) == false ){
+    //log->error("Meta Block: set size failed by %s\n", nameStr.c_str());
+    return false;
+  }
+
+  log->info("FileUploader: Receive meta of %s, ctime=%d, file size=%d\n", 
+              nameStr.data(), ctime, size);
 
   return true;
 }
