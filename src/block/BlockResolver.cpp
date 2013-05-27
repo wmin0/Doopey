@@ -115,6 +115,10 @@ void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
   _remoteIDs[id] = attr;
 }
 
+void BlockResolver::removeRemoteID(BlockID id) {
+  _remoteIDs.erase(id);
+}
+
 void BlockResolver::cleanCache() {
   // TODO: maybe use LRU?
 
@@ -160,6 +164,7 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
     }
   }
   if (0 == attr->machine.size()) {
+    _remoteIDs.erase(attr->block);
     return false;
   }
   if (requestReplica) {

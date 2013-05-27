@@ -27,7 +27,8 @@ namespace Doopey {
       BlockLocationAttrSPtr askLocalBlockDetail(BlockID id);
       BlockID newLocalID();
       void addLocalID(BlockID id);
-      //void removeID(BlockID id);
+
+      void removeRemoteID(BlockID id);
 
       bool isHealth() const { return _health; }
 

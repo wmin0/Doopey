@@ -5,6 +5,7 @@
 #include "block/DataBlock.h"
 #include "block/MetaBlock.h"
 #include "block/BlockManager.h"
+#include "block/BlockResolver.h"
 #include "network/Router.h"
 #include "common/Socket.h"
 #include "common/Message.h"
@@ -100,6 +101,7 @@ unsigned char* BlockLoader::getData(const BlockLocationAttrSPtr& attr) const {
     }
   } while(0);
   if (!succ) {
+    _manager->getBlockResolver()->removeRemoteID(attr->block);
     delete[] mem;
     mem = NULL;
   }

@@ -24,7 +24,10 @@ void BlockUpdater::updateRemoteBlockInfo(const BlockLocationAttrSPtr& attr) {
   off += sizeof(MachineID);
   }
   const RouterSPtr router = _manager->getRouter();
+/*
   for (size_t i = 0; i < attr->machine.size(); ++i) {
     router->sendTo(attr->machine[i], msg);
   }
+*/
+  router->broadcast(msg);
 }
