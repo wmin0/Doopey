@@ -196,12 +196,12 @@ bool Server::handleRequestSysInfoMem( const SocketSPtr& sock)
   char line[256];
   fgets(line, sizeof(line), meminfo);
   int ram;
-  log->debug("get line:%s\n", line);
+  //log->debug("get line:%s\n", line);
   sscanf(line, "MemFree: %d kB", &ram);
   pclose(meminfo);
 
   ack->addData((unsigned char*)&ram, 0, sizeof(uint64_t));
-  log->info("Server Free Mem: %d\n", ram);
+  log->debug("Server Free Mem: %d\n", ram);
 
   if (!sock->send(ack)) {
     log->warning("send SysInfo ack fail\n");
@@ -219,7 +219,7 @@ bool Server::handleRequestSysInfoDisk(const SocketSPtr& sock)
   FILE *fp;
   ConfigSPtr config=_sectionCollection->getConfig("block");
   string dir = config->getValue("BlockDir");
-  log->info("%s\n", dir.data());
+  //log->info("%s\n", dir.data());
   chdir(dir.data());
   fp = popen( "du -s |awk '{print $1}'", "r");
   char line[256];
@@ -229,7 +229,7 @@ bool Server::handleRequestSysInfoDisk(const SocketSPtr& sock)
   uint64_t sizenow = strtoull(line, NULL, 10);
   uint64_t usage = (_useSpaceMax - sizenow);
   ack->addData((unsigned char*)&usage, 0, sizeof(uint64_t));
-  log->info("Server Free Space: %d\n", usage);
+  log->debug("Server Free Space: %d\n", usage);
 
 /*
   string test = "hello world.";

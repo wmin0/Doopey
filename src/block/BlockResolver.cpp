@@ -29,7 +29,7 @@ using std::stringstream;
 
 const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
-// TODO: test
+// TODO: adjust after test
 const time_t BlockResolver::checkReplicaInterval = 0;
 
 BlockResolver::BlockResolver(
@@ -177,8 +177,6 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
 }
 
 MachineID BlockResolver::chooseReplica(const BlockLocationAttrSPtr& attr) {
-  //wait for test : load balance
-
   int maxmem = 0;
   int mem = 0;
   size_t a = 0;
