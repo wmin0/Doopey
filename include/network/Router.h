@@ -45,6 +45,8 @@ namespace Doopey {
       vector<MachineID> pickMachineBesideList(
         const vector<MachineID>& list, size_t num) const;
 
+      string askMachineIP(const MachineID& id) const;
+
     private:
       // routing operation functions
       bool addRoutingPath(

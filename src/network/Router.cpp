@@ -470,3 +470,11 @@ bool Router::handleCheckRepeatMachineID(
   }
   return true;
 }
+
+string Router::askMachineIP(const MachineID& id) const {
+  RoutingMap::const_iterator it = _routingTable.find(id);
+  if (_routingTable.end() == it) {
+    return "";
+  }
+  return it->second.ip;
+}
