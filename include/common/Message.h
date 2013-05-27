@@ -80,6 +80,10 @@ namespace Doopey {
     MC_UpdateReplica,
     // Remote Copy Block Request
     MC_CopyBlockFromRemote,
+    // Delete Block Start
+    MC_DoDelete,
+    // Delete Block
+    MC_DeleteBlock,
     //--------------------------------------------------------------------------
     // Command used by Machine -------------------------------------------------
     // ACK for RequestSysInfo

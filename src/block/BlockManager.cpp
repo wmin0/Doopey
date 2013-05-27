@@ -89,6 +89,24 @@ BlockID BlockManager::saveBlock(const BlockSPtr& block) {
   return newID;
 }
 
+void BlockManager::deleteBlock(BlockID id) {
+  // TODO:
+  BlockLocationAttrSPtr attr = _resolver->askBlockDetail(id);
+  if (NULL == attr) {
+    return;
+  }
+  if (0 == attr->machine.size()) {
+    return;
+  }
+  MessageSPtr msg(new Message(MT_Block, MC_DoDelete));
+  msg->addData((unsigned char*)&id, sizeof(BlockID));
+  if (getMachineID() == attr->machine[0]) {
+    handleDoDelete(msg);
+  } else {
+    getRouter()->sendTo(attr->machine[0], msg);
+  }
+}
+
 string BlockManager::convertBlockIDToPath(const BlockID& id) const {
   stringstream ss("");
   ss << _localDir << "/"
@@ -124,6 +142,12 @@ void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
     case MC_CopyBlockFromRemote:
       handleCopyBlockFromRemote(sock, msg);
       break;
+    case MC_DoDelete:
+      handleDoDelete(msg);
+      break;
+    case MC_DeleteBlock:
+      handleDeleteBlock(msg);
+      break;
     default:
       break;
   }
@@ -133,9 +157,13 @@ bool BlockManager::handleDoReplica(const MessageSPtr& msg) {
   // TODO:
   BlockID id;
   memcpy(&id, msg->getData().data(), sizeof(BlockID));
-  BlockLocationAttrSPtr attr = _resolver->askLocalBlockDetail(id);
+  BlockLocationAttrSPtr attr = _resolver->askBlockDetail(id);
   if (NULL == attr) {
     log->warning("receive wrong DoReplica Request: %lld\n", id);
+    return false;
+  }
+  if (BS_Available != attr->state) {
+    log->warning("invalid request replica: %lld\n", id);
     return false;
   }
   // change to remote list
@@ -182,5 +210,31 @@ bool BlockManager::handleCopyBlockFromRemote(
       sock->send(ack);
     }
   }
+  return true;
+}
+
+bool BlockManager::handleDoDelete(const MessageSPtr& msg) {
+  BlockID id;
+  memcpy(&id, msg->getData().data(), sizeof(Block));
+
+  BlockLocationAttrSPtr attr = _resolver->askBlockDetail(id);
+  if (NULL == attr) {
+    log->warning("invalid delete %lld\n", id);
+    return false;
+  }
+  // keep state
+  attr->state = BS_Deleting;
+  MessageSPtr cmd(new Message(MT_Block, MC_DeleteBlock));
+  cmd->addData(msg->getData().data(), sizeof(Block));
+  for (size_t i = 1; i < attr->machine.size(); ++i) {
+    getRouter()->sendTo(attr->machine[i], cmd);
+  }
+  return handleDeleteBlock(cmd);
+}
+
+bool BlockManager::handleDeleteBlock(const MessageSPtr& msg) {
+  BlockID id;
+  memcpy(&id, msg->getData().data(), sizeof(Block));
+  _resolver->removeLocalID(id);
   return true;
 }

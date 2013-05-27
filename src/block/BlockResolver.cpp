@@ -107,6 +107,7 @@ void BlockResolver::forceAddLocalID(BlockID id) {
   attr->addMachine(_manager->getMachineID());
   log->debug("add local ID: %lld\n", id);
   _localIDs[id] = attr;
+  _remoteIDs.erase(id);
 }
 
 void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
@@ -117,6 +118,13 @@ void BlockResolver::forceAddRemoteID(MachineID m, BlockID id) {
 
 void BlockResolver::removeRemoteID(BlockID id) {
   _remoteIDs.erase(id);
+}
+
+void BlockResolver::removeLocalID(BlockID id) {
+  log->info("delete Block %lld\n", id);
+  _localIDs.erase(id);
+  string path = _manager->convertBlockIDToPath(id);
+  unlink(path.data());
 }
 
 void BlockResolver::cleanCache() {
@@ -263,11 +271,16 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   return BlockLocationAttrSPtr(NULL);
 }
 
-BlockLocationAttrSPtr BlockResolver::askLocalBlockDetail(BlockID id) {
-  BlockMap::iterator it = _localIDs.find(id);
-  if (_localIDs.end() == it) {
+BlockLocationAttrSPtr BlockResolver::askBlockDetail(BlockID id) {
+  BlockLocationAttrSPtr tmp = askBlock(id);
+  if (NULL == tmp) {
     return NULL;
   }
+  BlockMap::iterator it = _localIDs.find(id);
+  if (_localIDs.end() != it) {
+    return it->second;
+  }
+  it = _remoteIDs.find(id);
   return it->second;
 }
 

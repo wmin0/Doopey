@@ -24,11 +24,12 @@ namespace Doopey {
       // only return 1 machine
       BlockLocationAttrSPtr askBlock(BlockID id);
       // return all machine list
-      BlockLocationAttrSPtr askLocalBlockDetail(BlockID id);
+      BlockLocationAttrSPtr askBlockDetail(BlockID id);
       BlockID newLocalID();
       void addLocalID(BlockID id);
 
       void removeRemoteID(BlockID id);
+      void removeLocalID(BlockID id);
 
       bool isHealth() const { return _health; }
 

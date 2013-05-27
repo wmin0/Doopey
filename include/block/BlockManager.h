@@ -23,6 +23,9 @@ namespace Doopey {
 
       BlockID saveBlock(const BlockSPtr& block);
 
+      void deleteBlock(BlockID id);
+
+
       void request(const MessageSPtr& msg, const SocketSPtr& sock);
 
       const BlockLoaderSPtr& getBlockLoader() const { return _loader; }
@@ -55,6 +58,8 @@ namespace Doopey {
     private:
       bool handleDoReplica(const MessageSPtr& msg);
       bool handleCopyBlockFromRemote(const SocketSPtr& sock, const MessageSPtr& msg);
+      bool handleDoDelete(const MessageSPtr& msg);
+      bool handleDeleteBlock(const MessageSPtr& msg);
   }; // class BlockManager
 
 };  // namespace Doopey
