@@ -169,6 +169,29 @@ bool FileManager::handleBroadcast(const MessageSPtr& msg)
 
 bool FileManager::handleGetFile(SocketSPtr socket)
 {
+  MessageSPtr msg = socket->receive(msg);
+  string path;
+  path.resize(msg->getData().size());
+  memcpy(&(path[0]), msg->getData(), msg->getData().size());
+
+  log->info("FileManager: a file request of %s\n", path);
+
+  //get meta block from block manager
+  BlockManagerSPtr blockManager = _server->getFileManager();
+  BlockID metaID = _fileMap->getMetaID(path);
+  MetaBlockSPtr meta = blockManager->getMeta(metaID);
+
+  //Start transfer location of block to Client
+  uint64_t nBlock = meta->getDataBlockNumber();
+  BlockResoverSPtr resolver = blockManager->getBlockResolver();
+  BlockID id;           //variable used in loop
+  BlockLocationAttrSPtr location;
+  for(uint64_t i=0; i<nBlock; i++)
+  {
+    id = meta->getDataBlockID(i);
+    location = resolver->askBlock(id);
+    
+  }
   return true;
 }
 
