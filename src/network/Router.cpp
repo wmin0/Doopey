@@ -472,6 +472,9 @@ bool Router::handleCheckRepeatMachineID(
 }
 
 string Router::askMachineIP(const MachineID& id) const {
+  if (_server->getMachineID() == id) {
+    return _server->getLocalIP();
+  }
   RoutingMap::const_iterator it = _routingTable.find(id);
   if (_routingTable.end() == it) {
     return "";
