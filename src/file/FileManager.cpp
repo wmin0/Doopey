@@ -5,8 +5,11 @@
 #include "block/BlockManager.h"
 #include "block/Block.h"
 #include "block/MetaBlock.h"
+#include "block/BlockResolver.h"
+#include "block/BlockLocationAttr.h"
 #include "machine/Server.h"
 #include "common/Message.h"
+#include "common/Doopey.h"
 #include "network/Router.h"
 
 #include <stdio.h>
@@ -35,6 +38,8 @@ void FileManager::receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket)
       handleUpload(socket);
       break;
     case MC_RequestFile:
+      log->info("FileManager: Start to get file\n");
+      handleGetFile(socket);
       break;
     case MC_RequestList:
       log->info("FileManager: Receive a request of file list\n");
@@ -169,29 +174,42 @@ bool FileManager::handleBroadcast(const MessageSPtr& msg)
 
 bool FileManager::handleGetFile(SocketSPtr socket)
 {
-  MessageSPtr msg = socket->receive(msg);
+  MessageSPtr msg = socket->receive();
   string path;
   path.resize(msg->getData().size());
-  memcpy(&(path[0]), msg->getData(), msg->getData().size());
+  memcpy(&(path[0]), msg->getData().data(), msg->getData().size());
 
-  log->info("FileManager: a file request of %s\n", path);
+  log->info("FileManager: receive the request message size is %d\n", msg->getData().size());
+  log->info("FileManager: a file request of %s\n", path.data());
 
   //get meta block from block manager
-  BlockManagerSPtr blockManager = _server->getFileManager();
+  const BlockManagerSPtr blockManager = _server->getBlockManager();
+  RouterSPtr router = _server->getRouter();
   BlockID metaID = _fileMap->getMetaID(path);
   MetaBlockSPtr meta = blockManager->getMeta(metaID);
 
+  size_t filesize = meta->getFileSize();
+  msg.reset(new Message(MT_File, MC_RequestFile));
+  msg->addData((unsigned char*)&filesize, sizeof(filesize));
+
   //Start transfer location of block to Client
   uint64_t nBlock = meta->getDataBlockNumber();
-  BlockResoverSPtr resolver = blockManager->getBlockResolver();
+  BlockResolverSPtr resolver = blockManager->getBlockResolver();
   BlockID id;           //variable used in loop
   BlockLocationAttrSPtr location;
+  string ip;
   for(uint64_t i=0; i<nBlock; i++)
   {
     id = meta->getDataBlockID(i);
     location = resolver->askBlock(id);
-    
+    ip = router->askMachineIP(location->machine[0]);
+    msg.reset(new Message(MT_File, MC_RequestFile));
+    msg->addData((unsigned char*)&id, sizeof(id));
+    msg->addData((unsigned char*)ip.data(), ip.length());
+    socket->send(msg);
   }
+  msg.reset(new Message(MT_File, MC_FileACK));
+  socket->send(msg);
   return true;
 }
 

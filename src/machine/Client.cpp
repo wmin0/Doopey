@@ -66,6 +66,8 @@ void Client::run(int argc, char** argv) {
         break;
       case 'g':
         cout << "get request" << endl;
+        cout << "filename=" << optarg << endl;
+        getFile(optarg);
         break;
       case 'h':
         cout << "help request" << endl;
@@ -198,7 +200,7 @@ bool Client::putFile(const char* filename, const char* dir) const
   socket.send(msg);
   msg = socket.receive();
   if(msg->getCmd() != MC_FileACK){
-    log->info("Error when uploading meta\n");
+      log->info("Error when uploading meta\n");
     return false;
   }
 
@@ -264,5 +266,58 @@ bool Client::addDir(const char* dirName) const
     return false;
   }
 
+  return true;
+}
+
+bool Client::getFile(const char* filepath){
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    log->info("Error when connect to server\n");
+    return false;
+  }
+  log->info("Connect server success\n");
+  //split name from filepath
+  string filename = filepath;
+  filename = filename.substr(filename.find_last_of("/")+1);
+
+  //create local file
+  FILE* pFile = fopen(filename.data(), "r");
+  if(NULL != pFile){
+    log->info("File already in exist\n");
+    return false;
+  }
+  pFile = fopen(filename.data(), "w+");
+
+  log->info("File create success\n");
+  //first message to let dispatcher transfer the task to fileManager
+  MessageSPtr msg(new Message(MT_File, MC_RequestFile));
+  socket.send(msg);
+
+  //ask for meta
+  msg.reset(new Message(MT_File, MC_RequestFile));
+  msg->addData((unsigned char*)filepath, strlen(filepath));
+  socket.send(msg);
+
+  log->info("Send request file %s message\n", filepath);
+  size_t file_size = 0;
+  socket.receive();
+  memcpy((unsigned char*)file_size, msg->getData().data(), sizeof(size_t));
+
+  BlockID id;
+  string ip;
+
+  while(1){
+    socket.receive();
+    if(msg->getCmd() == MC_FileACK)
+      break;
+
+    //get block
+    memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
+    memcpy((unsigned char*)&ip, msg->getData().data()+sizeof(BlockID),
+      msg->getData().size()-sizeof(BlockID));
+    log->info("Receive a block info %d, %s\n", id, ip.data());
+    //append to the local file
+    break;
+  }
   return true;
 }

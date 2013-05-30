@@ -8,12 +8,25 @@ using std::string;
 MetaBlock::MetaBlock(unsigned char* data, BlockID id): Block(data, id)
 {
   _nameLength = (uint64_t*)data;
-  *_nameLength = 0;
-  _filename = NULL;
-  _ctime = NULL;
-  _size = NULL;
-  _blockNumber = NULL;
-  _firstBlockID = NULL;
+  if(*_nameLength == 0){
+    _filename = NULL;
+    _ctime = NULL;
+    _size = NULL;
+    _blockNumber = NULL;
+    _firstBlockID = NULL;
+  }else{
+    char* op = (char*)data;
+    op += sizeof(uint64_t);
+    _filename = (char*)op;
+    op = op +  *_nameLength;
+    _ctime = (time_t*)op;
+    op = op + sizeof(_ctime);
+    _size = (size_t*)op;
+    op += sizeof(size_t);
+    _blockNumber = (uint64_t*)op;
+    op += sizeof(uint64_t);
+    _firstBlockID = (BlockID*)op;
+  }
 }
 
 bool MetaBlock::setFileName(string& name)
