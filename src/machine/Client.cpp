@@ -307,7 +307,7 @@ bool Client::getFile(const char* filepath){
   string ip;
 
   while(1){
-    socket.receive();
+    msg = socket.receive();
     if(msg->getCmd() == MC_FileACK)
       break;
 
@@ -315,7 +315,7 @@ bool Client::getFile(const char* filepath){
     memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
     ip.resize(msg->getData().size()-sizeof(BlockID));
     log->info("size of ip = %d\n", msg->getData().size()-sizeof(BlockID));
-    memcpy((unsigned char*)&ip, msg->getData().data()+sizeof(BlockID),
+    memcpy((unsigned char*)&(ip[0]) , msg->getData().data()+sizeof(BlockID),
       msg->getData().size()-sizeof(BlockID));
     log->info("Receive a block info %d, %s\n", id, ip.data());
     //append to the local file

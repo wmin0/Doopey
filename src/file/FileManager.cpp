@@ -191,6 +191,7 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   size_t filesize = meta->getFileSize();
   msg.reset(new Message(MT_File, MC_RequestFile));
   msg->addData((unsigned char*)&filesize, sizeof(filesize));
+  socket->send(msg);
 
   //Start transfer location of block to Client
   uint64_t nBlock = meta->getDataBlockNumber();
