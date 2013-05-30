@@ -196,13 +196,16 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   uint64_t nBlock = meta->getDataBlockNumber();
   BlockResolverSPtr resolver = blockManager->getBlockResolver();
   BlockID id;           //variable used in loop
+  MachineID mid;
   BlockLocationAttrSPtr location;
   string ip;
   for(uint64_t i=0; i<nBlock; i++)
   {
     id = meta->getDataBlockID(i);
     location = resolver->askBlock(id);
-    ip = router->askMachineIP(location->machine[0]);
+    mid = location->machine[0];
+    ip = router->askMachineIP(mid);
+    log->info("FileManager: get data block of ID=%u, machineID=%d, locationIP=%s\n", id, mid, ip.data());
     msg.reset(new Message(MT_File, MC_RequestFile));
     msg->addData((unsigned char*)&id, sizeof(id));
     msg->addData((unsigned char*)ip.data(), ip.length());

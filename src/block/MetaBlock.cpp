@@ -18,7 +18,7 @@ MetaBlock::MetaBlock(unsigned char* data, BlockID id): Block(data, id)
     char* op = (char*)data;
     op += sizeof(uint64_t);
     _filename = (char*)op;
-    op = op +  *_nameLength;
+    op += *_nameLength;
     _ctime = (time_t*)op;
     op = op + sizeof(_ctime);
     _size = (size_t*)op;
@@ -26,6 +26,10 @@ MetaBlock::MetaBlock(unsigned char* data, BlockID id): Block(data, id)
     _blockNumber = (uint64_t*)op;
     op += sizeof(uint64_t);
     _firstBlockID = (BlockID*)op;
+    log->info("MetaBlock: read a block name=%s\n \
+      \tctime=%d\n \
+      \tsize=%d\n \
+      \tblockNumber=%d\n", _filename, *_ctime, *_size, *_blockNumber);
   }
 }
 
@@ -166,7 +170,7 @@ BlockID MetaBlock::getDataBlockID(uint64_t number) const
     return 0;
   }
 
-  BlockID* id = _firstBlockID + (number-1)*sizeof(BlockID);
+  BlockID* id = _firstBlockID + number;
 
   return *id;
 }

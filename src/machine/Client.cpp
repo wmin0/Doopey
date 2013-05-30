@@ -301,7 +301,7 @@ bool Client::getFile(const char* filepath){
   log->info("Send request file %s message\n", filepath);
   size_t file_size = 0;
   socket.receive();
-  memcpy((unsigned char*)file_size, msg->getData().data(), sizeof(size_t));
+  memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(size_t));
 
   BlockID id;
   string ip;
@@ -313,11 +313,14 @@ bool Client::getFile(const char* filepath){
 
     //get block
     memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
+    ip.resize(msg->getData().size()-sizeof(BlockID));
+    log->info("size of ip = %d\n", msg->getData().size()-sizeof(BlockID));
     memcpy((unsigned char*)&ip, msg->getData().data()+sizeof(BlockID),
       msg->getData().size()-sizeof(BlockID));
     log->info("Receive a block info %d, %s\n", id, ip.data());
     //append to the local file
     break;
   }
+  fclose(pFile);
   return true;
 }
