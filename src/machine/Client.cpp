@@ -305,11 +305,13 @@ bool Client::getFile(const char* filepath){
   size_t file_size = 0;
   msg=socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(size_t));
+  fseek(pFile, file_size, SEEK_SET);
 
   uint64_t blockNum = 0;
   msg=socket.receive();
   memcpy((unsigned char*)&blockNum, msg->getData().data(), sizeof(uint64_t));
   log->info("Receive filezize=%d, blockNum=%d\n", file_size, blockNum);
+
   BlockID id;
   string ip;
   BlockInfo* info;
@@ -352,9 +354,10 @@ bool Client::getFile(const char* filepath){
         break;
       }
       sleep(1);
+      log->debug("lalala\n");
     }
   }
-
+  log->info("end of get file\n");
   fclose(pFile);
   return true;
 }
