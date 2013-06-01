@@ -34,7 +34,7 @@ const time_t BlockResolver::checkReplicaInterval = 0;
 BlockResolver* BlockResolver::_this = NULL;
 
 void BlockResolver::timeout(int sig) {
-  log->debug("ask remote timeout");
+  log->debug("ask remote timeout\n");
   pthread_mutex_unlock(&(_this->_remote_ask_lock));
 }
 
@@ -275,6 +275,8 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   _manager->getRouter()->broadcast(msg);
   alarm(waitRemote);
   pthread_mutex_lock(&_remote_ask_lock);
+  pthread_mutex_lock(&_remote_ask_lock);
+  pthread_mutex_unlock(&_remote_ask_lock);
   alarm(0);
   signal(SIGALRM, oldfunc);
   _this = NULL;
