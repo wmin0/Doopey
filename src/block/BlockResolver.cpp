@@ -27,10 +27,16 @@ using std::ifstream;
 using std::string;
 using std::stringstream;
 
-const int BlockResolver::waitRemote = 5;
+const int BlockResolver::waitRemote = 1;
 const size_t BlockResolver::remoteSizeMax = 1000;
 // TODO: adjust after test
 const time_t BlockResolver::checkReplicaInterval = 0;
+BlockResolver* BlockResolver::_this = NULL;
+
+void BlockResolver::timeout(int sig) {
+  log->debug("ask remote timeout");
+  pthread_mutex_unlock(&_remote_ask_lock);
+}
 
 BlockResolver::BlockResolver(
   const BlockManager* manager, const ConfigSPtr& config):
@@ -38,9 +44,11 @@ BlockResolver::BlockResolver(
   _localMax(0), _health(true) {
   // some setup
   loadLocalIDs();
+  pthread_mutex_init(&_remote_ask_lock, NULL);
 }
 
 BlockResolver::~BlockResolver() {
+  pthread_mutex_destroy(&_remote_ask_lock);
 }
 
 BlockID BlockResolver::newLocalID() {
@@ -261,8 +269,16 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   MachineID m = _manager->getMachineID();
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
+  pthread_mutex_lock(&DoopeyAlarmLock);
+  void (*oldFunc)(int) = signal(SIGALRM, BlockResolver::timeout);
+  _this = this;
   _manager->getRouter()->broadcast(msg);
-  sleep(waitRemote);
+  alarm(waitRemote);
+  pthread_mutex_lock(&_remote_ask_lock);
+  alarm(0);
+  signal(SIGALRM, oldfunc);
+  _this = NULL;
+  pthread_mutex_unlock(&DoopeyAlarmLock);
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
@@ -332,6 +348,7 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
     off += sizeof(MachineID);
     it->second->addMachine(m);
   }
+  pthread_mutex_unlock(&_remote_ask_lock);
   return true;
 }
 
