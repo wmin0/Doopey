@@ -211,13 +211,16 @@ bool Client::putFile(const char* filename, const char* dir) const
   socket.send(msg);
   msg = socket.receive();
   if(msg->getCmd() != MC_FileACK){
+    if(msg->getCmd() == MC_FileUploadRepeat)
+      log->info("Error: file existed\n");
+    else
       log->info("Error when uploading meta\n");
     return false;
   }
 
   //start to send the file content
   log->info("Start transfer data\n");
-  char* buf = (char*)malloc(DataBlock::blockSize);
+  char* buf = new char[DataBlock::blockSize];
   size_t cread;
   do{
     cread = fread(buf, 1, DataBlock::blockSize, pFile);
@@ -226,6 +229,7 @@ bool Client::putFile(const char* filename, const char* dir) const
         break;
       else{ //there is a error
         log->info("error while reading file\n");
+        delete[] buf;
         return false;
       }
     }
@@ -239,9 +243,12 @@ bool Client::putFile(const char* filename, const char* dir) const
     msg = socket.receive();
     if(msg->getCmd() != MC_FileACK){
       log->info("Error when uploading data\n");
+      delete[] buf;
       return false;
     }
   }while(1);
+
+  delete[] buf;
 
   //last msg to end the transfer
   log->info("Finish send the file\n");

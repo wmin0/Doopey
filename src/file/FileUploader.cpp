@@ -46,6 +46,8 @@ MetaBlockSPtr FileUploader::receiveFile(SocketSPtr socket)
         , enum2String(msg->getType()));
     }
 
+    BlockID checkExist;
+
     //decide what to do depend on the command
     switch(msg->getCmd())
     {
@@ -57,7 +59,11 @@ MetaBlockSPtr FileUploader::receiveFile(SocketSPtr socket)
           returnError(socket);
           return NULL;//one failure should terminate whole file?
         }
-        returnACK(socket);
+        checkExist = _fileTree->getMetaID(meta->getFileName());
+        if(checkExist != 0)
+          returnError(socket, MC_FileUploadRepeat);
+        else
+          returnACK(socket);
         break;
       //the msg is the file data, just receive and split it into different data 
       //block and add the datablock ID into metablock
@@ -166,6 +172,11 @@ void FileUploader::returnACK(SocketSPtr socket)
 
 void FileUploader::returnError(SocketSPtr socket)
 {
-  MessageSPtr msg(new Message(MT_File, MC_FileError));
+  returnError(socket, MC_FileError);
+}
+
+void FileUploader::returnError(SocketSPtr socket, MessageCmd cmd)
+{
+  MessageSPtr msg(new Message(MT_File, cmd));
   socket->send(msg);
 }

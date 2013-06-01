@@ -7,6 +7,7 @@
 
 #include "common/Doopey.h"
 #include "common/Socket.h"
+#include "common/Message.h"
 #include "block/BlockManager.h"
 #include "file/FileManager.h"
 #include "network/Router.h"
@@ -38,6 +39,7 @@ namespace Doopey{
       void cleanData(MetaBlockSPtr meta);
       void returnACK(SocketSPtr socket);
       void returnError(SocketSPtr socket);
+      void returnError(SocketSPtr socket, MessageCmd cmd);
 
       BlockManagerSPtr _blockManager;
       FileTreeSPtr _fileTree;
