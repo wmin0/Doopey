@@ -21,9 +21,7 @@ using namespace Doopey;
 using std::vector;
 using std::string;
 
-pthread_mutex_t Socket::_sig_lock;
 Socket* Socket::_this = NULL;
-
 
 Socket::Socket(SocketType type):
   _type(type), _fd(-1), _isConnected(false) {
@@ -82,7 +80,7 @@ bool Socket::connect(const char* servername, int port) {
   memcpy(&addr.sin_addr.s_addr,
          server->h_addr_list[0],
          server->h_length);
-  pthread_mutex_lock(&_sig_lock);
+  pthread_mutex_lock(&DoopeyAlarmLock);
   bool ret = true;
   void (*oldfunc)(int) = signal(SIGALRM, Socket::timeout);
   _this = this;
@@ -93,7 +91,7 @@ bool Socket::connect(const char* servername, int port) {
   }
   alarm(0);
   signal(SIGALRM, oldfunc);
-  pthread_mutex_unlock(&_sig_lock);
+  pthread_mutex_unlock(&DoopeyAlarmLock);
   _isConnected = true;
   return ret;
 }
