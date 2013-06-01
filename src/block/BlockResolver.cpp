@@ -27,7 +27,7 @@ using std::ifstream;
 using std::string;
 using std::stringstream;
 
-const int BlockResolver::waitRemote = 1;
+const int BlockResolver::waitRemote = 5;
 const size_t BlockResolver::remoteSizeMax = 1000;
 // TODO: adjust after test
 const time_t BlockResolver::checkReplicaInterval = 0;
