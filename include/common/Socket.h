@@ -37,7 +37,6 @@ namespace Doopey {
 
       void close();
 
-      static pthread_mutex_t _sig_lock;
     private:
       Socket(SocketType type, int fd, bool conn):
         _type(type), _fd(fd), _isConnected(conn) {}
