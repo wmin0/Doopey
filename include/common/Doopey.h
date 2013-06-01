@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <pthread.h>
 
 using std::shared_ptr;
 using std::string;
@@ -51,6 +52,9 @@ namespace Doopey {
 
   // signal
   #define SIGTSTOP SIGRTMAX - 1
+
+  // signal lock
+  extern pthread_mutex_t DoopeyAlarmLock;
 
   // general type
   typedef uint64_t BlockID;

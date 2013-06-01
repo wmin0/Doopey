@@ -195,6 +195,10 @@ bool FileManager::handleGetFile(SocketSPtr socket)
 
   //Start transfer location of block to Client
   uint64_t nBlock = meta->getDataBlockNumber();
+  msg.reset(new Message(MT_File, MC_RequestFile));
+  msg->addData((unsigned char*)&nBlock, sizeof(nBlock));
+  socket->send(msg);
+
   BlockResolverSPtr resolver = blockManager->getBlockResolver();
   BlockID id;           //variable used in loop
   MachineID mid;

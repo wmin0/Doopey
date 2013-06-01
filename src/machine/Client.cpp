@@ -3,6 +3,7 @@
 #include "common/Doopey.h"
 #include "common/Socket.h"
 #include "common/Message.h"
+#include "common/TaskThread.h"
 #include "block/DataBlock.h"
 
 #include <iostream>
@@ -16,6 +17,7 @@
 #include <unistd.h>
 
 #include <getopt.h>
+#include <map>
 
 using namespace Doopey;
 using namespace std;
@@ -23,6 +25,7 @@ using namespace std;
 typedef shared_ptr<Message> MessageSPtr;
 
 Client::Client() {
+  
 }
 
 Client::~Client() {
@@ -303,13 +306,16 @@ bool Client::getFile(const char* filepath){
   socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(size_t));
 
+  uint64_t blockNum = 0;
+  socket.receive();
+  memcpy((unsigned char*)&blockNum, msg->getData().data(), sizeof(uint64_t));
+
   BlockID id;
   string ip;
+  map<BlockID, string> blockMap;
 
-  while(1){
+  for(unsigned int i=0; i<blockNum; i++){
     msg = socket.receive();
-    if(msg->getCmd() == MC_FileACK)
-      break;
 
     //get block
     memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
@@ -318,9 +324,38 @@ bool Client::getFile(const char* filepath){
     memcpy((unsigned char*)&(ip[0]) , msg->getData().data()+sizeof(BlockID),
       msg->getData().size()-sizeof(BlockID));
     log->info("Receive a block info %d, %s\n", id, ip.data());
+    blockMap.insert(pair<BlockID, string>(id, ip));
     //append to the local file
-    break;
   }
+
+  vector<TaskThreadSPtr> threadPool;
+  size_t threadNum = 4;
+
+  for(size_t i=0; i<threadNum; i++)
+    threadPool[i] = TaskThreadSPtr(new TaskThread(Client::receiveBlock));
+
+  uint64_t wsize;
+  for(unsigned int i=0; i<blockNum;){
+    if(file_size > DataBlock::blockSize)
+      wsize = DataBlock::blockSize;
+    else
+      wsize = file_size;
+
+    for(size_t j=0; j<threadNum; j++){
+      if(threadPool[j]->isFree()){
+        file_size -= wsize;
+        threadPool[j]->runTask((void*)&wsize,(void*)&i, (void*)filename.data());
+        i++;
+        break;
+      }
+      sleep(1);
+    }
+  }
+
   fclose(pFile);
   return true;
+}
+
+void Client::receiveBlock(void* wsize, void* nblock, void* filename)
+{
 }
