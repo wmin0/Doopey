@@ -198,6 +198,7 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   msg.reset(new Message(MT_File, MC_RequestFile));
   msg->addData((unsigned char*)&nBlock, sizeof(nBlock));
   socket->send(msg);
+  log->info("FileManager: number of block = %d\n", nBlock);
 
   BlockResolverSPtr resolver = blockManager->getBlockResolver();
   BlockID id;           //variable used in loop

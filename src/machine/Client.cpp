@@ -17,7 +17,7 @@
 #include <unistd.h>
 
 #include <getopt.h>
-#include <map>
+#include <vector>
 
 using namespace Doopey;
 using namespace std;
@@ -303,16 +303,17 @@ bool Client::getFile(const char* filepath){
 
   log->info("Send request file %s message\n", filepath);
   size_t file_size = 0;
-  socket.receive();
+  msg=socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(size_t));
 
   uint64_t blockNum = 0;
-  socket.receive();
+  msg=socket.receive();
   memcpy((unsigned char*)&blockNum, msg->getData().data(), sizeof(uint64_t));
-
+  log->info("Receive filezize=%d, blockNum=%d\n", file_size, blockNum);
   BlockID id;
   string ip;
-  map<BlockID, string> blockMap;
+  BlockInfo* info;
+  vector<BlockInfo*> blocks(blockNum);
 
   for(unsigned int i=0; i<blockNum; i++){
     msg = socket.receive();
@@ -324,11 +325,12 @@ bool Client::getFile(const char* filepath){
     memcpy((unsigned char*)&(ip[0]) , msg->getData().data()+sizeof(BlockID),
       msg->getData().size()-sizeof(BlockID));
     log->info("Receive a block info %d, %s\n", id, ip.data());
-    blockMap.insert(pair<BlockID, string>(id, ip));
+    info = new BlockInfo(0, i, id, ip);
+    blocks[i]=info;
     //append to the local file
   }
 
-  vector<TaskThreadSPtr> threadPool;
+  vector<TaskThreadSPtr> threadPool(4);
   size_t threadNum = 4;
 
   for(size_t i=0; i<threadNum; i++)
@@ -344,7 +346,8 @@ bool Client::getFile(const char* filepath){
     for(size_t j=0; j<threadNum; j++){
       if(threadPool[j]->isFree()){
         file_size -= wsize;
-        threadPool[j]->runTask((void*)&wsize,(void*)&i, (void*)filename.data());
+        blocks[i]->wsize = wsize;
+        threadPool[i]->runTask(blocks[i], (void*)filename.data(), NULL);
         i++;
         break;
       }
@@ -356,6 +359,6 @@ bool Client::getFile(const char* filepath){
   return true;
 }
 
-void Client::receiveBlock(void* wsize, void* nblock, void* filename)
+void Client::receiveBlock(void* blockInfo, void* filename, void* output)
 {
 }

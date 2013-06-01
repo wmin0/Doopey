@@ -2,6 +2,7 @@
 #define _DOOPEY_CLIENT_H_
 
 #include <string>
+#include "common/Doopey.h"
 
 using std::string;
 
@@ -22,8 +23,23 @@ namespace Doopey {
       bool addDir(const char* dirName) const;
       bool getFile(const char* filename);
 
-      static void receiveBlock(void* wsize, void* nblock, void* filename);
+      static void receiveBlock(void* blockInfo, void* filename, void* output);
   }; // class Client
+
+  class BlockInfo {
+    public:
+      BlockInfo(uint64_t wSize, uint64_t nBlock, BlockID ID, string IP){
+        wsize = wSize;
+        nblock = nBlock;
+        id = ID;
+        ip = IP;
+      }
+      ~BlockInfo();
+      uint64_t wsize;
+      uint64_t nblock;
+      BlockID id;
+      string ip;
+  }; //class BlockInfo
 
 };  // namespace Doopey
 
