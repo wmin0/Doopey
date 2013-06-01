@@ -18,6 +18,7 @@
 
 #include <getopt.h>
 #include <vector>
+#include <fcntl.h>
 
 using namespace Doopey;
 using namespace std;
@@ -379,4 +380,30 @@ bool Client::getFile(const char* filepath){
 
 void Client::receiveBlock(void* blockInfo, void* filename, void* output)
 {
+  BlockInfo* bInfo = (BlockInfo*) blockInfo;
+  Socket socket(ST_TCP);
+  if (!socket.connect(bInfo->ip, DoopeyPort)) {
+    log->info("Error when connect to server\n");
+    //return false;
+  }
+
+  MessageSPtr msg(new Message(MT_Block, MC_RequestBlockData));
+  msg->addData((unsigned char*)&bInfo->id, sizeof(BlockID));
+  socket.send(msg);
+  msg=socket.receive();
+
+  int f = open((char*)filename, O_WRONLY);
+  if(f == -1){
+    log->info("Open error of local file %s\n", (char*)filename);
+    //return false;
+  }
+
+  lseek(f, bInfo->nblock * DataBlock::blockSize, SEEK_SET);
+
+  int wrAmount=0;
+  while(wrAmount < (int)bInfo->wsize)
+    wrAmount += write(f, msg->getData().data() + wrAmount, bInfo->wsize - wrAmount);
+
+  if(close(f) == -1)
+    log->info("Close error of local file %s\n", (char*)filename);
 }
