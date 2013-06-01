@@ -237,23 +237,27 @@ vector<string> FileTree::getExChildren()
 
 string FileTree::getTotalTree()
 {
-  return getTotalNode(_root);
+  log->info("FileTree: start get total tree\n");
+  return getTotalNode(_root, "");
 }
 
-string FileTree::getTotalNode(const TreeNode* tn)
+string FileTree::getTotalNode(const TreeNode* tn, string dir)
 {
-  string result = tn->_name;
-  result = result + ',';
-  if(tn->_isFile)
-    result +=to_string(tn->getID());
-  else
-    result += to_string(0);
-  result = result + ":";
+  log->info("FileTree: getTotalNode(%s,%s)\n", tn->_name.data(), dir.data());
+  string name = dir + tn->_name;
+
+  string nextDir = name;
+  if(nextDir != "/")
+    nextDir += "/";
+
+  name = name + ":";
+  name = name + to_string(tn->_isFile?tn->getID():0);
+  name = name + "\n";
   TreeNode* working = tn->_children;
   while(working!=NULL)
   {
-    result = result + getTotalNode(working);
+    name = name + getTotalNode(working, nextDir);
     working = working->_next;
   }
-  return result;
+  return name;
 }

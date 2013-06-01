@@ -33,20 +33,21 @@ Server* Server::_this = NULL;
 
 Server::Server(const SectionCollectionSPtr& section):
   _sectionCollection(section), _machineID(0), _machineIDMax(0), _ip(""),
-  _useSpaceMax(0), _health(true) {
+ _useSpaceMax(0), _health(true) {
   attachSignal();
   setupLocalIP();
 
   pthread_mutex_init(&_mutex, NULL);
   // TODO: snapshot
+
+  _fileManager.reset(
+    new FileManager(this, _sectionCollection->getConfig("file")));
   loadSnapshot();
   // NOTE: notice initial dependent
   _router.reset(new Router(this, _sectionCollection->getConfig("router")));
   _dispatcher.reset(new Dispatcher(this, _sectionCollection->getConfig("")));
   _blockManager.reset(
     new BlockManager(this, _sectionCollection->getConfig("block")));
-  _fileManager.reset(
-    new FileManager(this, _sectionCollection->getConfig("file")));
 
   ConfigSPtr config = _sectionCollection->getConfig("global");
   string tmp = config->getValue("UseSpaceMax");
@@ -156,6 +157,7 @@ void Server::handleUSR1(int sig) {
 void Server::saveSnapshot() {
   ServerSnapshot snapshot;
   snapshot.setMachineID(_machineID);
+  snapshot.setFileTree(_fileManager->snapshot());
   if (!snapshot.save()) {
     log->warning("can't save snapshot\n");
   }
@@ -168,6 +170,8 @@ void Server::loadSnapshot() {
     return;
   }
   _machineID = snapshot.getMachineID();
+  log->info("Server: load snapshot of fileTree:\n%s", snapshot.getFileTree().data());
+  _fileManager->loadSnapshot(snapshot.getFileTree());
 }
 
 

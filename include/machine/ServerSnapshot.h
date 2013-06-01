@@ -12,12 +12,15 @@ namespace Doopey {
       bool load();
       bool save();
       void setMachineID(const MachineID& id) { _machineID = id; }
+      void setFileTree(const string& tree) { _dumpFileTree = tree;}
       const MachineID& getMachineID() const { return _machineID; }
+      const string& getFileTree() const { return _dumpFileTree; }
     private:
       static const char* _dirpath;
       static const char* _filepath;
     private:
       MachineID _machineID;
+      string _dumpFileTree;
 
       void checkDirExist();
 

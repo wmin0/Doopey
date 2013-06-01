@@ -31,7 +31,7 @@ namespace Doopey{
       //this function is used to tell which work is requested in msg
       void receiveQuest(const MessageSPtr& msg, const SocketSPtr& socket);
       string snapshot();
-
+      void loadSnapshot(const string& dump);
     private:
       //three function belonging is used to handle different msg
       //which will be catch by receiveQuest()

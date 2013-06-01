@@ -316,8 +316,14 @@ bool Client::getFile(const char* filepath){
   msg.reset(new Message(MT_File, MC_RequestFile));
   msg->addData((unsigned char*)filepath, strlen(filepath));
   socket.send(msg);
-
   log->info("Send request file %s message\n", filepath);
+
+  msg = socket.receive();
+  if(msg->getCmd()!=MC_FileACK){
+    log->info("Error when get meta, maybe the file is not exist\n");
+    return false;
+  }
+
   uint64_t file_size = 0;
   msg=socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(uint64_t));

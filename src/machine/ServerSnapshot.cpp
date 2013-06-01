@@ -27,6 +27,12 @@ bool ServerSnapshot::load() {
     return false;
   }
   snapshot >> _machineID;
+  string temp;
+  _dumpFileTree = "";
+  while(snapshot >> temp){
+    _dumpFileTree = _dumpFileTree + temp;
+    _dumpFileTree = _dumpFileTree + "\n";
+  }
   snapshot.close();
   return true;
 }
@@ -38,6 +44,7 @@ bool ServerSnapshot::save() {
     return false;
   }
   snapshot << _machineID << endl;
+  snapshot << _dumpFileTree;
   snapshot.close();
   return true;
 }

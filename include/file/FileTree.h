@@ -79,7 +79,7 @@ namespace Doopey{
       TreeNode* _root;
       HashList<string, TreeNode*>* _fileMap;
 
-      string getTotalNode(const TreeNode* tn);
+      string getTotalNode(const TreeNode* tn, string dir);
 
     friend class FileTreeTest;
   };//class FileTree

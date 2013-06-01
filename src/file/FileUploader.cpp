@@ -163,6 +163,8 @@ bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
 void FileUploader::cleanData(MetaBlockSPtr meta)
 {
   uint64_t nBlock = meta->getDataBlockNumber();
+  if(nBlock==0)
+    return;
   for(uint64_t i=0; i<nBlock; i++){
     BlockID id = meta->getDataBlockID(i);
     _blockManager->deleteBlock(id);

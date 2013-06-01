@@ -186,6 +186,12 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   const BlockManagerSPtr blockManager = _server->getBlockManager();
   RouterSPtr router = _server->getRouter();
   BlockID metaID = _fileMap->getMetaID(path);
+  if(metaID==0)
+  {
+    returnError(socket);
+    return false;
+  }
+  returnACK(socket);
   MetaBlockSPtr meta = blockManager->getMeta(metaID);
 
   uint64_t filesize = meta->getFileSize();
@@ -265,6 +271,36 @@ string FileManager::getString(const MessageSPtr& msg) const
 
 string FileManager::snapshot()
 {
-  string result="";
+  string result = _fileMap->getTotalTree();
   return result;
+}
+
+void FileManager::loadSnapshot(const string& dump)
+{
+  log->info("FileManager: get all dump\n%s\n", dump.data());
+  string alldump = dump;
+
+  string record;
+  string filename;
+  string ID;
+
+  while(alldump.find_first_of("\n")!=string::npos)
+  {
+    record = alldump.substr(0, alldump.find_first_of("\n"));
+    filename = record.substr(0, record.find_first_of(":"));
+    ID = record.substr(record.find_first_of(":")+1);
+    alldump.erase(0, alldump.find_first_of("\n")+1);
+    log->info("FileManager: load a record of %s\n", record.data());
+    log->info("           : split into %s, %s\n", filename.data(), ID.data());
+
+    if(filename == "/")
+      continue;
+
+    BlockID id= stol(ID);
+    if(id == 0)
+      _fileMap->addDir(filename);
+    else
+      _fileMap->addFile(filename, id);
+  }
+  //string working = dump.substr(
 }
