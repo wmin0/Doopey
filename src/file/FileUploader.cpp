@@ -113,7 +113,7 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
   vector<unsigned char> data;
   string nameStr;
   time_t ctime;
-  size_t size;
+  uint64_t size;
 
   data = msg->getData();
   memcpy(&nameLength, data.data(), sizeof(nameLength));
@@ -132,13 +132,13 @@ bool FileUploader::setupMeta(MetaBlockSPtr meta, const MessageSPtr msg)
     return false;
   }
 
-  memcpy(&size, data.data()+sizeof(nameLength)+nameLength+sizeof(time_t), sizeof(size_t));
+  memcpy(&size, data.data()+sizeof(nameLength)+nameLength+sizeof(time_t), sizeof(uint64_t));
   if( meta->setFileSize(size) == false ){
     //log->error("Meta Block: set size failed by %s\n", nameStr.c_str());
     return false;
   }
 
-  log->info("FileUploader: Receive meta of %s, ctime=%d, file size=%d\n", 
+  log->info("FileUploader: Receive meta of %s, ctime=%d, file size=%d\n",
               nameStr.data(), ctime, size);
 
   return true;
@@ -162,6 +162,13 @@ bool FileUploader::setupData(MetaBlockSPtr meta, const MessageSPtr msg){
 
 void FileUploader::cleanData(MetaBlockSPtr meta)
 {
+  uint64_t nBlock = meta->getDataBlockNumber();
+  for(uint64_t i=0; i<nBlock; i++){
+    BlockID id = meta->getDataBlockID(i);
+    _blockManager->deleteBlock(id);
+  }
+  BlockID id = meta->getID();
+  _blockManager->deleteBlock(id);
 }
 
 void FileUploader::returnACK(SocketSPtr socket)

@@ -79,7 +79,7 @@ bool FileManager::handleUpload(SocketSPtr socket)
   //broadcast that here have a new file
   //broadcast format: length of name, name, ID of metablock
   string filename = meta->getFileName();
-  size_t l=filename.length();
+  uint64_t l=filename.length();
   BlockID id = meta->getID();
   MessageSPtr msg(new Message(MT_File, MC_BroadcastNewFile));
   msg->addData((unsigned char*)&l, sizeof(l));
@@ -146,7 +146,7 @@ bool FileManager::handleBroadcast(const MessageSPtr& msg)
   switch(msg->getCmd())
   {
     case MC_BroadcastNewFile:
-      size_t l;
+      uint64_t l;
       memcpy(&l, msg->getData().data(), sizeof(l));
       name.resize(l);
       memcpy(&(name[0]), msg->getData().data()+sizeof(l), l);
@@ -188,7 +188,7 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   BlockID metaID = _fileMap->getMetaID(path);
   MetaBlockSPtr meta = blockManager->getMeta(metaID);
 
-  size_t filesize = meta->getFileSize();
+  uint64_t filesize = meta->getFileSize();
   msg.reset(new Message(MT_File, MC_RequestFile));
   msg->addData((unsigned char*)&filesize, sizeof(filesize));
   socket->send(msg);
@@ -261,4 +261,10 @@ string FileManager::getString(const MessageSPtr& msg) const
   name.resize(l);
   memcpy(&(name[0]), msg->getData().data(), l);
   return name;
+}
+
+string FileManager::snapshot()
+{
+  string result="";
+  return result;
 }

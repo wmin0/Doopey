@@ -21,8 +21,8 @@ MetaBlock::MetaBlock(unsigned char* data, BlockID id): Block(data, id)
     op += *_nameLength;
     _ctime = (time_t*)op;
     op = op + sizeof(_ctime);
-    _size = (size_t*)op;
-    op += sizeof(size_t);
+    _size = (uint64_t*)op;
+    op += sizeof(uint64_t);
     _blockNumber = (uint64_t*)op;
     op += sizeof(uint64_t);
     _firstBlockID = (BlockID*)op;
@@ -77,7 +77,7 @@ bool MetaBlock::setCreateTime(time_t ctime)
   return true;
 }
 
-bool MetaBlock::setFileSize(size_t size)
+bool MetaBlock::setFileSize(uint64_t size)
 {
   if(_ctime == NULL){
     log->error("MetaBlock: error order of setting up Metablock, \
@@ -85,7 +85,7 @@ bool MetaBlock::setFileSize(size_t size)
     return false;
   }
   if(_size == NULL)
-    _size = (size_t*)((char*)_ctime + sizeof(time_t));
+    _size = (uint64_t*)((char*)_ctime + sizeof(time_t));
   *_size = size;
   return true;
 }
@@ -100,7 +100,7 @@ bool MetaBlock::addDataID(BlockID id)
   }
   if(_blockNumber == NULL){
     char* op = (char*)_size;
-    op += sizeof(size_t);
+    op += sizeof(uint64_t);
     _blockNumber = (uint64_t*)op;
     op += sizeof(uint64_t);
     _firstBlockID = (BlockID*)op;
@@ -137,7 +137,7 @@ time_t MetaBlock::getCreateTime() const
   return *_ctime;
 }
 
-size_t MetaBlock::getFileSize() const
+uint64_t MetaBlock::getFileSize() const
 {
   if(_size == NULL)
   {
@@ -165,6 +165,9 @@ BlockID MetaBlock::getDataBlockID(uint64_t number) const
     log->error("MetaBlock: get ID of data block before set up!\n");
     return 0;
   }
+
+  if(number >= *_blockNumber)
+    return 0;
 
   BlockID* id = _firstBlockID + number;
 

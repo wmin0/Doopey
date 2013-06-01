@@ -183,7 +183,7 @@ bool Client::putFile(const char* filename, const char* dir) const
     purename = purename.substr(purename.find_last_of("/")+1);
 
   time_t ctime = stat_buf->st_ctime;
-  size_t size = stat_buf->st_size;
+  uint64_t size = stat_buf->st_size;
   uint64_t nameLength = purename.length();
   uint64_t dirLength = strlen(dir);
   uint64_t totalLength = nameLength + dirLength;
@@ -317,9 +317,9 @@ bool Client::getFile(const char* filepath){
   socket.send(msg);
 
   log->info("Send request file %s message\n", filepath);
-  size_t file_size = 0;
+  uint64_t file_size = 0;
   msg=socket.receive();
-  memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(size_t));
+  memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(uint64_t));
   fseek(pFile, file_size, SEEK_SET);
 
   uint64_t blockNum = 0;
