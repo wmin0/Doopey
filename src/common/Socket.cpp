@@ -89,6 +89,7 @@ bool Socket::connect(const char* servername, int port) {
     log->error("socket connect error\n");
     ret = false;
   }
+  _this = NULL;
   alarm(0);
   signal(SIGALRM, oldfunc);
   pthread_mutex_unlock(&DoopeyAlarmLock);
