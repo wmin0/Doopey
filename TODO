@@ -1,0 +1,7 @@
+Daniel:
+done  1.change the position of checking if file existing or not while upload file.
+      2.clean data if upload file fail.
+      3.add check in get file.
+      4.snapshot of file table
+      5.delete file
+      6.fix size_t

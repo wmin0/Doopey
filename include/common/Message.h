@@ -41,8 +41,10 @@ namespace Doopey {
     MC_RmFile,
     // common File ACK
     MC_FileACK,
-    // File Error
+    // Common File Error
     MC_FileError,
+    // error of upload existing file
+    MC_FileUploadRepeat,
     // broadcast
     MC_BroadcastNewFile,
     MC_BroadcastNewDir,
