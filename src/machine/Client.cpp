@@ -58,6 +58,10 @@ void Client::run(int argc, char** argv) {
       case 'p':
         cout << "put request" << endl;
         cout << "filename=" << optarg << endl;
+        if(argv[optind]==NULL){
+          log->info("Missing destination dir\n");
+          return;
+        }
         cout << "optind=" << optind << endl;
         if(argv[optind][0] == '-'){
           cout << "missing the location on remote" << endl;
@@ -174,9 +178,13 @@ bool Client::putFile(const char* filename, const char* dir) const
     return false;
   }
 
+  string purename = filename;
+  if(purename.find_last_of("/") != string::npos)
+    purename = purename.substr(purename.find_last_of("/")+1);
+
   time_t ctime = stat_buf->st_ctime;
   size_t size = stat_buf->st_size;
-  uint64_t nameLength = strlen(filename);
+  uint64_t nameLength = purename.length();
   uint64_t dirLength = strlen(dir);
   uint64_t totalLength = nameLength + dirLength;
   if(dir[dirLength-1]!='/')
@@ -185,7 +193,7 @@ bool Client::putFile(const char* filename, const char* dir) const
   //clean the stat_buf
   free(stat_buf);
 
-  log->info("FileName:%s\nRemote Dir:%s\nctime:%d\n", filename, dir, ctime);
+  log->info("FileName:%s\nRemote Dir:%s\nctime:%d\n", purename.data(), dir, ctime);
 
   //first message to let dispatcher transfer socket to fileManager
   MessageSPtr msg(new Message(MT_File, MC_UpFileStart));
@@ -193,11 +201,11 @@ bool Client::putFile(const char* filename, const char* dir) const
 
   //second message to set up the Meta block
   msg.reset(new Message(MT_File, MC_UpFileMeta));
-  msg->addData((unsigned char*)&totalLength, sizeof(nameLength));
+  msg->addData((unsigned char*)&totalLength, sizeof(totalLength));
   msg->addData((unsigned char*)dir, dirLength);
   if(dir[dirLength-1]!='/')
     msg->addData((unsigned char*)"/", 1);
-  msg->addData((unsigned char*)filename, nameLength);
+  msg->addData((unsigned char*)purename.data(), nameLength);
   msg->addData((unsigned char*)&ctime, sizeof(ctime));
   msg->addData((unsigned char*)&size, sizeof(size));
   socket.send(msg);
