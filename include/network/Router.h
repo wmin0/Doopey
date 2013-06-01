@@ -47,6 +47,8 @@ namespace Doopey {
 
       string askMachineIP(const MachineID& id) const;
 
+      MachineID pickNeighborMachine() const;
+
     private:
       // routing operation functions
       bool addRoutingPath(

@@ -481,3 +481,10 @@ string Router::askMachineIP(const MachineID& id) const {
   }
   return it->second.ip;
 }
+
+MachineID Router::pickNeighborMachine() const {
+  if (0 == _neighbors.size()) {
+    return 0;
+  }
+  return *(_neighbors.begin());
+}
