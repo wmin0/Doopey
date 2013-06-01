@@ -245,6 +245,33 @@ bool FileManager::checkMsg(const MessageSPtr& msg) const
 
 bool FileManager::handleRemove(SocketSPtr socket)
 {
+  MessageSPtr msg = socket->receive();
+  string path = getString(msg);
+  log->info("FileManager: receive a request of remove %s\n", path.data());
+
+  BlockID id;
+  BlockManagerSPtr _blockManager = _server->getBlockManager();
+  MetaBlockSPtr meta;
+
+  switch(msg->getCmd()){
+    case MC_RmDir:
+      break;
+    case MC_RmFile:
+      id = _fileMap->getMetaID(path);
+      if(id != 0){
+        returnACK(socket);
+        _fileMap->removeFile(path);
+        meta = _blockManager->getMeta(id);
+        _uploader->cleanData(meta);
+      }else{
+        returnError(socket);
+      }
+      break;
+    default:
+      log->error("FileManager: Error cmd in remove\n");
+      break;
+  }
+
   return true;
 }
 

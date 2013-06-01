@@ -3,6 +3,7 @@ done  1.change the position of checking if file existing or not while upload fil
 done  2.clean data if upload file fail.
 done  3.add check in get file.
 done  4.snapshot of file table
-      5.delete file
+done  5.delete file
 done  6.fix size_t
       7.add file but local does not have space
+      8.delete dir

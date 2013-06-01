@@ -39,6 +39,7 @@ void Client::run(int argc, char** argv) {
     {"put",  required_argument, 0, 'p'},//use two parameter
     {"adDir",required_argument, 0, 'd'},
     {"rm",   required_argument, 0, 'r'},
+    {"rmDir",required_argument, 0, 'm'},
     {"get",  required_argument, 0, 'g'},
     {"help", no_argument,       0, 'h'},
     {0,      0,                 0,  0}
@@ -85,7 +86,12 @@ void Client::run(int argc, char** argv) {
         addDir(optarg);
         break;
       case 'r':
-        cout << "remove file/dir request" << endl;
+        cout << "remove file request" << endl;
+        removeFile(optarg);
+        break;
+      case 'm':
+        cout << "remove dir request" << endl;
+        break;
       case '?':
         break;
       default:
@@ -412,4 +418,40 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
 
   if(close(f) == -1)
     log->info("Close error of local file %s\n", (char*)filename);
+}
+
+bool Client::removeFile(const char* path) const
+{
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    log->info("Error when connect to server\n");
+    return false;
+  }
+
+  MessageSPtr msg(new Message(MT_File, MC_RmFile));
+  socket.send(msg);
+
+  msg.reset(new Message(MT_File, MC_RmFile));
+  msg->addData((const unsigned char*)path, strlen(path));
+  socket.send(msg);
+
+  msg = socket.receive();
+  if(msg->getCmd()!=MC_FileACK){
+    log->info("Delete file %s fail\n", path);
+    return false;
+  }
+  log->info("Delete file %s success\n", path);
+  return true;
+}
+
+bool Client::removeDir(const char* path) const
+{
+  Socket socket(ST_TCP);
+  if(!socket.connect("localhost", DoopeyPort)){
+    log->info("Error when connect to server\n");
+    return false;
+  }
+  MessageSPtr msg(new Message(MT_File, MC_RmDir));
+  socket.send(msg);
+  return true;
 }

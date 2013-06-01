@@ -30,13 +30,12 @@ namespace Doopey{
       MetaBlockSPtr receiveFile(SocketSPtr socket);
       void setBlockManager(const BlockManagerSPtr blockManager);
       void setFileTree(FileTreeSPtr tree);
+      void cleanData(MetaBlockSPtr meta);
     private:
       FileUploader();
       bool setupMeta(MetaBlockSPtr meta, const MessageSPtr msg);
       bool setupData(MetaBlockSPtr meta, const MessageSPtr msg);
 
-      //used when tranmition failed
-      void cleanData(MetaBlockSPtr meta);
       void returnACK(SocketSPtr socket);
       void returnError(SocketSPtr socket);
       void returnError(SocketSPtr socket, MessageCmd cmd);
