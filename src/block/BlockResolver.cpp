@@ -35,7 +35,7 @@ BlockResolver* BlockResolver::_this = NULL;
 
 void BlockResolver::timeout(int sig) {
   log->debug("ask remote timeout");
-  pthread_mutex_unlock(&_remote_ask_lock);
+  pthread_mutex_unlock(&(_this->_remote_ask_lock));
 }
 
 BlockResolver::BlockResolver(
@@ -270,7 +270,7 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
   pthread_mutex_lock(&DoopeyAlarmLock);
-  void (*oldFunc)(int) = signal(SIGALRM, BlockResolver::timeout);
+  void (*oldfunc)(int) = signal(SIGALRM, BlockResolver::timeout);
   _this = this;
   _manager->getRouter()->broadcast(msg);
   alarm(waitRemote);
