@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <pthread.h>
 
 using std::map;
 using std::set;
@@ -45,6 +46,12 @@ namespace Doopey {
       BlockLocationAttrSPtr askRemoteBlock(BlockID id);
       bool checkReplica(BlockLocationAttrSPtr& attr);
       MachineID chooseReplica(const BlockLocationAttrSPtr& attr);
+    // signal section
+    private:
+      pthread_mutex_t _remote_ask_lock;
+      static void timeout(int sig);
+      static BlockResolver* _this;
+
     private:
       const BlockManager* _manager;
 
@@ -56,9 +63,11 @@ namespace Doopey {
 
       bool _health;
 
+
       static const int waitRemote;
       static const size_t remoteSizeMax;
       static const time_t checkReplicaInterval;
+
   }; // class BlockResolver
 
 };  // namespace Doopey
