@@ -263,12 +263,16 @@ bool FileManager::handleRemove(SocketSPtr socket)
         _fileMap->removeFile(path);
         meta = _blockManager->getMeta(id);
         _uploader->cleanData(meta);
+        msg.reset(new Message(MT_File, MC_BroadcastRmFile));
+        (_server->getRouter())->broadcast(msg);
       }else{
         returnError(socket);
+        return false;
       }
       break;
     default:
       log->error("FileManager: Error cmd in remove\n");
+      return false;
       break;
   }
 
