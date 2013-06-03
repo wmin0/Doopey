@@ -395,29 +395,37 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   BlockInfo* bInfo = (BlockInfo*) blockInfo;
   Socket socket(ST_TCP);
   if (!socket.connect(bInfo->ip, DoopeyPort)) {
-    log->info("Error when connect to server\n");
+    log->error("Error when connect to server\n");
     //return false;
   }
 
   MessageSPtr msg(new Message(MT_Block, MC_RequestBlockData));
   msg->addData((unsigned char*)&bInfo->id, sizeof(BlockID));
-  socket.send(msg);
+  if(socket.send(msg) == false){
+    log->info("Send msg to %s fail while requesting block", bInfo->ip.c_str());
+    //return false;
+  }
   msg=socket.receive();
+  if(msg->getCmd()!= MC_BlockACK){
+    log->info("Receive block %llu of file %s fail from %s\n", bInfo->id, (char*)filename, bInfo->ip.c_str());
+    //return false;
+  }
 
   int f = open((char*)filename, O_WRONLY);
   if(f == -1){
-    log->info("Open error of local file %s\n", (char*)filename);
+    log->warning("Open error of local file %s\n", (char*)filename);
     //return false;
   }
 
   lseek(f, bInfo->nblock * DataBlock::blockSize, SEEK_SET);
 
-  int wrAmount=0;
-  while(wrAmount < (int)bInfo->wsize)
-    wrAmount += write(f, msg->getData().data() + wrAmount, bInfo->wsize - wrAmount);
-
+  int wrAmount=0, wrOnce;
+  while(wrAmount < (int)bInfo->wsize){
+    wrOnce = write(f, msg->getData().data() + wrAmount, bInfo->wsize - wrAmount);
+    if(wrOnce != -1) wrAmount += wrOnce;
+  }
   if(close(f) == -1)
-    log->info("Close error of local file %s\n", (char*)filename);
+    log->warning("Close error of local file %s\n", (char*)filename);
 }
 
 bool Client::removeFile(const char* path) const
