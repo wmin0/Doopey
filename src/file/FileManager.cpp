@@ -287,7 +287,12 @@ void FileManager::returnACK(SocketSPtr socket)
 
 void FileManager::returnError(SocketSPtr socket)
 {
-  MessageSPtr msg(new Message(MT_File, MC_FileError));
+  returnError(socket, MC_FileError);
+}
+
+void FileManager:returnError(SocketSPtr socket, MessageCmd cmd)
+{
+  MessageSPtr msg(new Message(MT_File, cmd));
   socket->send(msg);
 }
 
