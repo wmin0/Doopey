@@ -290,7 +290,7 @@ void FileManager::returnError(SocketSPtr socket)
   returnError(socket, MC_FileError);
 }
 
-void FileManager:returnError(SocketSPtr socket, MessageCmd cmd)
+void FileManager::returnError(SocketSPtr socket, MessageCmd cmd)
 {
   MessageSPtr msg(new Message(MT_File, cmd));
   socket->send(msg);

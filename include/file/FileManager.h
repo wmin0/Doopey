@@ -8,6 +8,7 @@
 
 #include "common/Doopey.h"
 #include "common/Socket.h"
+#include "common/Message.h"
 
 using std::shared_ptr;
 using std::string;

@@ -367,6 +367,11 @@ bool Client::getFile(const char* filepath){
     threadPool[i] = TaskThreadSPtr(new TaskThread(Client::receiveBlock));
 
   uint64_t wsize;
+
+  vector<int> result(blockNum);
+  for(unsigned int i=0; i<blockNum;i++)
+    result[i] = 0;
+
   for(unsigned int i=0; i<blockNum;){
     if(file_size > DataBlock::blockSize)
       wsize = DataBlock::blockSize;
@@ -377,7 +382,7 @@ bool Client::getFile(const char* filepath){
       if(threadPool[j]->isFree()){
         file_size -= wsize;
         blocks[i]->wsize = wsize;
-        threadPool[i]->runTask(blocks[i], (void*)filename.data(), NULL);
+        threadPool[i]->runTask(blocks[i], (void*)filename.data(), result.data());
         i++;
         break;
       }
