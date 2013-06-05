@@ -398,6 +398,7 @@ bool Client::getFile(const char* filepath){
 void Client::receiveBlock(void* blockInfo, void* filename, void* output)
 {
   int* outPut = (int*)output;
+  *outPut = 1;
   BlockInfo* bInfo = (BlockInfo*) blockInfo;
   Socket socket(ST_TCP);
   if (!socket.connect(bInfo->ip, DoopeyPort)) {
@@ -436,8 +437,6 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   }
   if(close(f) == -1)
     log->warning("Close error of local file %s\n", (char*)filename);
-
-  *outPut = 1;
 }
 
 bool Client::removeFile(const char* path) const
