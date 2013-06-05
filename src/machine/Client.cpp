@@ -397,10 +397,12 @@ bool Client::getFile(const char* filepath){
 
 void Client::receiveBlock(void* blockInfo, void* filename, void* output)
 {
+  int* outPut = (int*)output;
   BlockInfo* bInfo = (BlockInfo*) blockInfo;
   Socket socket(ST_TCP);
   if (!socket.connect(bInfo->ip, DoopeyPort)) {
     log->error("Error when connect to server\n");
+    *outPut = -1;
     //return false;
   }
 
@@ -408,17 +410,20 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   msg->addData((unsigned char*)&bInfo->id, sizeof(BlockID));
   if(socket.send(msg) == false){
     log->info("Send msg to %s fail while requesting block", bInfo->ip.c_str());
+    *outPut = -1;
     //return false;
   }
   msg=socket.receive();
   if(msg->getCmd()!= MC_BlockACK){
     log->info("Receive block %llu of file %s fail from %s\n", bInfo->id, (char*)filename, bInfo->ip.c_str());
+    *outPut = -1;
     //return false;
   }
 
   int f = open((char*)filename, O_WRONLY);
   if(f == -1){
     log->warning("Open error of local file %s\n", (char*)filename);
+    *outPut = -1;
     //return false;
   }
 
@@ -431,6 +436,8 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   }
   if(close(f) == -1)
     log->warning("Close error of local file %s\n", (char*)filename);
+
+  *outPut = 1;
 }
 
 bool Client::removeFile(const char* path) const
