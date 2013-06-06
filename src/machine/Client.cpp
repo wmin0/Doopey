@@ -382,10 +382,12 @@ bool Client::getFile(const char* filepath){
       if(threadPool[j]->isFree()){
         file_size -= wsize;
         blocks[i]->wsize = wsize;
+        // TODO: no handle result
         threadPool[i]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
         i++;
         break;
       }
+      // TODO: use sleep but no while?
       sleep(1);
       log->debug("lalala\n");
     }
