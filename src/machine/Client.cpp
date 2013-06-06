@@ -382,7 +382,7 @@ bool Client::getFile(const char* filepath){
       if(threadPool[j]->isFree()){
         file_size -= wsize;
         blocks[i]->wsize = wsize;
-        threadPool[i]->runTask(blocks[i], (void*)filename.data(), result.data());
+        threadPool[i]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
         i++;
         break;
       }
@@ -404,7 +404,7 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   if (!socket.connect(bInfo->ip, DoopeyPort)) {
     log->error("Error when connect to server\n");
     *outPut = -1;
-    //return false;
+    return;
   }
 
   MessageSPtr msg(new Message(MT_Block, MC_RequestBlockData));
@@ -412,20 +412,20 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   if(socket.send(msg) == false){
     log->info("Send msg to %s fail while requesting block", bInfo->ip.c_str());
     *outPut = -1;
-    //return false;
+    return;
   }
   msg=socket.receive();
-  if(msg->getCmd()!= MC_BlockACK){
+  if(msg == NULL || msg->getCmd()!= MC_BlockACK){
     log->info("Receive block %llu of file %s fail from %s\n", bInfo->id, (char*)filename, bInfo->ip.c_str());
     *outPut = -1;
-    //return false;
+    return;
   }
 
   int f = open((char*)filename, O_WRONLY);
   if(f == -1){
     log->warning("Open error of local file %s\n", (char*)filename);
     *outPut = -1;
-    //return false;
+    return;
   }
 
   lseek(f, bInfo->nblock * DataBlock::blockSize, SEEK_SET);
@@ -433,7 +433,13 @@ void Client::receiveBlock(void* blockInfo, void* filename, void* output)
   int wrAmount=0, wrOnce;
   while(wrAmount < (int)bInfo->wsize){
     wrOnce = write(f, msg->getData().data() + wrAmount, bInfo->wsize - wrAmount);
-    if(wrOnce != -1) wrAmount += wrOnce;
+    if(wrOnce > 0)
+      wrAmount += wrOnce;
+    else {
+      if (wrOnce == -1)
+        *outPut = -1;
+      break;
+    }
   }
   if(close(f) == -1)
     log->warning("Close error of local file %s\n", (char*)filename);
