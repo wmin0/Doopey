@@ -284,6 +284,8 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
+    // TODO: code for demo
+    checkReplica(it->second);
     return it->second;
   }
   return BlockLocationAttrSPtr(NULL);
