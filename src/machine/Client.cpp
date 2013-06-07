@@ -387,7 +387,6 @@ bool Client::getFile(const char* filepath){
         i++;
         break;
       }
-      // TODO: use sleep but no while?
       if(j == threadNum -1 ){
         j=0;
         sleep(1);
