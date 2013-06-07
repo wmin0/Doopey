@@ -388,12 +388,26 @@ bool Client::getFile(const char* filepath){
         break;
       }
       // TODO: use sleep but no while?
-      sleep(1);
+      if(j == threadNum -1 ){
+        j=0;
+        sleep(1);
+      }
       log->debug("lalala\n");
     }
   }
-  log->info("end of get file\n");
   fclose(pFile);
+
+  int finish = 0;
+  while(finish != 1){
+    for(unsigned int i=0; i<blockNum; i++){
+      finish = result[i];
+      if(finish == 0)
+        break;
+    }
+    sleep(1);
+  }
+
+  log->info("end of get file\n");
   return true;
 }
 
