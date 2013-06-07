@@ -334,6 +334,7 @@ bool Client::getFile(const char* filepath){
   msg=socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(uint64_t));
   fseek(pFile, file_size, SEEK_SET);
+  fclose(pFile);
 
   uint64_t blockNum = 0;
   msg=socket.receive();
@@ -387,13 +388,11 @@ bool Client::getFile(const char* filepath){
         i++;
         break;
       }
-      // TODO: use sleep but no while?
       sleep(1);
       log->debug("lalala\n");
     }
   }
   log->info("end of get file\n");
-  fclose(pFile);
   return true;
 }
 
