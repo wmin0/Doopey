@@ -334,6 +334,7 @@ bool Client::getFile(const char* filepath){
   msg=socket.receive();
   memcpy((unsigned char*)&file_size, msg->getData().data(), sizeof(uint64_t));
   fseek(pFile, file_size, SEEK_SET);
+  fclose(pFile);
 
   uint64_t blockNum = 0;
   msg=socket.receive();
@@ -360,8 +361,8 @@ bool Client::getFile(const char* filepath){
     //append to the local file
   }
 
-  vector<TaskThreadSPtr> threadPool(4);
   size_t threadNum = 4;
+  vector<TaskThreadSPtr> threadPool(threadNum);
 
   for(size_t i=0; i<threadNum; i++)
     threadPool[i] = TaskThreadSPtr(new TaskThread(Client::receiveBlock));
@@ -392,10 +393,8 @@ bool Client::getFile(const char* filepath){
         j=0;
         sleep(1);
       }
-      log->debug("lalala\n");
     }
   }
-  fclose(pFile);
 
   int finish = 0;
   while(finish != 1){
@@ -403,8 +402,11 @@ bool Client::getFile(const char* filepath){
       finish = result[i];
       if(finish == 0)
         break;
+      if(finish == -1){
+        return false;
+      }
     }
-    sleep(1);
+    sleep(3);
   }
 
   log->info("end of get file\n");
@@ -495,4 +497,14 @@ bool Client::removeDir(const char* path) const
   MessageSPtr msg(new Message(MT_File, MC_RmDir));
   socket.send(msg);
   return true;
+}
+
+const char* Client::getFileName(const char* path) const
+{
+  for(int i = strlen(path); i>=0; i--)
+  {
+    if(path[i]=='/')
+      return &path[i+1];
+  }
+  return NULL;
 }

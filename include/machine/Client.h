@@ -24,6 +24,7 @@ namespace Doopey {
       bool getFile(const char* filename);
       bool removeFile(const char* path) const;
       bool removeDir(const char* path) const;
+      const char* getFileName(const char* path) const;
 
       static void receiveBlock(void* blockInfo, void* filename, void* output);
   }; // class Client
