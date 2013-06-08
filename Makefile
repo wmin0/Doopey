@@ -53,3 +53,6 @@ cleantest:
 		make -C test/$$pkg --no-print-directory clean; \
 	done
 
+reset:
+	rm -rf block .Doopey
+	mkdir block
