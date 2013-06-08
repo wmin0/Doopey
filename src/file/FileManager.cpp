@@ -191,8 +191,13 @@ bool FileManager::handleGetFile(SocketSPtr socket)
     returnError(socket);
     return false;
   }
-  returnACK(socket);
   MetaBlockSPtr meta = blockManager->getMeta(metaID);
+  
+  if(meta == NULL){
+    returnError(socket);
+    return false;
+  }
+  returnACK(socket);
 
   uint64_t filesize = meta->getFileSize();
   msg.reset(new Message(MT_File, MC_RequestFile));
