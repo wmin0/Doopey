@@ -349,6 +349,9 @@ bool Client::getFile(const char* filepath){
   for(unsigned int i=0; i<blockNum; i++){
     msg = socket.receive();
 
+    if(msg->getCmd() != MC_RequestFile)
+      return false;
+
     //get block
     memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
     ip.resize(msg->getData().size()-sizeof(BlockID));

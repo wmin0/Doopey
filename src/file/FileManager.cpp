@@ -220,6 +220,8 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   {
     id = meta->getDataBlockID(i);
     location = resolver->askBlock(id);
+    if(location == NULL)
+      returnError(socket);
     mid = location->machine[0];
     ip = router->askMachineIP(mid);
     log->info("FileManager: get data block of ID=%u, machineID=%d, locationIP=%s\n", id, mid, ip.data());
@@ -228,8 +230,7 @@ bool FileManager::handleGetFile(SocketSPtr socket)
     msg->addData((unsigned char*)ip.data(), ip.length());
     socket->send(msg);
   }
-  msg.reset(new Message(MT_File, MC_FileACK));
-  socket->send(msg);
+  returnACK(socket);
   return true;
 }
 
