@@ -12,7 +12,7 @@ namespace Doopey {
 
   class BlockManager {
     public:
-      BlockManager(const Server* server, const ConfigSPtr& config);
+      BlockManager(Server* server, const ConfigSPtr& config);
       ~BlockManager();
       // request handle interface
       MetaBlockSPtr getMeta(BlockID id);
@@ -60,6 +60,7 @@ namespace Doopey {
       bool handleCopyBlockFromRemote(const SocketSPtr& sock, const MessageSPtr& msg);
       bool handleDoDelete(const MessageSPtr& msg);
       bool handleDeleteBlock(const MessageSPtr& msg);
+    friend class BlockResolver;
   }; // class BlockManager
 
 };  // namespace Doopey

@@ -32,7 +32,7 @@ const RouterSPtr& BlockManager::getRouter() const {
   return _server->getRouter();
 }
 
-BlockManager::BlockManager(const Server* server, const ConfigSPtr& config):
+BlockManager::BlockManager(Server* server, const ConfigSPtr& config):
   _server(server), _localDir(".") {
   if (NULL != config) {
     string tmp = config->getValue("BlockDir");

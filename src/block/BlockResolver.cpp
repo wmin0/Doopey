@@ -39,7 +39,7 @@ void BlockResolver::timeout(int sig) {
 }
 
 BlockResolver::BlockResolver(
-  const BlockManager* manager, const ConfigSPtr& config):
+  BlockManager* manager, const ConfigSPtr& config):
   _manager(manager), _cacheRemoteSize(0),
   _localMax(0), _health(true) {
   // some setup
