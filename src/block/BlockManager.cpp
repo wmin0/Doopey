@@ -32,7 +32,7 @@ const RouterSPtr& BlockManager::getRouter() const {
   return _server->getRouter();
 }
 
-BlockManager::BlockManager(const Server* server, const ConfigSPtr& config):
+BlockManager::BlockManager(Server* server, const ConfigSPtr& config):
   _server(server), _localDir(".") {
   if (NULL != config) {
     string tmp = config->getValue("BlockDir");
@@ -122,33 +122,43 @@ bool BlockManager::isHealth() const {
 void BlockManager::request(const MessageSPtr& msg, const SocketSPtr& sock) {
   switch (msg->getCmd()) {
     case MC_RequestBlockLocation:
+      log->debug("RequestBlockLocation\n");
       _resolver->handleRequestBlockLocation(msg);
       break;
     case MC_RequestBlockLocationACK:
+      log->debug("RequestBlockLocationACK\n");
       _resolver->handleRequestBlockLocationACK(msg);
       break;
     case MC_RequestBlockData:
+      log->debug("RequestBlockData\n");
       _loader->handleRequestBlockData(sock, msg);
       break;
     case MC_CheckBlockAlive:
+      log->debug("RequestBlockAlive\n");
       _resolver->handleCheckBlockAlive(sock, msg);
       break;
     case MC_DoReplica:
+      log->debug("DoReplica\n");
       handleDoReplica(msg);
       break;
     case MC_UpdateReplica:
+      log->debug("UpdateReplica\n");
       _resolver->handleUpdateReplica(msg);
       break;
     case MC_CopyBlockFromRemote:
+      log->debug("CopyBlockFromRemote\n");
       handleCopyBlockFromRemote(sock, msg);
       break;
     case MC_DoDelete:
+      log->debug("DoDelete\n");
       handleDoDelete(msg);
       break;
     case MC_DeleteBlock:
+      log->debug("DeleteBlock\n");
       handleDeleteBlock(msg);
       break;
     default:
+      log->warning("unknown block request\n");
       break;
   }
 }

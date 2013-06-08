@@ -353,6 +353,9 @@ bool Client::getFile(const char* filepath){
   for(unsigned int i=0; i<blockNum; i++){
     msg = socket.receive();
 
+    if(msg->getCmd() != MC_RequestFile)
+      return false;
+
     //get block
     memcpy((unsigned char*)&id, msg->getData().data(), sizeof(BlockID));
     ip.resize(msg->getData().size()-sizeof(BlockID));
@@ -388,7 +391,7 @@ bool Client::getFile(const char* filepath){
         file_size -= wsize;
         blocks[i]->wsize = wsize;
         // TODO: no handle result
-        threadPool[i]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
+        threadPool[j]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
         i++;
         break;
       }

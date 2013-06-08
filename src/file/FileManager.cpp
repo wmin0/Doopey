@@ -191,8 +191,13 @@ bool FileManager::handleGetFile(SocketSPtr socket)
     returnError(socket);
     return false;
   }
-  returnACK(socket);
   MetaBlockSPtr meta = blockManager->getMeta(metaID);
+  
+  if(meta == NULL){
+    returnError(socket);
+    return false;
+  }
+  returnACK(socket);
 
   uint64_t filesize = meta->getFileSize();
   msg.reset(new Message(MT_File, MC_RequestFile));
@@ -215,6 +220,8 @@ bool FileManager::handleGetFile(SocketSPtr socket)
   {
     id = meta->getDataBlockID(i);
     location = resolver->askBlock(id);
+    if(location == NULL)
+      returnError(socket);
     mid = location->machine[0];
     ip = router->askMachineIP(mid);
     log->info("FileManager: get data block of ID=%u, machineID=%d, locationIP=%s\n", id, mid, ip.data());
@@ -223,8 +230,7 @@ bool FileManager::handleGetFile(SocketSPtr socket)
     msg->addData((unsigned char*)ip.data(), ip.length());
     socket->send(msg);
   }
-  msg.reset(new Message(MT_File, MC_FileACK));
-  socket->send(msg);
+  returnACK(socket);
   return true;
 }
 
@@ -262,6 +268,7 @@ bool FileManager::handleRemove(SocketSPtr socket)
         returnACK(socket);
         _fileMap->removeFile(path);
         meta = _blockManager->getMeta(id);
+        _uploader->setBlockManager(_blockManager);
         _uploader->cleanData(meta);
         msg.reset(new Message(MT_File, MC_BroadcastRmFile));
         (_server->getRouter())->broadcast(msg);

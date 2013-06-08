@@ -35,11 +35,11 @@ BlockResolver* BlockResolver::_this = NULL;
 
 void BlockResolver::timeout(int sig) {
   log->debug("ask remote timeout\n");
-  pthread_mutex_unlock(&(_this->_remote_ask_lock));
+  //pthread_mutex_unlock(&(_this->_remote_ask_lock));
 }
 
 BlockResolver::BlockResolver(
-  const BlockManager* manager, const ConfigSPtr& config):
+  BlockManager* manager, const ConfigSPtr& config):
   _manager(manager), _cacheRemoteSize(0),
   _localMax(0), _health(true) {
   // some setup
@@ -49,6 +49,21 @@ BlockResolver::BlockResolver(
 
 BlockResolver::~BlockResolver() {
   pthread_mutex_destroy(&_remote_ask_lock);
+}
+
+void BlockResolver::checkAllReplica() {
+  BlockMap::iterator it = _localIDs.begin();
+  for (; it != _localIDs.end(); ++it) {
+    BlockLocationAttrSPtr attr = it->second;
+    MessageSPtr req(new Message(MT_Block, MC_DoReplica));
+    req->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    size_t off = sizeof(BlockID);
+    for (size_t i = 0; i < attr->machine.size(); ++i) {
+      req->addData((unsigned char*)&(attr->machine[i]), off, sizeof(MachineID));
+      off += sizeof(MachineID);
+    }
+    _manager->handleDoReplica(req);
+  }
 }
 
 BlockID BlockResolver::newLocalID() {
@@ -158,12 +173,16 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
     do {
       SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
       if (NULL == sock) {
+        log->warning("check replica send fail\n");
         succ = false;
+        log->warning("check replica send fail\n");
         break;
       }
       MessageSPtr ack = sock->receive();
       if (NULL == ack) {
+        log->warning("check replica ack fail\n");
         succ = false;
+        log->warning("check replica ack fail\n");
         break;
       }
       bool result = false;
@@ -269,23 +288,24 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   MachineID m = _manager->getMachineID();
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
-  pthread_mutex_lock(&DoopeyAlarmLock);
-  void (*oldfunc)(int) = signal(SIGALRM, BlockResolver::timeout);
-  _this = this;
+  //pthread_mutex_lock(&DoopeyAlarmLock);
+  //void (*oldfunc)(int) = signal(SIGALRM, BlockResolver::timeout);
+  //_this = this;
   _manager->getRouter()->broadcast(msg);
-  alarm(waitRemote);
-  pthread_mutex_lock(&_remote_ask_lock);
-  pthread_mutex_lock(&_remote_ask_lock);
-  pthread_mutex_unlock(&_remote_ask_lock);
-  alarm(0);
-  signal(SIGALRM, oldfunc);
-  _this = NULL;
-  pthread_mutex_unlock(&DoopeyAlarmLock);
+  sleep(1);
+  //alarm(waitRemote);
+  //pthread_mutex_lock(&_remote_ask_lock);
+  //pthread_mutex_lock(&_remote_ask_lock);
+  //pthread_mutex_unlock(&_remote_ask_lock);
+  //alarm(0);
+  //signal(SIGALRM, oldfunc);
+  //_this = NULL;
+  //pthread_mutex_unlock(&DoopeyAlarmLock);
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
     // TODO: code for demo
-    checkReplica(it->second);
+    //checkReplica(it->second);
     return it->second;
   }
   return BlockLocationAttrSPtr(NULL);
@@ -311,8 +331,10 @@ bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
   memcpy(&m, msg->getData().data(), sizeof(MachineID));
   memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
   MessageSPtr ack(new Message(MT_Block, MC_RequestBlockLocationACK));
+  log->debug("req ask block: %ld\n", id);
   BlockMap::iterator it = _localIDs.find(id);
   if (_localIDs.end() != it) {
+    log->debug("find block\n", id);
     ack->addData((unsigned char*)&id, 0, sizeof(BlockID));
     size_t off = sizeof(BlockID);
     for (size_t i = 0; i < it->second->machine.size(); ++i) {
@@ -352,7 +374,7 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
     off += sizeof(MachineID);
     it->second->addMachine(m);
   }
-  pthread_mutex_unlock(&_remote_ask_lock);
+  //pthread_mutex_unlock(&_remote_ask_lock);
   return true;
 }
 

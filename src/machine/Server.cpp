@@ -2,6 +2,7 @@
 
 #include "file/FileManager.h"
 #include "block/BlockManager.h"
+#include "block/BlockResolver.h"
 #include "common/Doopey.h"
 #include "common/Config.h"
 #include "common/Message.h"
@@ -149,7 +150,8 @@ void Server::handleUSR1(int sig) {
   BlockID id = _this->_blockManager->saveBlock((BlockSPtr)block);
   log->debug("save new block %d\n", id);
 */
-  DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(4, 1));
+  //DataBlockSPtr block = _this->_blockManager->getData(Doopey::buildBlockID(4, 1));
+  _this->_blockManager->getBlockResolver()->checkAllReplica();
 }
 
 

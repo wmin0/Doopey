@@ -19,7 +19,7 @@ namespace Doopey {
     typedef map<BlockID, BlockLocationAttrSPtr> BlockMap;
     typedef pair<BlockID, BlockLocationAttrSPtr> BlockPair;
     public:
-      BlockResolver(const BlockManager* manager, const ConfigSPtr& config);
+      BlockResolver(BlockManager* manager, const ConfigSPtr& config);
       ~BlockResolver();
 
       // only return 1 machine
@@ -31,6 +31,8 @@ namespace Doopey {
 
       void removeRemoteID(BlockID id);
       void removeLocalID(BlockID id);
+      void checkAllReplica();
+
 
       bool isHealth() const { return _health; }
 
@@ -53,7 +55,7 @@ namespace Doopey {
       static BlockResolver* _this;
 
     private:
-      const BlockManager* _manager;
+      BlockManager* _manager;
 
       size_t _cacheRemoteSize;
 
