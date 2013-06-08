@@ -166,11 +166,13 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
       SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
       if (NULL == sock) {
         succ = false;
+        log->warning("check replica send fail\n");
         break;
       }
       MessageSPtr ack = sock->receive();
       if (NULL == ack) {
         succ = false;
+        log->warning("check replica ack fail\n");
         break;
       }
       bool result = false;
