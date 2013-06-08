@@ -268,6 +268,7 @@ bool FileManager::handleRemove(SocketSPtr socket)
         returnACK(socket);
         _fileMap->removeFile(path);
         meta = _blockManager->getMeta(id);
+        _uploader->setBlockManager(_blockManager);
         _uploader->cleanData(meta);
         msg.reset(new Message(MT_File, MC_BroadcastRmFile));
         (_server->getRouter())->broadcast(msg);
