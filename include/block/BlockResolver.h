@@ -31,6 +31,8 @@ namespace Doopey {
 
       void removeRemoteID(BlockID id);
       void removeLocalID(BlockID id);
+      void checkAllReplica();
+
 
       bool isHealth() const { return _health; }
 

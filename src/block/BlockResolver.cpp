@@ -51,6 +51,13 @@ BlockResolver::~BlockResolver() {
   pthread_mutex_destroy(&_remote_ask_lock);
 }
 
+void BlockResolver::checkAllReplica() {
+  BlockMap::iterator it = _localIDs.begin();
+  for (; it != _localIDs.end(); ++it) {
+    checkReplica(it->second);
+  }
+}
+
 BlockID BlockResolver::newLocalID() {
   return Doopey::buildBlockID(_manager->getMachineID(), ++_localMax);
 }
@@ -286,7 +293,7 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
     // TODO: code for demo
-    checkReplica(it->second);
+    //checkReplica(it->second);
     return it->second;
   }
   return BlockLocationAttrSPtr(NULL);
@@ -312,9 +319,10 @@ bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
   memcpy(&m, msg->getData().data(), sizeof(MachineID));
   memcpy(&id, msg->getData().data() + sizeof(MachineID), sizeof(BlockID));
   MessageSPtr ack(new Message(MT_Block, MC_RequestBlockLocationACK));
+  log->debug("req ask block: %ld\n", id);
   BlockMap::iterator it = _localIDs.find(id);
   if (_localIDs.end() != it) {
-    log->debug("find block: %ld\n", id);
+    log->debug("find block\n", id);
     ack->addData((unsigned char*)&id, 0, sizeof(BlockID));
     size_t off = sizeof(BlockID);
     for (size_t i = 0; i < it->second->machine.size(); ++i) {
