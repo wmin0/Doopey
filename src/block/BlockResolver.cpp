@@ -314,6 +314,7 @@ bool BlockResolver::handleRequestBlockLocation(const MessageSPtr& msg) {
   MessageSPtr ack(new Message(MT_Block, MC_RequestBlockLocationACK));
   BlockMap::iterator it = _localIDs.find(id);
   if (_localIDs.end() != it) {
+    log->debug("find block: %ld\n", id);
     ack->addData((unsigned char*)&id, 0, sizeof(BlockID));
     size_t off = sizeof(BlockID);
     for (size_t i = 0; i < it->second->machine.size(); ++i) {
