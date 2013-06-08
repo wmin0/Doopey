@@ -298,7 +298,11 @@ vector<MachineID> Router::pickMachineBesideList(
   vector<MachineID> ret;
   RoutingMap::const_iterator it = _routingTable.begin();
   while (_routingTable.end() != it) {
-    it = _routingTable.begin() + rand() % _routingTable.size();
+    int j = rand() % _routingTable.size();
+    it = _routingTable.begin();
+    for (int i = 0; i < j; ++i) {
+      ++it;
+    }
     if (num == 0 || num > Block::blockReplica) {
       break;
     }
