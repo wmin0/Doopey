@@ -54,7 +54,15 @@ BlockResolver::~BlockResolver() {
 void BlockResolver::checkAllReplica() {
   BlockMap::iterator it = _localIDs.begin();
   for (; it != _localIDs.end(); ++it) {
-    checkReplica(it->second);
+    BlockLocationAttrSPtr attr = it->second;
+    MessageSPtr req(new Message(MT_Block, MC_DoReplica));
+    req->addData((unsigned char*)&(attr->block), 0, sizeof(BlockID));
+    size_t off = sizeof(BlockID);
+    for (size_t i = 0; i < attr->machine.size(); ++i) {
+      req->addData((unsigned char*)&(attr->machine[i]), off, sizeof(MachineID));
+      off += sizeof(MachineID);
+    }
+    _manager->handleDoReplica(req);
   }
 }
 
@@ -165,11 +173,13 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
     do {
       SocketSPtr sock = _manager->getRouter()->sendTo(attr->machine[i], msg);
       if (NULL == sock) {
+        log->warning("check replica send fail\n");
         succ = false;
         break;
       }
       MessageSPtr ack = sock->receive();
       if (NULL == ack) {
+        log->warning("check replica ack fail\n");
         succ = false;
         break;
       }
