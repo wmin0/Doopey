@@ -6,6 +6,8 @@
 #include "common/SectionCollection.h"
 #include "common/Config.h"
 
+#include <cstdlib>
+#include <ctime>
 #include <pthread.h>
 #include <string>
 
@@ -67,6 +69,7 @@ SectionCollectionSPtr Doopey::DoopeyInit(const char* path, char* argv0) {
   // TODO: do log init
   log.reset(new Logger(LL_Debug));
   log->info("Root: %s\n", DoopeyRoot.data());
+  srand(time(NULL));
   return section;
 }
 

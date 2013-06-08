@@ -292,7 +292,7 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   //void (*oldfunc)(int) = signal(SIGALRM, BlockResolver::timeout);
   //_this = this;
   _manager->getRouter()->broadcast(msg);
-  sleep(2);
+  sleep(1);
   //alarm(waitRemote);
   //pthread_mutex_lock(&_remote_ask_lock);
   //pthread_mutex_lock(&_remote_ask_lock);
