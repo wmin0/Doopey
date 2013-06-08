@@ -387,7 +387,7 @@ bool Client::getFile(const char* filepath){
         file_size -= wsize;
         blocks[i]->wsize = wsize;
         // TODO: no handle result
-        threadPool[i]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
+        threadPool[j]->runTask(blocks[i], (void*)filename.data(), &(result[i]));
         i++;
         break;
       }
