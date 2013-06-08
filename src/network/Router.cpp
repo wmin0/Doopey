@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <vector>
 #include <memory.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace Doopey;
 using namespace std;
@@ -292,15 +294,22 @@ void Router::threadStop(void* obj) {
 
 vector<MachineID> Router::pickMachineBesideList(
   const vector<MachineID>& list, size_t num) const {
+  srand(time(NULL));
   vector<MachineID> ret;
   RoutingMap::const_iterator it = _routingTable.begin();
   while (_routingTable.end() != it) {
+    it = _routingTable.begin() + rand() % _routingTable.size();
     if (num == 0 || num > Block::blockReplica) {
       break;
     }
     bool in = false;
     for (size_t i = 0; i < list.size(); ++i) {
       if (list[i] == it->first) {
+        in = true;
+      }
+    }
+    for (size_t i = 0; i < ret.size(); ++i) {
+      if (ret[i] == it->first) {
         in = true;
       }
     }
