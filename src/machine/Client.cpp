@@ -312,6 +312,10 @@ bool Client::getFile(const char* filepath){
     return false;
   }
   pFile = fopen(filename.data(), "w+");
+  if(pFile==NULL){
+    log->info("File create fail\n");
+    return false;
+  }
 
   log->info("File create success\n");
   //first message to let dispatcher transfer the task to fileManager
