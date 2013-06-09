@@ -176,14 +176,12 @@ bool BlockResolver::checkReplica(BlockLocationAttrSPtr& attr) {
       if (NULL == sock) {
         log->warning("check replica send fail\n");
         succ = false;
-        log->warning("check replica send fail\n");
         break;
       }
       MessageSPtr ack = sock->receive();
       if (NULL == ack) {
         log->warning("check replica ack fail\n");
         succ = false;
-        log->warning("check replica ack fail\n");
         break;
       }
       bool result = false;

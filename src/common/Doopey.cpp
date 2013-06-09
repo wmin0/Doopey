@@ -66,7 +66,7 @@ namespace {
     for (size_t i = 0; i < todo.size(); ++i) {
       alarmMap.erase(todo[i]);
     }
-    log->debug("alarm done\n");
+    //log->debug("alarm done\n");
     if (next) {
       if (time(NULL) >= min) {
         alarmHandler(SIGALRM);
