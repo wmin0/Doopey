@@ -58,11 +58,11 @@ void Client::run(int argc, char** argv) {
       case 'p':
         log->info("put request\n");
         if(argv[optind]==NULL){
-          log->Error("Missing destination dir\n");
+          log->error("Missing destination dir\n");
           return;
         }
         if(argv[optind][0] == '-'){
-          log->Error("missing the location on remote\n");
+          log->error("missing the location on remote\n");
           return;
         }
         putFile(optarg, argv[optind]);
