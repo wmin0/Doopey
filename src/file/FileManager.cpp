@@ -281,6 +281,7 @@ bool FileManager::handleRemove(SocketSPtr socket)
         _uploader->setBlockManager(_blockManager);
         _uploader->cleanData(meta);
         msg.reset(new Message(MT_File, MC_BroadcastRmFile));
+        msg->addData((unsigned char*)(path.data()), path.length());
         (_server->getRouter())->broadcast(msg);
       }else{
         returnError(socket);
