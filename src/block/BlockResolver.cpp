@@ -27,15 +27,16 @@ using std::ifstream;
 using std::string;
 using std::stringstream;
 
-const int BlockResolver::waitRemote = 5;
+const int BlockResolver::waitRemote = 2;
 const size_t BlockResolver::remoteSizeMax = 1000;
 // TODO: adjust after test
 const time_t BlockResolver::checkReplicaInterval = 0;
 BlockResolver* BlockResolver::_this = NULL;
+pthread_mutex_t BlockResolver::_sig_lock;
 
 void BlockResolver::timeout(int sig) {
   log->debug("ask remote timeout\n");
-  //pthread_mutex_unlock(&(_this->_remote_ask_lock));
+  pthread_mutex_unlock(&(_this->_remote_ask_lock));
 }
 
 BlockResolver::BlockResolver(
@@ -288,24 +289,19 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   MachineID m = _manager->getMachineID();
   msg->addData((unsigned char*)&m, 0, sizeof(MachineID));
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
-  //pthread_mutex_lock(&DoopeyAlarmLock);
-  //void (*oldfunc)(int) = signal(SIGALRM, BlockResolver::timeout);
-  //_this = this;
+  pthread_mutex_lock(&_sig_lock);
+  _this = this;
+  DoopeyAlarm(BlockResolver::timeout, waitRemote);
   _manager->getRouter()->broadcast(msg);
-  sleep(1);
-  //alarm(waitRemote);
-  //pthread_mutex_lock(&_remote_ask_lock);
-  //pthread_mutex_lock(&_remote_ask_lock);
-  //pthread_mutex_unlock(&_remote_ask_lock);
-  //alarm(0);
-  //signal(SIGALRM, oldfunc);
-  //_this = NULL;
-  //pthread_mutex_unlock(&DoopeyAlarmLock);
+  pthread_mutex_lock(&_remote_ask_lock);
+  pthread_mutex_lock(&_remote_ask_lock);
+  pthread_mutex_unlock(&_remote_ask_lock);
+  DoopeyAlarm(BlockResolver::timeout, 0);
+  _this = NULL;
+  pthread_mutex_unlock(&_sig_lock);
   BlockMap::iterator it = _remoteIDs.find(id);
   if (_remoteIDs.end() != it) {
     it->second->ts = time(0);
-    // TODO: code for demo
-    //checkReplica(it->second);
     return it->second;
   }
   return BlockLocationAttrSPtr(NULL);
@@ -374,7 +370,7 @@ bool BlockResolver::handleRequestBlockLocationACK(const MessageSPtr& msg) {
     off += sizeof(MachineID);
     it->second->addMachine(m);
   }
-  //pthread_mutex_unlock(&_remote_ask_lock);
+  pthread_mutex_unlock(&_remote_ask_lock);
   return true;
 }
 

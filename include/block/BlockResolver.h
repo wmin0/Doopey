@@ -40,6 +40,8 @@ namespace Doopey {
       bool handleRequestBlockLocationACK(const MessageSPtr& msg);
       bool handleCheckBlockAlive(const SocketSPtr& sock, const MessageSPtr& msg);
       bool handleUpdateReplica(const MessageSPtr& msg);
+    public:
+      static pthread_mutex_t _sig_lock;
     private:
       void loadLocalIDs();
       void cleanCache();

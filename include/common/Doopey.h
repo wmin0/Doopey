@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <pthread.h>
 
 using std::shared_ptr;
 using std::string;
@@ -53,8 +52,8 @@ namespace Doopey {
   // signal
   #define SIGTSTOP SIGRTMAX - 1
 
-  // signal lock
-  extern pthread_mutex_t DoopeyAlarmLock;
+  // custom alarm
+  extern void DoopeyAlarm(sighandler_t func, time_t sec);
 
   // general type
   typedef uint64_t BlockID;
@@ -64,6 +63,7 @@ namespace Doopey {
   extern MachineID getMachineIDFromBlockID(BlockID block);
   extern MachineID getLocalIDFromBlockID(BlockID block);
   extern BlockID buildBlockID(MachineID machine, LocalBlockID local);
+
 
   extern SectionCollectionSPtr DoopeyInit(const char* path, char* argv0);
   extern bool DoopeyFinal();

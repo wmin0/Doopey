@@ -20,6 +20,7 @@
 #include <string>
 #include <iomanip>
 #include <memory.h>
+#include <pthread.h>
 
 using namespace Doopey;
 using namespace std;
@@ -48,9 +49,11 @@ BlockManager::BlockManager(Server* server, const ConfigSPtr& config):
   _loader.reset(new BlockLoader(this, config));
   _saver.reset(new BlockSaver(this, config));
   _updater.reset(new BlockUpdater(this, config));
+  pthread_mutex_init(&BlockResolver::_sig_lock, NULL);
 }
 
 BlockManager::~BlockManager() {
+  pthread_mutex_destroy(&BlockResolver::_sig_lock);
 }
 
 MetaBlockSPtr BlockManager::newMeta() {

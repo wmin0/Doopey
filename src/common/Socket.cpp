@@ -22,6 +22,7 @@ using std::vector;
 using std::string;
 
 Socket* Socket::_this = NULL;
+pthread_mutex_t Socket::_sig_lock;
 
 Socket::Socket(SocketType type):
   _type(type), _fd(-1), _isConnected(false) {
@@ -80,19 +81,17 @@ bool Socket::connect(const char* servername, int port) {
   memcpy(&addr.sin_addr.s_addr,
          server->h_addr_list[0],
          server->h_length);
-  pthread_mutex_lock(&DoopeyAlarmLock);
+  pthread_mutex_lock(&_sig_lock);
   bool ret = true;
-  void (*oldfunc)(int) = signal(SIGALRM, Socket::timeout);
   _this = this;
-  alarm(1);
+  DoopeyAlarm(Socket::timeout, 1);
   if (::connect(_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
     log->error("socket connect error\n");
     ret = false;
   }
   _this = NULL;
-  alarm(0);
-  signal(SIGALRM, oldfunc);
-  pthread_mutex_unlock(&DoopeyAlarmLock);
+  DoopeyAlarm(Socket::timeout, 0);
+  pthread_mutex_unlock(&_sig_lock);
   _isConnected = true;
   return ret;
 }
