@@ -26,7 +26,6 @@ using namespace std;
 typedef shared_ptr<Message> MessageSPtr;
 
 Client::Client() {
-  
 }
 
 Client::~Client() {
@@ -37,9 +36,9 @@ void Client::run(int argc, char** argv) {
   struct option long_options[] = {
     {"ls",   required_argument, 0, 'l'},
     {"put",  required_argument, 0, 'p'},//use two parameter
-    {"adDir",required_argument, 0, 'd'},
+    {"addir",required_argument, 0, 'd'},
     {"rm",   required_argument, 0, 'r'},
-    {"rmDir",required_argument, 0, 'm'},
+    {"rmdir",required_argument, 0, 'm'},
     {"get",  required_argument, 0, 'g'},
     {"help", no_argument,       0, 'h'},
     {0,      0,                 0,  0}
@@ -53,50 +52,42 @@ void Client::run(int argc, char** argv) {
     switch (c) {
       // TODO: build option and check one option only
       case 'l':
-        cout << "ls request" << endl;
-        cout << "arg=" << optarg << endl;
+        log->info("ls request\n");
         getFileList(optarg);
         break;
       case 'p':
-        cout << "put request" << endl;
-        cout << "filename=" << optarg << endl;
+        log->info("put request\n");
         if(argv[optind]==NULL){
-          log->info("Missing destination dir\n");
+          log->Error("Missing destination dir\n");
           return;
         }
-        cout << "optind=" << optind << endl;
         if(argv[optind][0] == '-'){
-          cout << "missing the location on remote" << endl;
+          log->Error("missing the location on remote\n");
           return;
         }
-        cout << "remote dir=" << argv[optind] << endl;
         putFile(optarg, argv[optind]);
         optind++;
         break;
       case 'g':
-        cout << "get request" << endl;
-        cout << "filename=" << optarg << endl;
+        log->info("get request\n");
         getFile(optarg);
         break;
-      case 'h':
-        cout << "help request" << endl;
-        break;
       case 'd':
-        cout << "add Dir request" << endl;
+        log->info("add Dir request\n");
         addDir(optarg);
         break;
       case 'r':
-        cout << "remove file request" << endl;
+        log->info("remove file request\n");
         removeFile(optarg);
         break;
       case 'm':
-        cout << "remove dir request" << endl;
+        log->info("remove dir request\n");
         removeDir(optarg);
         break;
       case '?':
-        break;
+      case 'h':
       default:
-        cout << "?? getopt returned character code 0" << c << "??" << endl;
+        showHow();
     }
   }
   if (optind < argc) {
@@ -525,4 +516,15 @@ const char* Client::getFileName(const char* path) const
       return &path[i+1];
   }
   return NULL;
+}
+
+void Client::showHow()
+{
+  cout << "Here are the commands" << endl;
+  cout << "-l [directory name] : show the file in the directory" << endl;
+  cout << "-p [local file] [remote directory] : upload file" << endl;
+  cout << "-a [remote directory] : add new directory at remote" << endl;
+  cout << "-r [remote file path] : delete a file at remote" << endl;
+  cout << "-m [remove directory path] : delete a directory at remote" << endl;
+  cout << "-g [remote file path] : download file at remote" << endl;
 }
