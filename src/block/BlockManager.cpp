@@ -196,6 +196,9 @@ bool BlockManager::handleDoReplica(const MessageSPtr& msg) {
   cmd->addData((unsigned char*)&id, 0, sizeof(BlockID));
   for (size_t i = 0; i < candidate.size(); ++i) {
     SocketSPtr sock = getRouter()->sendTo(candidate[i], cmd);
+    if (NULL == sock) {
+      continue;
+    }
     MessageSPtr ack = sock->receive();
     if (NULL != ack &&
         MT_Block == ack->getType() &&
