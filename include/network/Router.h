@@ -37,8 +37,8 @@ namespace Doopey {
       bool start();
       bool stop();
 
-      void broadcast(const MessageSPtr& msg) const;
-      SocketSPtr sendTo(MachineID id, const MessageSPtr& msg) const;
+      void broadcast(const MessageSPtr& msg);
+      SocketSPtr sendTo(MachineID id, const MessageSPtr& msg);
 
       void request(const MessageSPtr& msg, const SocketSPtr& sock);
 

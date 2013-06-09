@@ -324,7 +324,7 @@ vector<MachineID> Router::pickMachineBesideList(
   return ret;
 }
 
-void Router::broadcast(const MessageSPtr& msg) const {
+void Router::broadcast(const MessageSPtr& msg) {
   RoutingMap::const_iterator it = _routingTable.begin();
   while (_routingTable.end() != it) {
     sendTo(it->first, msg);
@@ -332,8 +332,8 @@ void Router::broadcast(const MessageSPtr& msg) const {
   }
 }
 
-SocketSPtr Router::sendTo(MachineID id, const MessageSPtr& msg) const {
-  RoutingMap::const_iterator it = _routingTable.find(id);
+SocketSPtr Router::sendTo(MachineID id, const MessageSPtr& msg) {
+  RoutingMap::iterator it = _routingTable.find(id);
   if (_routingTable.end() == it) {
     log->warning("can't route to %d\n", id);
     return NULL;
