@@ -158,12 +158,18 @@ bool FileManager::handleBroadcast(const MessageSPtr& msg)
       break;
     case MC_BroadcastNewDir:
       success = _fileMap->addDir(getString(msg));
+      log->info("FileManager: receive a broadcast of adding new dir %s\n",
+        getString(msg).data());
       break;
     case MC_BroadcastRmFile:
       success = _fileMap->removeFile(getString(msg));
+      log->info("FileManager: receive a broadcast of remove a file %s\n",
+        getString(msg).data());
       break;
     case MC_BroadcastRmDir:
       success = _fileMap->removeDir(getString(msg));
+      log->info("FileManager: receive a broadcast of remove a dir %s\n", 
+        getString(msg).data());
       break;
     default:
       log->error("FileManager: Error msg cmd\n");
@@ -261,6 +267,10 @@ bool FileManager::handleRemove(SocketSPtr socket)
 
   switch(msg->getCmd()){
     case MC_RmDir:
+      if(!_fileMap->removeDir(path))
+        returnError(socket);
+      else
+        returnACK(socket);
       break;
     case MC_RmFile:
       id = _fileMap->getMetaID(path);
@@ -333,8 +343,6 @@ void FileManager::loadSnapshot(const string& dump)
     filename = record.substr(0, record.find_first_of(":"));
     ID = record.substr(record.find_first_of(":")+1);
     alldump.erase(0, alldump.find_first_of("\n")+1);
-    log->info("FileManager: load a record of %s\n", record.data());
-    log->info("           : split into %s, %s\n", filename.data(), ID.data());
 
     if(filename == "/")
       continue;

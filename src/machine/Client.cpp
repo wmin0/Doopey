@@ -91,6 +91,7 @@ void Client::run(int argc, char** argv) {
         break;
       case 'm':
         cout << "remove dir request" << endl;
+        removeDir(optarg);
         break;
       case '?':
         break;
@@ -502,6 +503,17 @@ bool Client::removeDir(const char* path) const
   }
   MessageSPtr msg(new Message(MT_File, MC_RmDir));
   socket.send(msg);
+
+  msg.reset(new Message(MT_File, MC_RmDir));
+  msg->addData((const unsigned char*)path, strlen(path));
+  socket.send(msg);
+
+  msg = socket.receive();
+  if(msg->getCmd()!=MC_FileACK){
+    log->info("Delete dir %s fail\n", path);
+    return false;
+  }
+  log->info("Delete dir %s success\n", path);
   return true;
 }
 

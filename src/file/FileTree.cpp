@@ -156,6 +156,7 @@ bool FileTree::removeNode(TreeNode* tn)
 
 bool FileTree::removeFile(const string& path)
 {
+  log->info("FileTree: removing file:%s\n", path.data());
   TreeNode* remove = _fileMap->getValue(path);
   if(remove == NULL)
     return false;
@@ -174,6 +175,7 @@ bool FileTree::removeFile(const string& path)
 
 bool FileTree::removeDir(const string& path)
 {
+  log->info("FileTree: removing Dir:%s\n", path.data());
   TreeNode* remove = _fileMap->getValue(path);
   if(remove == NULL)
     return false;
@@ -190,7 +192,8 @@ bool FileTree::removeDir(const string& path)
     TreeNode* next = remove->_children;
     while(next!=NULL)
     {
-      next->_isFile? removeFile(next->_name):removeDir(next->_name);
+      string newpath = path+"/"+next->_name;
+      next->_isFile? removeFile(newpath):removeDir(newpath);
       next = remove->_next;
     }
   }
