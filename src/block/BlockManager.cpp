@@ -242,9 +242,12 @@ bool BlockManager::handleDoDelete(const MessageSPtr& msg) {
   attr->state = BS_Deleting;
   MessageSPtr cmd(new Message(MT_Block, MC_DeleteBlock));
   cmd->addData(msg->getData().data(), sizeof(Block));
+/*
   for (size_t i = 1; i < attr->machine.size(); ++i) {
     getRouter()->sendTo(attr->machine[i], cmd);
   }
+*/
+  getRouter()->broadcast(cmd);
   return handleDeleteBlock(cmd);
 }
 
