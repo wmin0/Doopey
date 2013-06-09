@@ -291,6 +291,7 @@ BlockLocationAttrSPtr BlockResolver::askRemoteBlock(BlockID id) {
   msg->addData((unsigned char*)&id, sizeof(MachineID), sizeof(BlockID));
   pthread_mutex_lock(&_sig_lock);
   _this = this;
+  //log->debug("set timeout\n");
   DoopeyAlarm(BlockResolver::timeout, waitRemote);
   _manager->getRouter()->broadcast(msg);
   pthread_mutex_lock(&_remote_ask_lock);

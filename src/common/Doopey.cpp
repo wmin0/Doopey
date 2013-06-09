@@ -46,7 +46,7 @@ namespace {
     // check
     AlarmMap::iterator it;
     vector<sighandler_t> todo;
-    time_t min = -1;
+    time_t min = 0;
     sighandler_t next = NULL;
 
     // pickup next
@@ -54,18 +54,26 @@ namespace {
       if (time(NULL) >= it->second) {
         it->first(sig);
         todo.push_back(it->first);
+        //log->debug("do alarm func\n");
       } else {
-        if (it->second < min) {
+        if (0 == min || it->second < min) {
           min = it->second;
           next = it->first;
+          //log->debug("pick alarm func\n");
         }
       }
     }
     for (size_t i = 0; i < todo.size(); ++i) {
       alarmMap.erase(todo[i]);
     }
+    log->debug("alarm done\n");
     if (next) {
-      alarm(min - time(NULL));
+      if (time(NULL) >= min) {
+        alarmHandler(SIGALRM);
+      } else {
+        //log->debug("set alarm\n");
+        alarm(min - time(NULL));
+      }
     }
   }
 
