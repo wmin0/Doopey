@@ -335,13 +335,14 @@ void Router::broadcast(const MessageSPtr& msg) const {
 SocketSPtr Router::sendTo(MachineID id, const MessageSPtr& msg) const {
   RoutingMap::const_iterator it = _routingTable.find(id);
   if (_routingTable.end() == it) {
+    log->warning("can't route to %d\n", id);
     return NULL;
   }
   msg->setSrc(_server->getMachineID());
   msg->setDest(id);
   SocketSPtr sock(new Socket(ST_TCP));
   if (!sock->connect(it->second.ip, DoopeyPort)) {
-    // TODO: clear record
+    _routingTable.erase(it);
     return NULL;
   }
   if (!sock->send(msg)) {

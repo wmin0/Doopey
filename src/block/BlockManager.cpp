@@ -255,5 +255,6 @@ bool BlockManager::handleDeleteBlock(const MessageSPtr& msg) {
   BlockID id;
   memcpy(&id, msg->getData().data(), sizeof(Block));
   _resolver->removeLocalID(id);
+  _resolver->removeRemoteID(id);
   return true;
 }
